@@ -28,7 +28,7 @@ jobs:
           GIF_URL=$(echo $RESPONSE | jq -r '.data[0].images.original.url')
           echo "GIF URL: $GIF_URL"  
           
-          perl -pe "s/^.*\!\[Trending GIF\]\(.*\)$/![Trending GIF]($GIF_URL)/" README.md > temp.md && mv temp.md README.md
+           awk -v gif_url="![Trending GIF]($GIF_URL)" '{if ($0 ~ /^\!\[Trending GIF\]/) {print gif_url} else {print $0}}' README.md > temp.md && mv temp.md README.md
           
       - name: Commit and push changes
         run: |
