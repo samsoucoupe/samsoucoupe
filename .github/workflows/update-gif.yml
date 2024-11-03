@@ -29,8 +29,7 @@ jobs:
           echo "GIF URL: $GIF_URL"  
 
           # Mise à jour du README.md avec le nouveau GIF (remplacement de la première occurrence)
-          sed -i.bak '0,/^\[Trending GIF\](.*)$/s|^\[Trending GIF\](.*)$|[Trending GIF]('$GIF_URL')|' README.md
-
+          sed -i.bak '0,/!\[Trending GIF\](.*)$/s|!\[Trending GIF\](.*)|![Trending GIF]('$GIF_URL')|' README.md
 
       - name: Commit and push changes
         run: |
