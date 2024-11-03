@@ -1,0 +1,28 @@
+name: Update README with Trending Programmer GIF
+
+on:
+  schedule:
+    - cron: "0 0 * * *"  # Runs daily at midnight
+
+jobs:
+  update-readme:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Fetch top "programmer" GIF
+        env:
+          GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
+        run: |
+          GIF_URL=$(curl -s "https://api.giphy.com/v1/gifs/search?api_key=$GIPHY_API_KEY&q=programmer&limit=1&offset=0&rating=g&lang=en" | jq -r '.data[0].images.original.url')
+          sed -i "/### 🎉 Random GIF/c\\### 🎉 Random GIF\\n![Trending GIF]($GIF_URL)" README.md
+
+      - name: Commit and push changes
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git add README.md
+          git commit -m "Update trending GIF"
+          git push
