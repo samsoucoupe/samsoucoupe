@@ -1,7 +1,7 @@
 name: Update README with Trending Programmer GIF
 
 on:
-    schedule:
+  schedule:
       - cron: "0 0 * * *"  
     workflow_dispatch:  
   
@@ -14,11 +14,17 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Install jq
+        run: sudo apt-get install jq
+
       - name: Fetch top "programmer" GIF
         env:
           GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
         run: |
-          GIF_URL=$(curl -s "https://api.giphy.com/v1/gifs/search?api_key=$GIPHY_API_KEY&q=programmer&limit=1&offset=0&rating=g&lang=en" | jq -r '.data[0].images.original.url')
+          RESPONSE=$(curl -s "https://api.giphy.com/v1/gifs/search?api_key=$GIPHY_API_KEY&q=programmer&limit=1&offset=0&rating=g&lang=en")
+          echo "API Response: $RESPONSE"  # Log the response for debugging
+          GIF_URL=$(echo $RESPONSE | jq -r '.data[0].images.original.url')
+          echo "GIF URL: $GIF_URL"  # Log the GIF URL for debugging
           sed -i "/### 🎉 Random GIF/c\\### 🎉 Random GIF\\n![Trending GIF]($GIF_URL)" README.md
 
       - name: Commit and push changes
@@ -26,5 +32,5 @@ jobs:
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git add README.md
-          git commit -m "Update trending GIF"
+          git commit -m "Update trending GIF" || echo "No changes to commit"
           git push
