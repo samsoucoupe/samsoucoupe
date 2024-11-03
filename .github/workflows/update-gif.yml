@@ -1,44 +1,50 @@
-name: Update GIF in README
+name: Update README with Trending Programmer GIF
 
 on:
+  workflow_dispatch:  # Permet le lancement manuel du workflow
   schedule:
-    - cron: '0 0 * * *' # Exécute tous les jours à minuit
-  workflow_dispatch:
+    - cron: '0 0 * * *'  # Exécute le workflow tous les jours à minuit
+    - cron: '0 12 * * *'  # Exécute le workflow tous les jours à midi
 
 jobs:
-  update_gif:
+  update-readme:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Get a random GIF
-        id: get_gif
-        run: |
-          # Remplace cette URL par celle de l'API que tu utilises pour obtenir un GIF aléatoire
-          GIF_URL=$(curl -s 'https://api.giphy.com/v1/gifs/random?api_key=YOUR_API_KEY&tag=&rating=g' | jq -r '.data.images.original.url')
-          echo "::set-output name=gif_url::$GIF_URL"
+      - name: Install jq
+        run: sudo apt-get install jq
 
-      - name: Update README.md with new GIF
+      - name: Fetch top "programmer" GIF
+        env:
+          GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}  # Utilisation de la clé API stockée dans les secrets
         run: |
-          GITHUB_TOKEN=${{ secrets.GITHUB_TOKEN }}
-          GIF_URL="${{ steps.get_gif.outputs.gif_url }}"
+          # Récupération d'un GIF tendance lié à "programmer"
+          RESPONSE=$(curl -s "https://api.giphy.com/v1/gifs/search?api_key=$GIPHY_API_KEY&q=programmer&limit=1&offset=0&rating=g&lang=en")
+          echo "API Response: $RESPONSE"  # Log de la réponse API pour le débogage
+          
+          # Extraction de l'URL du GIF depuis la réponse
+          GIF_URL=$(echo $RESPONSE | jq -r '.data[0].images.original.url')
+          echo "GIF URL: $GIF_URL"  # Log de l'URL du GIF pour le débogage
 
-          # Remplacer le contenu entre les balises de commentaire
-          sed -i.bak "/<!-- Start of Trending GIF Section -->/,/<!-- End of Trending GIF Section -->/ {
-            /<!-- Start of Trending GIF Section -->/! { 
-              /<!-- End of Trending GIF Section -->/! d 
-            } 
-            s|![Trending GIF](.*)|![Trending GIF]($GIF_URL)|
+          # Mise à jour du README.md avec le nouveau GIF
+          sed -i.bak "/<!-- Start of Trending GIF Section -->/,/<!-- End of Trending GIF Section -->/{
+            /<!-- Start of Trending GIF Section -->/!{
+              /<!-- End of Trending GIF Section -->/!d
+            }
+            a ![Trending GIF]($GIF_URL)  # Ajout de l'URL du GIF dans la section spécifiée
           }" README.md
 
-      - name: Commit changes
+      - name: Commit and push changes
         run: |
-          git config --local user.email "you@example.com"
-          git config --local user.name "Your Name"
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git add README.md
-          git commit -m "Update trending GIF"
+          git commit -m "Update trending GIF" || echo "No changes to commit"
+
+          # Pull remote changes to prevent rejection
+          git pull origin main --rebase || echo "No changes to pull"
+          
           git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
