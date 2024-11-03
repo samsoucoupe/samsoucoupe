@@ -32,9 +32,10 @@ jobs:
           # Mise à jour du README.md avec le nouveau GIF
           sed -i.bak "/<!-- Start of Trending GIF Section -->/,/<!-- End of Trending GIF Section -->/{
             /<!-- Start of Trending GIF Section -->/!{
+            a ![Trending GIF]($GIF_URL)
               /<!-- End of Trending GIF Section -->/!d
             }
-            a ![Trending GIF]($GIF_URL)  # Ajout de l'URL du GIF dans la section spécifiée
+            
           }" README.md
 
       - name: Commit and push changes
