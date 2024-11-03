@@ -22,7 +22,6 @@
 <!-- Start of Trending GIF Section -->
 ![Trending GIF](https://media1.giphy.com/media/RbDKaczqWovIugyJmW/giphy.gif?cid=8bb21772gpgngau5rdfi6omn47svqnk35lb4bxjkysfanl5c&ep=v1_gifs_search&rid=giphy.gif&ct=g)
 <!-- End of Trending GIF Section -->
-![Trending GIF](https://media1.giphy.com/media/RbDKaczqWovIugyJmW/giphy.gif?cid=8bb21772gpgngau5rdfi6omn47svqnk35lb4bxjkysfanl5c&ep=v1_gifs_search&rid=giphy.gif&ct=g)
 
 
 ## 💰 You can help me by Donating
