@@ -1,10 +1,9 @@
 name: Update README with Trending Programmer GIF
 
 on:
-    schedule:
-      - cron: "0 0 * * *"  
-    workflow_dispatch:  
-  
+  schedule:
+    - cron: "0 0 * * *"  
+  workflow_dispatch:  
 
 jobs:
   update-readme:
@@ -15,7 +14,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install jq
-        run: sudo apt-get install jq
+        uses: jwalton/merge-commit@v2
 
       - name: Fetch top "programmer" GIF
         env:
@@ -33,4 +32,8 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git add README.md
           git commit -m "Update trending GIF" || echo "No changes to commit"
+          
+          # Pull remote changes to prevent rejection
+          git pull origin main --rebase || echo "No changes to pull"
+          
           git push
