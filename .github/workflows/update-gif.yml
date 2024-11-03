@@ -24,7 +24,9 @@ jobs:
           echo "API Response: $RESPONSE"  # Log the response for debugging
           GIF_URL=$(echo $RESPONSE | jq -r '.data[0].images.original.url')
           echo "GIF URL: $GIF_URL"  # Log the GIF URL for debugging
-          sed -i "/### 🎉 Random GIF/c\\### 🎉 Random GIF\\n![Trending GIF]($GIF_URL)" README.md
+
+          # Replace the existing GIF in README.md
+          sed -i.bak "/### 🎉 Random GIF/c\\### 🎉 Random GIF\\n![Trending GIF]($GIF_URL)" README.md
 
       - name: Commit and push changes
         run: |
