@@ -3,6 +3,7 @@ name: Update GIF in README
 on:
   schedule:
     - cron: '0 0 * * *' # Exécute tous les jours à minuit
+  workflow_dispatch:
 
 jobs:
   update_gif:
