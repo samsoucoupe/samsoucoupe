@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Install jq
-        run: sudo apt-get install jq
+        run: sudo apt-get install -y jq
 
       - name: Fetch top "programmer" GIF
         env:
@@ -28,11 +28,7 @@ jobs:
           echo "GIF URL: $GIF_URL"  
 
           # Mise à jour du README.md avec le nouveau GIF
-          sed -i.bak "/<!-- Start of Trending GIF Section -->/,/<!-- End of Trending GIF Section -->/{
-            /<!-- Start of Trending GIF Section -->/!{
-              s/.![Trending GIF]*<!-- End of Trending GIF Section -->/![Trending GIF]($GIF_URL)<!-- End of Trending GIF Section -->/
-            }
-          }" README.md
+          sed -i.bak "s|\[Trending GIF\](.*)|![Trending GIF]($GIF_URL)|" README.md
 
       - name: Commit and push changes
         run: |
