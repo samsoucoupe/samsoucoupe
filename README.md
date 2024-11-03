@@ -20,9 +20,9 @@
 ![](https://quotes-github-readme.vercel.app/api?type=horizontal&theme=tokyonight)
 
 <!-- Start of Trending GIF Section -->
-### 🎉 Random GIF
-![Trending GIF](https://media1.giphy.com/media/RbDKaczqWovIugyJmW/giphy.gif?cid=8bb21772oedh7llnfocaqtm1pm7jqt8vzddp1q8sclamox8n&ep=v1_gifs_search&rid=giphy.gif&ct=g)
+![Trending GIF](https://media1.giphy.com/media/RbDKaczqWovIugyJmW/giphy.gif?cid=8bb21772kc2s1d2b0el01zdh0y4nudo9fcnzch8vjwt970uy&ep=v1_gifs_search&rid=giphy.gif&ct=g)  # Ajout de l'URL du GIF dans la section spécifiée
 <!-- End of Trending GIF Section -->
+![Trending GIF](https://media1.giphy.com/media/RbDKaczqWovIugyJmW/giphy.gif?cid=8bb21772kc2s1d2b0el01zdh0y4nudo9fcnzch8vjwt970uy&ep=v1_gifs_search&rid=giphy.gif&ct=g)  # Ajout de l'URL du GIF dans la section spécifiée
 
 ## 💰 You can help me by Donating
 [![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/samsoucoupe) [![Ko-Fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/samsoucoupe)
