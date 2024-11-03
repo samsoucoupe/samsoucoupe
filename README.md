@@ -20,8 +20,6 @@
 
 ### 🎉 Random GIF
 ![Trending GIF](https://media1.giphy.com/media/RbDKaczqWovIugyJmW/giphy.gif?cid=8bb21772oedh7llnfocaqtm1pm7jqt8vzddp1q8sclamox8n&ep=v1_gifs_search&rid=giphy.gif&ct=g)
-![Trending GIF](null)
-![Trending GIF](null)
 
 ## 💰 You can help me by Donating
 [![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/samsoucoupe) [![Ko-Fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/samsoucoupe)
