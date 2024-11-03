@@ -30,10 +30,7 @@ jobs:
           # Mise à jour du README.md avec le nouveau GIF
           sed -i.bak "/<!-- Start of Trending GIF Section -->/,/<!-- End of Trending GIF Section -->/{
             /<!-- Start of Trending GIF Section -->/!{
-              /<!-- End of Trending GIF Section -->/!d
-            }
-            /<!-- Start of Trending GIF Section -->/!{
-              s/.*/![Trending GIF]($GIF_URL)/
+              s/.![Trending GIF]*<!-- End of Trending GIF Section -->/![Trending GIF]($GIF_URL)<!-- End of Trending GIF Section -->/
             }
           }" README.md
 
