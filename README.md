@@ -19,7 +19,7 @@
 ### ✍️ Random Dev Quote
 ![](https://quotes-github-readme.vercel.app/api?type=horizontal&theme=tokyonight)
 
-### 🎉  GIF
+
 ![Trending GIF](https://media3.giphy.com/media/bGgsc5mWoryfgKBx1u/giphy.gif?cid=8bb21772ojhw28ibo7qtw5jgphnurme6ijwi1bf17eiw3o47&ep=v1_gifs_search&rid=giphy.gif&ct=g)
 
 
