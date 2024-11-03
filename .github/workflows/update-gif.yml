@@ -19,23 +19,22 @@ jobs:
 
       - name: Fetch top "programmer" GIF
         env:
-          GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}  # Utilisation de la clé API stockée dans les secrets
+          GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
         run: |
-          # Récupération d'un GIF tendance lié à "programmer"
           RESPONSE=$(curl -s "https://api.giphy.com/v1/gifs/search?api_key=$GIPHY_API_KEY&q=programmer&limit=1&offset=0&rating=g&lang=en")
-          echo "API Response: $RESPONSE"  # Log de la réponse API pour le débogage
+          echo "API Response: $RESPONSE"  
           
-          # Extraction de l'URL du GIF depuis la réponse
           GIF_URL=$(echo $RESPONSE | jq -r '.data[0].images.original.url')
-          echo "GIF URL: $GIF_URL"  # Log de l'URL du GIF pour le débogage
+          echo "GIF URL: $GIF_URL"  
 
           # Mise à jour du README.md avec le nouveau GIF
           sed -i.bak "/<!-- Start of Trending GIF Section -->/,/<!-- End of Trending GIF Section -->/{
             /<!-- Start of Trending GIF Section -->/!{
-            a ![Trending GIF]($GIF_URL)
               /<!-- End of Trending GIF Section -->/!d
             }
-            
+            /<!-- Start of Trending GIF Section -->/!{
+              s/.*/![Trending GIF]($GIF_URL)/
+            }
           }" README.md
 
       - name: Commit and push changes
@@ -44,8 +43,5 @@ jobs:
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git add README.md
           git commit -m "Update trending GIF" || echo "No changes to commit"
-
-          # Pull remote changes to prevent rejection
           git pull origin main --rebase || echo "No changes to pull"
-          
           git push
