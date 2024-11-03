@@ -28,7 +28,12 @@ jobs:
           GIF_URL=$(echo $RESPONSE | jq -r '.data[0].images.original.url')
           echo "GIF URL: $GIF_URL"  
           
-          perl -pe 's/!\[Trending GIF\]\(.*?\)/![Trending GIF]('$GIF_URL')/' README.md > temp.md && mv temp.md README.md
+          # Échapper les caractères spéciaux dans l'URL
+          ESCAPED_GIF_URL=$(perl -MURI::Escape -e 'print uri_escape($ARGV[0])' "$GIF_URL")
+
+          # Remplacer la ligne contenant ![Trending GIF](...) par la nouvelle ligne avec perl
+          perl -pe "s/^.*\!\[Trending GIF\]\(.*\)$/![Trending GIF]($ESCAPED_GIF_URL)/" README.md > temp.md && mv temp.md README.md
+
           
       - name: Commit and push changes
         run: |
