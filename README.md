@@ -19,6 +19,7 @@
 ![](https://quotes-github-readme.vercel.app/api?type=horizontal&theme=tokyonight)
 
 ### 🎉 Random GIF
+![Trending GIF](https://media1.giphy.com/media/RbDKaczqWovIugyJmW/giphy.gif?cid=8bb21772oedh7llnfocaqtm1pm7jqt8vzddp1q8sclamox8n&ep=v1_gifs_search&rid=giphy.gif&ct=g)
 ![Trending GIF](null)
 ![Trending GIF](null)
 
