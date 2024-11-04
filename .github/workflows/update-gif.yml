@@ -3,8 +3,7 @@ name: Update README with Trending Programmer GIF
 on:
   workflow_dispatch:  # Permet le lancement manuel du workflow
   schedule:
-    - cron: '0 0 * * *'  # Exécute le workflow tous les jours à minuit
-    - cron: '0 12 * * *'  # Exécute le workflow tous les jours à midi
+    - cron: '0 * * * *'  # Exécute le workflow toutes les heures
 
 jobs:
   update-readme:
