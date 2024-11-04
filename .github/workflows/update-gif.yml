@@ -22,7 +22,13 @@ jobs:
           GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
           GIPHY_NAME_CAT: ${{ secrets.GIPHY_NAME_CAT }}
         run: |
-          RESPONSE=$(curl -s "https://api.giphy.com/v1/gifs/search?api_key=$GIPHY_API_KEY&q=$GIPHY_NAME_CAT&limit=1&offset=0&rating=g&lang=en")
+          
+          # Split the categories into an array
+          CATEGORIES=($GIPHY_NAME_CATS)
+          # Pick a random category
+          RANDOM_CATEGORY=${CATEGORIES[$RANDOM % ${#CATEGORIES[@]}]}
+          
+          RESPONSE=$(curl -s "https://api.giphy.com/v1/gifs/search?api_key=$GIPHY_API_KEY&q=$RANDOM_CATEGORY&limit=1&offset=0&rating=g&lang=en")
           echo "API Response: $RESPONSE"  
           
           GIF_URL=$(echo $RESPONSE | jq -r '.data[0].images.original.url')
