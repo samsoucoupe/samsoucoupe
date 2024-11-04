@@ -20,11 +20,10 @@ jobs:
       - name: Fetch top "programmer" GIF
         env:
           GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
-          GIPHY_NAME_CAT: ${{ secrets.GIPHY_NAME_CAT }}
+          GIPHY_NAME_CAT: "programmer coding developer tech" 
         run: |
-          
           # Split the categories into an array
-          CATEGORIES=($GIPHY_NAME_CATS)
+          CATEGORIES=($GIPHY_NAME_CAT)
           # Pick a random category
           RANDOM_CATEGORY=${CATEGORIES[$RANDOM % ${#CATEGORIES[@]}]}
           
