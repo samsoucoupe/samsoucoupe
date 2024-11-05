@@ -15,16 +15,16 @@ jobs:
 
       - name: Install jq
         run: sudo apt-get install -y jq
-
+      
       - name: Fetch top GIF
         env:
           GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
         run: |
-          # Split the categories into an array using ',' as the delimiter
+          # Use the environment variable GIPHY_NAME_CAT and split it into an array using ',' as the delimiter
           IFS=',' read -r -a CATEGORIES <<< "$GIPHY_NAME_CAT"
           # Pick a random category
           RANDOM_CATEGORY=${CATEGORIES[$RANDOM % ${#CATEGORIES[@]}]}
-
+          
           echo "RANDOM_CATEGORY: $RANDOM_CATEGORY"
           
           RESPONSE=$(curl -s "https://api.giphy.com/v1/gifs/search?api_key=$GIPHY_API_KEY&q=$RANDOM_CATEGORY&limit=1&offset=0&rating=g&lang=en")
@@ -33,8 +33,9 @@ jobs:
           GIF_URL=$(echo $RESPONSE | jq -r '.data[0].images.original.url')
           echo "GIF URL: $GIF_URL"  
           
-           awk -v gif_url="![Trending GIF]($GIF_URL)" '{if ($0 ~ /^\!\[Trending GIF\]/) {print gif_url} else {print $0}}' README.md > temp.md && mv temp.md README.md
-          
+          # Update the README.md file with the new GIF URL
+          awk -v gif_url="![Trending GIF]($GIF_URL)" '{if ($0 ~ /^\!\[Trending GIF\]/) {print gif_url} else {print $0}}' README.md > temp.md && mv temp.md README.md
+
       - name: Commit and push changes
         run: |
           git config --local user.name "github-actions[bot]"
