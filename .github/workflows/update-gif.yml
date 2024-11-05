@@ -31,10 +31,7 @@ jobs:
           RESPONSE=$(curl -s "https://api.giphy.com/v1/gifs/search?api_key=$GIPHY_API_KEY&q=$RANDOM_CATEGORY&limit=1&offset=0&rating=g&lang=en")
           echo "API Response: $RESPONSE"  
           
-          RANDOM_INDEX=$((RANDOM % 5))
-        
-          # Extract the GIF URL from the randomly selected index
-          GIF_URL=$(echo $RESPONSE | jq -r ".data[$RANDOM_INDEX].images.original.url")
+          GIF_URL=$(echo $RESPONSE | jq -r ".data[0].images.original.url")
           echo "GIF URL: $GIF_URL"
           
           awk -v gif_url="![Trending GIF]($GIF_URL)" '{if ($0 ~ /^\!\[Trending GIF\]/) {print gif_url} else {print $0}}' README.md > temp.md && mv temp.md README.md
