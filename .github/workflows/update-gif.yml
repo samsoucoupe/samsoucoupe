@@ -1,9 +1,9 @@
-name: Update README with Trending Programmer GIF
+name: Update README with GIF from Secondary Repo
 
 on:
   workflow_dispatch:  # Permet le lancement manuel du workflow
   schedule:
-    - cron: '0 * * * *'  # Exécute le workflow toutes les heures
+    - cron: '5 * * * *'  # Exécute le workflow toutes les heures avec un petit de retard
 
 jobs:
   update-readme:
@@ -13,35 +13,20 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Install jq
-        run: sudo apt-get install -y jq
-      
-      - name: Fetch top GIF
-        env:
-          GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
-          GIPHY_NAME_CAT: ${{ vars.GIPHY_NAME_CAT }}
+      - name: Fetch README from gif-updater-repo
+        id: fetch_readme
         run: |
-          # Use the environment variable GIPHY_NAME_CAT and split it into an array using ',' as the delimiter
-          IFS=',' read -r -a CATEGORIES <<< "$GIPHY_NAME_CAT"
-          # Pick a random category
-          RANDOM_CATEGORY=${CATEGORIES[$RANDOM % ${#CATEGORIES[@]}]}
+          curl -o temp_readme.md https://raw.githubusercontent.com/samsoucoupe/gif-updater-repo/refs/heads/main/README.md
           
-          echo "RANDOM_CATEGORY: $RANDOM_CATEGORY"
-          
-          RESPONSE=$(curl -s "https://api.giphy.com/v1/gifs/search?api_key=$GIPHY_API_KEY&q=$RANDOM_CATEGORY&limit=1&offset=0&rating=g&lang=en")
-          echo "API Response: $RESPONSE"  
-          
-          GIF_URL=$(echo $RESPONSE | jq -r ".data[0].images.original.url")
-          echo "GIF URL: $GIF_URL"
-          
-          awk -v gif_url="![Trending GIF]($GIF_URL)" '{if ($0 ~ /^\!\[Trending GIF\]/) {print gif_url} else {print $0}}' README.md > temp.md && mv temp.md README.md
-      
-      
+      - name: Replace GIF line in README
+        run: |
+          # Remplacer la ligne contenant ![Trending GIF] par le contenu du README du dépôt secondaire
+          awk -v new_line="$(cat temp_readme.md)" '{if ($0 ~ /^\!\[Trending GIF\]/) {print new_line} else {print $0}}' README.md > temp.md && mv temp.md README.md
+
       - name: Commit and push changes
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git add README.md
-          git commit -m "Update trending GIF" || echo "No changes to commit"
-          git pull origin main --rebase || echo "No changes to pull"
+          git commit -m "Update README with latest GIF" || echo "No changes to commit"
           git push
