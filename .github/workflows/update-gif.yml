@@ -19,7 +19,7 @@ jobs:
       - name: Fetch top "programmer" GIF
         env:
           GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
-          GIPHY_NAME_CAT: "pprogrammer, coding, developer, tech, terminal, Linux coding, bash scripting, Linux commands, open source, basketball, basketball skills, dunk, 3-pointer, basketball teamwork, basketball hustle, tech humor, cybersecurity, IT troubleshooting, data analysis, cloud computing, debugging, coding session, pull request, merge conflict, code review, commit, machine learning, data science, API development, software engineering, automation, coffee break code, coding music, debugging face, coding all night, dev life humor" 
+          GIPHY_NAME_CAT: "programmer, coding, developer, tech, terminal, Linux coding, bash scripting, Linux commands, tech humor, cybersecurity,debugging, coding session, data science, coffee break code, coding all night, dev life humor" 
         run: |
           # Split the categories into an array
           CATEGORIES=($GIPHY_NAME_CAT)
