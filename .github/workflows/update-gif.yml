@@ -19,6 +19,7 @@ jobs:
       - name: Fetch top GIF
         env:
           GIPHY_API_KEY: ${{ secrets.GIPHY_API_KEY }}
+          GIPHY_NAME_CAT: ${{ vars.GIPHY_NAME_CAT }}
         run: |
           # Use the environment variable GIPHY_NAME_CAT and split it into an array using ',' as the delimiter
           IFS=',' read -r -a CATEGORIES <<< "$GIPHY_NAME_CAT"
