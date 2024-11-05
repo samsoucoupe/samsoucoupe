@@ -34,9 +34,9 @@ jobs:
           GIF_URL=$(echo $RESPONSE | jq -r '.data[0].images.original.url')
           echo "GIF URL: $GIF_URL"  
           
-          # Update the README.md file with the new GIF URL
           awk -v gif_url="![Trending GIF]($GIF_URL)" '{if ($0 ~ /^\!\[Trending GIF\]/) {print gif_url} else {print $0}}' README.md > temp.md && mv temp.md README.md
-
+      
+      
       - name: Commit and push changes
         run: |
           git config --local user.name "github-actions[bot]"
