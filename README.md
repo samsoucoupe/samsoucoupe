@@ -20,7 +20,7 @@
 ![](https://quotes-github-readme.vercel.app/api?type=horizontal&theme=tokyonight)
 
 
-![Trending GIF](https://media3.giphy.com/media/rplvK3z0IzLqBxVJWk/giphy.gif?cid=8bb21772r3b0pjt3uulsuft268qag7x3vj8iytsrmj40sewi&ep=v1_gifs_search&rid=giphy.gif&ct=g)
+![Trending GIF](https://media3.giphy.com/media/YYKoJL28YtscdUTGWA/giphy.gif?cid=8bb21772vyqt66qlomjpwpy22z8i9j6g4ajqdpine8z1t9tq&ep=v1_gifs_search&rid=giphy.gif&ct=g)
 
 
 
