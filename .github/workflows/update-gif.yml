@@ -1,9 +1,9 @@
 name: Update README with GIF from Secondary Repo
 
 on:
-  workflow_dispatch:  # Permet le lancement manuel du workflow
+  workflow_dispatch:
   schedule:
-    - cron: '5 * * * *'  # Exécute le workflow toutes les heures à 5 min
+    - cron: '5 * * * *'
 
 jobs:
   update-readme:
@@ -13,27 +13,25 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Fetch GIF line from gif-updater-repo
-        id: fetch_readme
+      - name: Fetch new GIF line from gif-updater-repo
         run: |
           curl -sSL https://raw.githubusercontent.com/samsoucoupe/gif-updater-repo/main/README.md > temp_readme.md
-          grep '!\[Trending GIF\]' temp_readme.md > gif_line.txt
+          sed -n '/<!-- GIF_SECTION -->/,/<!-- END_GIF_SECTION -->/p' temp_readme.md > new_gif_block.md
 
-      - name: Replace GIF line in README.md
+      - name: Replace GIF section in README.md
         run: |
-          gif_line=$(cat gif_line.txt)
-          awk -v new_line="$gif_line" '{if ($0 ~ /^\!\[Trending GIF\]/) {print new_line} else {print $0}}' README.md > temp.md
-          mv temp.md README.md
+          sed -i '/<!-- GIF_SECTION -->/,/<!-- END_GIF_SECTION -->/d' README.md
+          sed -i '/^# 💫 About Me:/r new_gif_block.md' README.md
 
       - name: Commit and push changes
         run: |
           git config --local user.name "github-actions[bot]"
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
-          
+
           if git diff --quiet; then
             echo "No changes to commit."
           else
             git add README.md
-            git commit -m "Update README with latest GIF"
+            git commit -m "Update README GIF section"
             git push
           fi
