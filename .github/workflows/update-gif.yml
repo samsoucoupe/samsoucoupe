@@ -13,16 +13,19 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Fetch new GIF line from gif-updater-repo
+      - name: Fetch new GIF content from gif-updater-repo
         run: |
           curl -sSL https://raw.githubusercontent.com/samsoucoupe/gif-updater-repo/main/README.md > temp_readme.md
-          sed -n '/<!-- GIF_SECTION -->/,/<!-- END_GIF_SECTION -->/p' temp_readme.md > new_gif_block.md
+          # Extrait le bloc entre balises, puis enlève les balises (1ère et dernière ligne)
+          sed -n '/<!-- GIF_SECTION -->/,/<!-- END_GIF_SECTION -->/p' temp_readme.md | sed '1d;$d' > new_gif_block.md
 
       - name: Replace GIF section in README.md
         run: |
+          # Supprime tout entre balises dans README.md sauf les balises elles-mêmes
           sed -i '/<!-- GIF_SECTION -->/,/<!-- END_GIF_SECTION -->/{
             /<!-- GIF_SECTION -->/!{/<!-- END_GIF_SECTION -->/!d}
           }' README.md
+          # Insère le contenu extrait (le GIF seul) après la balise d'ouverture
           sed -i '/<!-- GIF_SECTION -->/r new_gif_block.md' README.md
 
       - name: Commit and push changes
