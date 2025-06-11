@@ -20,7 +20,10 @@ jobs:
 
       - name: Replace GIF section in README.md
         run: |
-          sed -i '/<!-- GIF_SECTION -->/,/<!-- END_GIF_SECTION -->/d' README.md
+          sed -i '/<!-- GIF_SECTION -->/,/<!-- END_GIF_SECTION -->/{
+            /<!-- GIF_SECTION -->/!{/<!-- END_GIF_SECTION -->/!d}
+          }' README.md
+          sed -i '/<!-- GIF_SECTION -->/r new_gif_block.md' README.md
 
       - name: Commit and push changes
         run: |
