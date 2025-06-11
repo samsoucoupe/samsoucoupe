@@ -25,8 +25,9 @@
 ![](https://quotes-github-readme.vercel.app/api?type=horizontal&theme=tokyonight)
 
 
-
-
+<!-- GIF_SECTION -->
+![Trending GIF](https://media4.giphy.com/media/v1.Y2lkPThiYjIxNzcydzU5bWF1NmtzeWxrbHh0ZDNyaW9wYXJ1dzNmMDl1cTI1ODF0OGh5dyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/gyoipv2u40ekqz89Rk/giphy.gif)
+<!-- END_GIF_SECTION -->
 
 ## 💰 You can help me by Donating
 [![BuyMeACoffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-ffdd00?style=for-the-badge&logo=buy-me-a-coffee&logoColor=black)](https://buymeacoffee.com/samsoucoupe) [![Ko-Fi](https://img.shields.io/badge/Ko--fi-F16061?style=for-the-badge&logo=ko-fi&logoColor=white)](https://ko-fi.com/samsoucoupe)
