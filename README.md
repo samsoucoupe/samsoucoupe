@@ -22,9 +22,6 @@
 ![](https://quotes-github-readme.vercel.app/api?type=horizontal&theme=tokyonight)
 
 
-<!-- GIF_SECTION -->
-![Trending GIF](https://media4.giphy.com/media/xxxxx/giphy.gif)
-<!-- END_GIF_SECTION -->
 
 
 
