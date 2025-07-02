@@ -102,14 +102,31 @@ body {
     margin: 0 auto;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 4rem;
+    gap: 6rem;
     align-items: center;
+    position: relative;
+    z-index: 2;
+    /* Empêche le texte d'être masqué par l'orbite sticky */
+    pointer-events: auto;
+    /* Ajoute un padding en haut pour éviter le chevauchement lors du sticky */
+    padding-top: 48px;
+    padding-bottom: 48px;
+}
+
+.hero-content {
+    z-index: 3;
+    position: relative;
+    /* Empêche le texte d'aller sous la pdp/orbite */
+    padding-right: 2.5rem;
+    word-break: break-word;
+    min-width: 0;
 }
 
 .hero-title {
     font-size: 3rem;
     font-weight: 700;
     margin-bottom: 1rem;
+    word-break: break-word;
 }
 
 .hero-subtitle {
@@ -126,12 +143,36 @@ body {
     font-size: 1.1rem;
     color: var(--text-muted);
     margin-bottom: 2rem;
+    z-index: 3;
+    position: relative;
+    word-break: break-word;
 }
 
+/* Ajout d'un fond semi-transparent pour éviter que la pdp/orbite ne masque le texte en sticky */
 .hero-buttons {
     display: flex;
     gap: 1rem;
     margin-bottom: 2rem;
+    /* Correction : plus de pointer-events ni de background ici, pour que les boutons restent cliquables et normaux */
+}
+
+/* Empêche les planètes d'être masquées par le texte sur mobile */
+@media (max-width: 900px) {
+    .hero-container {
+        padding-top: 32px;
+        padding-bottom: 32px;
+        gap: 2rem;
+    }
+    .sticky-orbit {
+        width: 180px !important;
+        height: 180px !important;
+        min-width: unset !important;
+        min-height: unset !important;
+    }
+    .hero-content {
+        padding-bottom: 32px;
+        padding-right: 0;
+    }
 }
 
 .btn {
@@ -853,4 +894,42 @@ section {
     .project-card {
         max-width: 98vw;
     }
+}
+
+.orbit-planet {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.3s;
+    pointer-events: auto;
+    cursor: pointer;
+    font-size: 2em;
+    z-index: 2;
+    background: rgba(20,24,38,0.85);
+    border-radius: 50%;
+    box-shadow: 0 2px 8px #0005;
+    border: 2px solid #222c;
+    overflow: visible;
+}
+
+.orbit-planet .planet-label {
+    display: none !important;
+}
+
+#orbit-tooltip {
+    position: fixed;
+    background: rgba(30,41,59,0.98);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 8px;
+    font-size: 1rem;
+    pointer-events: none;
+    z-index: 9999;
+    box-shadow: 0 2px 12px #0008;
+    display: none;
+    white-space: nowrap;
+    opacity: 0.97;
+    transition: opacity 0.15s;
 }

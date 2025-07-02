@@ -34,8 +34,8 @@
 
     <!-- Hero Section -->
     <section id="home" class="hero">
-        <div class="hero-container">
-            <div class="hero-content">
+        <div class="hero-container" style="position:relative;display:flex;align-items:center;justify-content:center;min-height:60vh;gap:48px;">
+            <div class="hero-content" style="flex:1;min-width:320px;z-index:3;">
                 <h1 class="hero-title">
                     Salut 👋, je suis <span class="highlight">samsoucoupe</span>
                 </h1>
@@ -43,7 +43,7 @@
                     Développeur Backend à tendance <span class="highlight">Full Stack</span>
                 </h2>
                 <p class="hero-description">
-                    Passionné par le développement backend et les technologies de données.
+                    Passionné par le développement backend et les technologies de données.<br>
                     Spécialisé en Python, R, SQL avec une expertise en outils de data comme Excel et Power BI.
                 </p>
                 <div class="hero-buttons">
@@ -59,21 +59,11 @@
                     </a>
                 </div>
             </div>
-            <div class="hero-image">
-                <div class="floating-card">
-                    <div class="card-content">
-                        <div class="code-snippet">
-                            <div class="code-line">
-                                <span class="keyword">def</span>
-                                <span class="function">create_amazing_projects</span>():
-                            </div>
-                            <div class="code-line indent">
-                                <span class="keyword">return</span>
-                                <span class="string">"Backend Magic ✨"</span>
-                            </div>
-                        </div>
-                    </div>
+            <div style="flex:1;min-width:320px;position:relative;display:flex;align-items:center;justify-content:center;min-height:340px;">
+                <div id="orbit-center" style="position:relative;z-index:2;">
+                    <img src="assets/pdpSamsoucoupe.gif" alt="Photo de profil samsoucoupe" style="width:160px;height:160px;border-radius:50%;border:4px solid #fff;box-shadow:0 0 32px #0ff7;object-fit:cover;background:#222;">
                 </div>
+                <div id="orbit-skills" style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:1;"></div>
             </div>
         </div>
     </section>
@@ -604,7 +594,7 @@
     <!-- Starfield Controls -->
     <!-- Starfield Controls removed: always in étoile mode -->
     <script src="js/starfield.js"></script>
-    <script src="js/script.js"></script>
+    <script src="js/orbit.js"></script>
 </body>
 
 </html>
