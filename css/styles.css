@@ -446,6 +446,27 @@ section {
     object-fit: cover;
     border: none;
     border-radius: 10px;
+    pointer-events: auto;
+    z-index: 2;
+}
+
+/* Video controls accessibility */
+.media-item video::-webkit-media-controls {
+    z-index: 10;
+}
+
+.media-item video::-webkit-media-controls-panel {
+    z-index: 10;
+}
+
+.media-item video::-webkit-media-controls-play-button {
+    z-index: 10;
+}
+
+/* Ensure video interaction over carousel */
+.media-item video {
+    position: relative;
+    z-index: 5;
 }
 
 .carousel-controls {

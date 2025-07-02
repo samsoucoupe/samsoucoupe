@@ -49,6 +49,13 @@ function changeMedia(button, direction) {
     const items = carousel.querySelectorAll('.media-item');
     let currentIndex = Array.from(items).findIndex(item => item.classList.contains('active'));
     
+    // Pause current video if any
+    const currentItem = items[currentIndex];
+    const currentVideo = currentItem.querySelector('video');
+    if (currentVideo) {
+        currentVideo.pause();
+    }
+    
     // Remove active class from current item
     items[currentIndex].classList.remove('active');
     
@@ -59,7 +66,40 @@ function changeMedia(button, direction) {
     
     // Add active class to new item
     items[currentIndex].classList.add('active');
+    
+    // Auto-play new video if any
+    const newItem = items[currentIndex];
+    const newVideo = newItem.querySelector('video');
+    if (newVideo) {
+        newVideo.currentTime = 0;
+    }
 }
+
+// Video interaction handling
+document.addEventListener('DOMContentLoaded', () => {
+    const videos = document.querySelectorAll('.media-item video');
+    
+    videos.forEach(video => {
+        // Prevent carousel interference with video controls
+        video.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (video.paused) {
+                video.play();
+            } else {
+                video.pause();
+            }
+        });
+        
+        // Handle video control clicks
+        video.addEventListener('mousedown', (e) => {
+            e.stopPropagation();
+        });
+        
+        video.addEventListener('mouseup', (e) => {
+            e.stopPropagation();
+        });
+    });
+});
 
 // Initialize carousel
 document.addEventListener('DOMContentLoaded', () => {
