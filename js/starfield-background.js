@@ -1,16 +1,16 @@
+
+// starfield-background.js : animation du fond spatial (warp)
+// (copie de starfield.js, version étoile simple)
 const canvas = document.getElementById('starfield');
 const ctx = canvas.getContext('2d');
-
 let stars = [];
 const STAR_COUNT = 180;
 const STAR_SPEED = 0.7;
 const STAR_SIZE = 1.2;
-
 function resizeStarfield() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 }
-
 function createStars() {
     stars = [];
     for (let i = 0; i < STAR_COUNT; i++) {
@@ -22,7 +22,6 @@ function createStars() {
         });
     }
 }
-
 function drawStars() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     for (let i = 0; i < STAR_COUNT; i++) {
@@ -46,7 +45,6 @@ function drawStars() {
         ctx.shadowBlur = 0;
     }
 }
-
 function moveStars() {
     for (let i = 0; i < STAR_COUNT; i++) {
         stars[i].z -= STAR_SPEED;
@@ -55,74 +53,17 @@ function moveStars() {
         }
     }
 }
-
 function animateStarfield() {
     moveStars();
     drawStars();
     requestAnimationFrame(animateStarfield);
 }
-
 window.addEventListener('resize', () => {
     resizeStarfield();
     createStars();
 });
-
 window.addEventListener('DOMContentLoaded', () => {
     resizeStarfield();
     createStars();
     animateStarfield();
-});
-
-// --- Starfield: Space Travel (warp) effect ---
-
-function drawSpaceTravelStarfield() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    for (let i = 0; i < STAR_COUNT; i++) {
-        let star = stars[i];
-        // Perspective projection (simulate 3D)
-        let k = 128.0 / star.z;
-        let sx = star.x * k + canvas.width / 2;
-        let sy = star.y * k + canvas.height / 2;
-        // Warp line effect: draw a streak from previous to current position
-        let prevZ = star.z + STAR_SPEED * 8;
-        let prevK = 128.0 / prevZ;
-        let px = star.x * prevK + canvas.width / 2;
-        let py = star.y * prevK + canvas.height / 2;
-        ctx.save();
-        ctx.beginPath();
-        ctx.moveTo(px, py);
-        ctx.lineTo(sx, sy);
-        ctx.strokeStyle = `rgba(200,255,255,${star.o})`;
-        ctx.lineWidth = 1.2 + 2 * (1 - star.z / canvas.width);
-        ctx.shadowColor = '#0ff';
-        ctx.shadowBlur = 10;
-        ctx.stroke();
-        ctx.shadowBlur = 0;
-        ctx.restore();
-    }
-}
-
-function moveSpaceTravelStars() {
-    for (let i = 0; i < STAR_COUNT; i++) {
-        stars[i].z -= STAR_SPEED * 2.2; // Faster for warp effect
-        if (stars[i].z <= 0.5) {
-            // Reset star to far away
-            stars[i].x = Math.random() * canvas.width - canvas.width / 2;
-            stars[i].y = Math.random() * canvas.height - canvas.height / 2;
-            stars[i].z = canvas.width;
-            stars[i].o = 0.7 + Math.random() * 0.3;
-        }
-    }
-}
-
-function animateSpaceTravelStarfield() {
-    moveSpaceTravelStars();
-    drawSpaceTravelStarfield();
-    requestAnimationFrame(animateSpaceTravelStarfield);
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-    resizeStarfield();
-    createStars();
-    animateSpaceTravelStarfield();
 });

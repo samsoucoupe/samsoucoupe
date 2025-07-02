@@ -1,0 +1,12 @@
+/* starfield.css : styles spécifiques à l'animation starfield (fond spatial) */
+
+#starfield {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    pointer-events: none;
+    background: #0f172a;
+}
