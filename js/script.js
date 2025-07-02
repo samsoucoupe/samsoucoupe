@@ -109,24 +109,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const items = carousel.querySelectorAll('.media-item');
         const controls = projectMedia.querySelector('.carousel-controls');
         
-        // Check if there are valid media items (with actual src)
-        const validItems = Array.from(items).filter(item => {
-            const img = item.querySelector('img');
-            const video = item.querySelector('video source');
-            const iframe = item.querySelector('iframe');
-            
-            return (img && img.src && !img.src.includes('placeholder')) ||
-                   (video && video.src && !video.src.includes('placeholder')) ||
-                   (iframe && iframe.src && !iframe.src.includes('placeholder'));
-        });
-        
-        // If no valid media items, hide the entire media section
-        if (validItems.length === 0) {
+        // Always show carousel controls - let CSS handle the hover effect
+        // Only hide controls if there are literally no media items at all
+        if (items.length === 0) {
             projectMedia.style.display = 'none';
         }
-        // If only one valid media item, hide controls
-        else if (validItems.length <= 1) {
-            controls.style.display = 'none';
+        // Show controls for all projects, even single media items
+        else {
+            controls.style.display = 'flex';
         }
     });
 });
