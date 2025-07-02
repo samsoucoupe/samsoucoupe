@@ -109,7 +109,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const items = carousel.querySelectorAll('.media-item');
         const controls = projectMedia.querySelector('.carousel-controls');
         
-        // Check if there are valid media items (with actual src)
+        // Check if there are valid media items (not placeholders)
         const validItems = Array.from(items).filter(item => {
             const img = item.querySelector('img');
             const video = item.querySelector('video source');
@@ -120,14 +120,11 @@ document.addEventListener('DOMContentLoaded', () => {
                    (iframe && iframe.src && !iframe.src.includes('placeholder'));
         });
         
-        // If no valid media items, hide the entire media section
+        // Hide the entire media section if no valid media items or only placeholders
         if (validItems.length === 0) {
             projectMedia.style.display = 'none';
         }
-        // If only one valid media item, hide controls
-        else if (validItems.length <= 1) {
-            controls.style.display = 'none';
-        }
+        // Let CSS handle the carousel controls visibility (opacity on hover)
     });
 });
 
