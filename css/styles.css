@@ -323,11 +323,22 @@ section {
     background-color: var(--surface-color);
 }
 
+
+
+/* Masonry grid for projects */
 .projects-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2.5rem 2.5rem;
+    width: 100%;
+    margin: 0 auto;
+    grid-auto-flow: dense;
+    align-items: stretch;
+    padding-bottom: 3rem;
+    background: radial-gradient(ellipse at 50% 0%, #232946 60%, #0f172a 100%);
+    justify-items: stretch;
 }
+
 
 .project-card {
     background: rgba(30, 41, 59, 0.8);
@@ -337,7 +348,80 @@ section {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    width: 100%;
+    max-width: 420px;
+    min-width: 260px;
+    margin: 0 auto;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 8px 32px 0 rgba(80,120,255,0.18), 0 1.5px 8px 0 rgba(80,120,255,0.10);
+    transition: box-shadow 0.4s cubic-bezier(.4,2,.6,1), transform 0.4s cubic-bezier(.4,2,.6,1);
+    background: rgba(30,41,59,0.92);
+    backdrop-filter: blur(2px);
+    will-change: transform;
+    /* Allow masonry effect with variable height */
+    break-inside: avoid;
 }
+
+/* Large project card: occupe plus de colonnes sur desktop */
+.project-card.large-content {
+    grid-column: span 2;
+    max-width: 100%;
+}
+
+/* Middle project card: occupe 1.5 colonnes sur desktop */
+.project-card.middle-content {
+    grid-column: span 2;
+    max-width: 700px;
+}
+
+@media (max-width: 1100px) {
+    .projects-grid {
+        grid-template-columns: repeat(2, minmax(220px, 1fr));
+    }
+    .project-card.large-content {
+        grid-column: span 2;
+    }
+    .project-card.middle-content {
+        grid-column: span 2;
+        max-width: 90vw;
+    }
+}
+
+@media (max-width: 900px) {
+    .projects-grid {
+        grid-template-columns: 1fr;
+    }
+    .project-card.large-content {
+        grid-column: span 1;
+    }
+    .project-card.middle-content {
+        grid-column: span 1;
+        max-width: 98vw;
+    }
+}
+
+@media (max-width: 700px) {
+    .projects-grid {
+        grid-template-columns: 1fr;
+    }
+    .project-card {
+        max-width: 98vw;
+    }
+    .project-card.large-content {
+        grid-column: span 1;
+    }
+    .project-card.middle-content {
+        grid-column: span 1;
+        max-width: 98vw;
+    }
+}
+
+/* Card variations for size diversity */
+
+
+
 
 .project-card::before {
     content: '';
@@ -357,9 +441,10 @@ section {
 }
 
 .project-card:hover {
-    border-color: rgba(59, 130, 246, 0.5);
-    transform: translateY(-10px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    border-color: #6366f1;
+    transform: translateY(-18px) scale(1.025) rotate(-1deg);
+    box-shadow: 0 32px 64px 0 rgba(80,120,255,0.22), 0 2px 12px 0 rgba(80,120,255,0.12);
+    z-index: 2;
 }
 
 .project-header {
@@ -416,12 +501,19 @@ section {
     overflow: hidden;
     background: rgba(15, 23, 42, 0.8);
     height: 250px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 0 10px;
 }
 
 .media-carousel {
     position: relative;
     width: 100%;
-    height: 100%;
+    height: calc(100% - 20px);
+    flex: 1;
+    border-radius: 10px;
+    overflow: hidden;
 }
 
 .media-item {
@@ -443,7 +535,8 @@ section {
 .media-item img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+    background: #111827;
     border: none;
     border-radius: 10px;
     pointer-events: auto;
@@ -470,28 +563,22 @@ section {
 }
 
 .carousel-controls {
-    position: absolute;
-    top: 50%;
-    width: 100%;
     display: flex;
-    justify-content: space-between;
-    padding: 0 15px;
-    transform: translateY(-50%);
-    opacity: 0;
+    align-items: center;
+    gap: 10px;
+    opacity: 0.7;
     transition: opacity 0.3s ease;
-    pointer-events: none;
 }
 
 .project-media:hover .carousel-controls {
     opacity: 1;
-    pointer-events: all;
 }
 
 .carousel-btn {
-    background: rgba(59, 130, 246, 0.8);
+    background: rgba(59, 130, 246, 0.9);
     border: none;
-    width: 40px;
-    height: 40px;
+    width: 45px;
+    height: 45px;
     border-radius: 50%;
     color: white;
     cursor: pointer;
@@ -499,12 +586,14 @@ section {
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    z-index: 10;
 }
 
 .carousel-btn:hover {
     background: rgba(59, 130, 246, 1);
     transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
 .carousel-btn:active {
@@ -522,6 +611,11 @@ section {
     color: #94a3b8;
     margin-bottom: 1.5rem;
     line-height: 1.6;
+    text-align: justify;
+}
+
+.project-card:not(.large-content) .project-description {
+    /* Suppression de la limitation à 4 lignes */
 }
 
 .project-tech {
@@ -678,6 +772,21 @@ section {
         gap: 1rem;
         text-align: center;
     }
+    
+    /* Responsive masonry adjustments */
+    .projects-grid {
+        grid-template-columns: 1fr;
+        grid-auto-rows: 15px;
+        gap: 1.5rem;
+    }
+    
+    .project-card {
+        grid-row: span 12 !important;
+    }
+    
+    .project-card.large-content {
+        grid-row: span 20 !important;
+    }
 }
 
 /* Animations */
@@ -724,4 +833,24 @@ section {
 
 .skill-item.active {
     background-color: var(--primary-color);
+}
+
+
+@media (max-width: 1100px) {
+    .projects-grid {
+        grid-template-columns: repeat(2, minmax(220px, 1fr));
+    }
+    .projects-grid:has(.project-card:only-child) {
+        grid-template-columns: 1fr;
+    }
+}
+
+
+@media (max-width: 700px) {
+    .projects-grid {
+        grid-template-columns: 1fr;
+    }
+    .project-card {
+        max-width: 98vw;
+    }
 }

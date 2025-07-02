@@ -45,7 +45,8 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 
 // Media carousel functionality
 function changeMedia(button, direction) {
-    const carousel = button.closest('.project-media').querySelector('.media-carousel');
+    const projectMedia = button.closest('.project-media');
+    const carousel = projectMedia.querySelector('.media-carousel');
     const items = carousel.querySelectorAll('.media-item');
     let currentIndex = Array.from(items).findIndex(item => item.classList.contains('active'));
     
@@ -107,7 +108,8 @@ document.addEventListener('DOMContentLoaded', () => {
     projectMedias.forEach(projectMedia => {
         const carousel = projectMedia.querySelector('.media-carousel');
         const items = carousel.querySelectorAll('.media-item');
-        const controls = projectMedia.querySelector('.carousel-controls');
+        const prevBtn = projectMedia.querySelector('.carousel-btn.prev');
+        const nextBtn = projectMedia.querySelector('.carousel-btn.next');
         
         // Check if there are valid media items (not placeholders)
         const validItems = Array.from(items).filter(item => {
@@ -124,7 +126,18 @@ document.addEventListener('DOMContentLoaded', () => {
         if (validItems.length === 0) {
             projectMedia.style.display = 'none';
         }
-        // Let CSS handle the carousel controls visibility (opacity on hover)
+        // Hide carousel buttons if only one valid item
+        else if (validItems.length <= 1) {
+            if (prevBtn) prevBtn.style.display = 'none';
+            if (nextBtn) nextBtn.style.display = 'none';
+            // Adjust media carousel to take full width
+            carousel.style.margin = '0';
+        }
+        // Show buttons for multiple items
+        else {
+            if (prevBtn) prevBtn.style.display = 'flex';
+            if (nextBtn) nextBtn.style.display = 'flex';
+        }
     });
 });
 
@@ -158,3 +171,5 @@ document.addEventListener('DOMContentLoaded', () => {
         randomItem.classList.add('active');
     }, 3000);
 });
+
+

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
+
 <body>
     <!-- Navigation -->
     <nav class="navbar">
@@ -41,7 +43,7 @@
                     Développeur Backend à tendance <span class="highlight">Full Stack</span>
                 </h2>
                 <p class="hero-description">
-                    Passionné par le développement backend et les technologies de données. 
+                    Passionné par le développement backend et les technologies de données.
                     Spécialisé en Python, R, SQL avec une expertise en outils de data comme Excel et Power BI.
                 </p>
                 <div class="hero-buttons">
@@ -62,11 +64,11 @@
                     <div class="card-content">
                         <div class="code-snippet">
                             <div class="code-line">
-                                <span class="keyword">def</span> 
+                                <span class="keyword">def</span>
                                 <span class="function">create_amazing_projects</span>():
                             </div>
                             <div class="code-line indent">
-                                <span class="keyword">return</span> 
+                                <span class="keyword">return</span>
                                 <span class="string">"Backend Magic ✨"</span>
                             </div>
                         </div>
@@ -84,7 +86,7 @@
                 <div class="about-text">
                     <h3>Développeur Backend passionné 🚀</h3>
                     <p>
-                        Je suis un étudiant développeur français passionné par les technologies backend 
+                        Je suis un étudiant développeur français passionné par les technologies backend
                         et la data science. Actuellement en apprentissage de l'IA et du développement backend,
                         j'aime créer des solutions robustes et efficaces.
                     </p>
@@ -253,10 +255,71 @@
         <div class="container">
             <h2 class="section-title">Mes Projets</h2>
             <p class="section-description">
-                Découvrez mes projets réels incluant des jeux web innovants, des participations à des concours de développement, 
-                et des solutions backend et data. Mes projets démontrent ma polyvalence entre game development et développement backend.
+                Découvrez mes projets réels incluant des jeux web innovants, des participations à des concours de
+                développement,
+                et des solutions backend et data. Mes projets démontrent ma polyvalence entre game development et
+                développement backend.
             </p>
             <div class="projects-grid">
+
+                <!-- Project SAE - Neko Corporation -->
+                <div class="project-card large-content">
+                    <div class="project-header">
+                        <div class="project-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="project-actions">
+                            <a href="https://github.com/your-username/sae-nekocorporation" target="_blank"
+                                class="project-link">
+                                <i class="fas fa-external-link-alt"></i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="project-media">
+                        <button class="carousel-btn prev" onclick="changeMedia(this, -1)">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <div class="media-carousel">
+                            <div class="media-item active">
+                                <img src="assets/SAE 2025/nekoCORPV1.png" alt="SAE Neko Corporation - Architecture">
+                            </div>
+                        </div>
+                        <button class="carousel-btn next" onclick="changeMedia(this, 1)">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <h3 class="project-title">SAE Neko Corporation - Loup-Garou Online</h3>
+                    <p class="project-description">
+                        Implémentation complète du jeu "Les Loups-Garous de Thiercelieux" en architecture microservices.
+                        Application web multijoueur avec système d'authentification JWT, chat en temps réel via
+                        WebSocket,
+                        interface Angular moderne, et bots IA intelligents. Projet académique Master 1 MIAGE -
+                        Université Côte d'Azur.
+                        <br><br>
+                        <strong>Fonctionnalités clés :</strong>
+                        • Jeu multijoueur en temps réel (8-18 joueurs)
+                        • Architecture distribuée avec 9 microservices Spring Boot
+                        • Interface utilisateur responsive avec Angular
+                        • Système de chat intégré pendant les parties
+                        • Bots IA pour compléter les parties
+                        • Historique des parties et statistiques
+                        • Administration avancée des jeux
+                        • Containerisation Docker complète
+                        • CI/CD avec GitHub Actions
+                    </p>
+                    <div class="project-tech">
+                        <span class="tech-tag">Spring Boot</span>
+                        <span class="tech-tag">Angular</span>
+                        <span class="tech-tag">Docker</span>
+                        <span class="tech-tag">WebSocket</span>
+                        <span class="tech-tag">JWT</span>
+                        <span class="tech-tag">PostgreSQL</span>
+                        <span class="tech-tag">MongoDB</span>
+                        <span class="tech-tag">Microservices</span>
+                        <span class="tech-tag">DevOps</span>
+                        <span class="tech-tag">Game Dev</span>
+                    </div>
+                </div>
                 <!-- Project 1 - Candy Crush -->
                 <div class="project-card">
                     <div class="project-header">
@@ -264,30 +327,30 @@
                             <i class="fas fa-gamepad"></i>
                         </div>
                         <div class="project-actions">
-                            <a href="https://samsoucoupe.github.io/Candy-Crush-bis/" target="_blank" class="project-link">
+                            <a href="https://samsoucoupe.github.io/Candy-Crush-bis/" target="_blank"
+                                class="project-link">
                                 <i class="fas fa-external-link-alt"></i>
                             </a>
                         </div>
                     </div>
                     <div class="project-media">
+                        <button class="carousel-btn prev" onclick="changeMedia(this, -1)">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
                         <div class="media-carousel">
                             <div class="media-item active">
                                 <img src="assets\candy-crush\image.png" alt="Candy Crush UE Game">
                             </div>
                         </div>
-                        <div class="carousel-controls">
-                            <button class="carousel-btn prev" onclick="changeMedia(this, -1)">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <button class="carousel-btn next" onclick="changeMedia(this, 1)">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
+                        <button class="carousel-btn next" onclick="changeMedia(this, 1)">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
                     </div>
                     <h3 class="project-title">Candy Crush UE Game</h3>
                     <p class="project-description">
                         Implémentation complète du jeu Candy Crush en HTML/CSS/JavaScript pur.
-                        Jeu fonctionnel avec animations, système de score et mécaniques de gameplay fidèles à l'original.
+                        Jeu fonctionnel avec animations, système de score et mécaniques de gameplay fidèles à
+                        l'original.
                     </p>
                     <div class="project-tech">
                         <span class="tech-tag">HTML5</span>
@@ -298,18 +361,22 @@
                 </div>
 
                 <!-- Project 2 - Game on Web 2024 -->
-                <div class="project-card">
+                <div class="project-card middle-content">
                     <div class="project-header">
                         <div class="project-icon">
                             <i class="fas fa-trophy"></i>
                         </div>
                         <div class="project-actions">
-                            <a href="https://samsoucoupe.github.io/Velocity-Olympiad/" target="_blank" class="project-link">
+                            <a href="https://samsoucoupe.github.io/Velocity-Olympiad/" target="_blank"
+                                class="project-link">
                                 <i class="fas fa-external-link-alt"></i>
                             </a>
                         </div>
                     </div>
                     <div class="project-media">
+                        <button class="carousel-btn prev" onclick="changeMedia(this, -1)">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
                         <div class="media-carousel">
                             <div class="media-item active">
                                 <video controls muted loop>
@@ -319,14 +386,9 @@
                             </div>
                             <!-- Placeholder pour d'autres médias -->
                         </div>
-                        <div class="carousel-controls">
-                            <button class="carousel-btn prev" onclick="changeMedia(this, -1)">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <button class="carousel-btn next" onclick="changeMedia(this, 1)">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
+                        <button class="carousel-btn next" onclick="changeMedia(this, 1)">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
                     </div>
                     <h3 class="project-title">Velocity Olympiad - Game on Web 2024</h3>
                     <p class="project-description">
@@ -342,7 +404,7 @@
                 </div>
 
                 <!-- Project 3 - Game on Web 2025 -->
-                <div class="project-card">
+                <div class="project-card middle-content">
                     <div class="project-header">
                         <div class="project-icon">
                             <i class="fas fa-magic"></i>
@@ -354,6 +416,9 @@
                         </div>
                     </div>
                     <div class="project-media">
+                        <button class="carousel-btn prev" onclick="changeMedia(this, -1)">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
                         <div class="media-carousel">
                             <div class="media-item active">
                                 <video controls muted loop>
@@ -365,19 +430,15 @@
                                 <img src="assets/GOW/2025/iconweb.png" alt="Dreamland - Icône Web">
                             </div>
                         </div>
-                        <div class="carousel-controls">
-                            <button class="carousel-btn prev" onclick="changeMedia(this, -1)">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <button class="carousel-btn next" onclick="changeMedia(this, 1)">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
+                        <button class="carousel-btn next" onclick="changeMedia(this, 1)">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
                     </div>
                     <h3 class="project-title">Dreamland - Game on Web 2025</h3>
                     <p class="project-description">
                         Dernière création pour le concours Game on Web 2025 sur le thème Dreamland.
-                        Expérience immersive développée avec Babylon.js démontrant une progression dans le game development.
+                        Expérience immersive développée avec Babylon.js démontrant une progression dans le game
+                        development.
                     </p>
                     <div class="project-tech">
                         <span class="tech-tag">Babylon.js</span>
@@ -394,30 +455,30 @@
                             <i class="fab fa-angular"></i>
                         </div>
                         <div class="project-actions">
-                            <a href="https://angular-m1s1-assignments-front.onrender.com/login" target="_blank" class="project-link">
+                            <a href="https://angular-m1s1-assignments-front.onrender.com/login" target="_blank"
+                                class="project-link">
                                 <i class="fas fa-external-link-alt"></i>
                             </a>
                         </div>
                     </div>
                     <div class="project-media">
+                        <button class="carousel-btn prev" onclick="changeMedia(this, -1)">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
                         <div class="media-carousel">
                             <div class="media-item active">
                                 <img src="assets/angular/placeholder.jpg" alt="Application Angular - DS4H MIAGE">
                             </div>
                         </div>
-                        <div class="carousel-controls">
-                            <button class="carousel-btn prev" onclick="changeMedia(this, -1)">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <button class="carousel-btn next" onclick="changeMedia(this, 1)">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
+                        <button class="carousel-btn next" onclick="changeMedia(this, 1)">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
                     </div>
                     <h3 class="project-title">Application Angular - DS4H MIAGE</h3>
                     <p class="project-description">
                         Application web développée avec Angular dans le cadre du Master MIAGE.
-                        Projet académique démontrant la maîtrise du framework Angular et des bonnes pratiques de développement frontend.
+                        Projet académique démontrant la maîtrise du framework Angular et des bonnes pratiques de
+                        développement frontend.
                     </p>
                     <div class="project-tech">
                         <span class="tech-tag">Angular</span>
@@ -438,19 +499,17 @@
                         </div>
                     </div>
                     <div class="project-media">
+                        <button class="carousel-btn prev" onclick="changeMedia(this, -1)">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
                         <div class="media-carousel">
                             <div class="media-item active">
                                 <img src="assets/powerbi/placeholder.jpg" alt="Dashboard Analytics Power BI">
                             </div>
                         </div>
-                        <div class="carousel-controls">
-                            <button class="carousel-btn prev" onclick="changeMedia(this, -1)">
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <button class="carousel-btn next" onclick="changeMedia(this, 1)">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
+                        <button class="carousel-btn next" onclick="changeMedia(this, 1)">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
                     </div>
                     <h3 class="project-title">Dashboard Analytics Power BI</h3>
                     <p class="project-description">
@@ -464,7 +523,7 @@
                     </div>
                 </div>
 
-                
+
             </div>
         </div>
     </section>
@@ -543,4 +602,5 @@
 
     <script src="js/script.js"></script>
 </body>
+
 </html>
