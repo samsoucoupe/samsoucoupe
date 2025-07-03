@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/orbit.css">
     <link rel="stylesheet" href="css/starfield.css">
+    <link rel="stylesheet" href="css/projects-space.css">
+    <link rel="stylesheet" href="css/projects-space-modal.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
@@ -243,281 +245,19 @@
     </section>
 
     <!-- Projects Section -->
-    <section id="projects" class="projects">
-        <div class="container">
-            <h2 class="section-title">Mes Projets</h2>
-            <p class="section-description">
-                Découvrez mes projets réels incluant des jeux web innovants, des participations à des concours de
-                développement,
-                et des solutions backend et data. Mes projets démontrent ma polyvalence entre game development et
-                développement backend.
-            </p>
-            <div class="projects-grid">
-
-                <!-- Project SAE - Neko Corporation -->
-                <div class="project-card large-content">
-                    <div class="project-header">
-                        <div class="project-icon">
-                            <i class="fas fa-users"></i>
-                        </div>
-                        <div class="project-actions">
-                            <a href="https://github.com/your-username/sae-nekocorporation" target="_blank"
-                                class="project-link">
-                                <i class="fas fa-external-link-alt"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="project-media">
-                        <button class="carousel-btn prev" onclick="changeMedia(this, -1)">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <div class="media-carousel">
-                            <div class="media-item active">
-                                <img src="assets/SAE 2025/nekoCORPV1.png" alt="SAE Neko Corporation - Architecture">
-                            </div>
-                        </div>
-                        <button class="carousel-btn next" onclick="changeMedia(this, 1)">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-                    <h3 class="project-title">SAE Neko Corporation - Loup-Garou Online</h3>
-                    <p class="project-description">
-                        Implémentation complète du jeu "Les Loups-Garous de Thiercelieux" en architecture microservices.
-                        Application web multijoueur avec système d'authentification JWT, chat en temps réel via
-                        WebSocket,
-                        interface Angular moderne, et bots IA intelligents. Projet académique Master 1 MIAGE -
-                        Université Côte d'Azur.
-                        <br><br>
-                        <strong>Fonctionnalités clés :</strong>
-                        • Jeu multijoueur en temps réel (8-18 joueurs)
-                        • Architecture distribuée avec 9 microservices Spring Boot
-                        • Interface utilisateur responsive avec Angular
-                        • Système de chat intégré pendant les parties
-                        • Bots IA pour compléter les parties
-                        • Historique des parties et statistiques
-                        • Administration avancée des jeux
-                        • Containerisation Docker complète
-                        • CI/CD avec GitHub Actions
-                    </p>
-                    <div class="project-tech">
-                        <span class="tech-tag">Spring Boot</span>
-                        <span class="tech-tag">Angular</span>
-                        <span class="tech-tag">Docker</span>
-                        <span class="tech-tag">WebSocket</span>
-                        <span class="tech-tag">JWT</span>
-                        <span class="tech-tag">PostgreSQL</span>
-                        <span class="tech-tag">MongoDB</span>
-                        <span class="tech-tag">Microservices</span>
-                        <span class="tech-tag">DevOps</span>
-                        <span class="tech-tag">Game Dev</span>
-                    </div>
-                </div>
-                <!-- Project 1 - Candy Crush -->
-                <div class="project-card">
-                    <div class="project-header">
-                        <div class="project-icon">
-                            <i class="fas fa-gamepad"></i>
-                        </div>
-                        <div class="project-actions">
-                            <a href="https://samsoucoupe.github.io/Candy-Crush-bis/" target="_blank"
-                                class="project-link">
-                                <i class="fas fa-external-link-alt"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="project-media">
-                        <button class="carousel-btn prev" onclick="changeMedia(this, -1)">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <div class="media-carousel">
-                            <div class="media-item active">
-                                <img src="assets\candy-crush\image.png" alt="Candy Crush UE Game">
-                            </div>
-                        </div>
-                        <button class="carousel-btn next" onclick="changeMedia(this, 1)">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-                    <h3 class="project-title">Candy Crush UE Game</h3>
-                    <p class="project-description">
-                        Implémentation complète du jeu Candy Crush en HTML/CSS/JavaScript pur.
-                        Jeu fonctionnel avec animations, système de score et mécaniques de gameplay fidèles à
-                        l'original.
-                    </p>
-                    <div class="project-tech">
-                        <span class="tech-tag">HTML5</span>
-                        <span class="tech-tag">CSS3</span>
-                        <span class="tech-tag">JavaScript</span>
-                        <span class="tech-tag">Game Dev</span>
-                    </div>
-                </div>
-
-                <!-- Project 2 - Game on Web 2024 -->
-                <div class="project-card middle-content">
-                    <div class="project-header">
-                        <div class="project-icon">
-                            <i class="fas fa-trophy"></i>
-                        </div>
-                        <div class="project-actions">
-                            <a href="https://samsoucoupe.github.io/Velocity-Olympiad/" target="_blank"
-                                class="project-link">
-                                <i class="fas fa-external-link-alt"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="project-media">
-                        <button class="carousel-btn prev" onclick="changeMedia(this, -1)">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <div class="media-carousel">
-                            <div class="media-item active">
-                                <video controls muted loop>
-                                    <source src="assets/GOW/2024/videogow2024.mp4" type="video/mp4">
-                                    Votre navigateur ne supporte pas la lecture de vidéos.
-                                </video>
-                            </div>
-                            <!-- Placeholder pour d'autres médias -->
-                        </div>
-                        <button class="carousel-btn next" onclick="changeMedia(this, 1)">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-                    <h3 class="project-title">Velocity Olympiad - Game on Web 2024</h3>
-                    <p class="project-description">
-                        Jeu 3D développé avec Babylon.js pour le concours Game on Web 2024 sur le thème Olympic.
-                        Projet de compétition mettant en avant mes compétences en développement de jeux web 3D.
-                    </p>
-                    <div class="project-tech">
-                        <span class="tech-tag">Babylon.js</span>
-                        <span class="tech-tag">TypeScript</span>
-                        <span class="tech-tag">WebGL</span>
-                        <span class="tech-tag">3D Game</span>
-                    </div>
-                </div>
-
-                <!-- Project 3 - Game on Web 2025 -->
-                <div class="project-card middle-content">
-                    <div class="project-header">
-                        <div class="project-icon">
-                            <i class="fas fa-magic"></i>
-                        </div>
-                        <div class="project-actions">
-                            <a href="https://samsoucoupe.github.io/GOW2025/" target="_blank" class="project-link">
-                                <i class="fas fa-external-link-alt"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="project-media">
-                        <button class="carousel-btn prev" onclick="changeMedia(this, -1)">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <div class="media-carousel">
-                            <div class="media-item active">
-                                <video controls muted loop>
-                                    <source src="assets/GOW/2025/videogow2025.mp4" type="video/mp4">
-                                    Votre navigateur ne supporte pas la lecture de vidéos.
-                                </video>
-                            </div>
-                            <div class="media-item">
-                                <img src="assets/GOW/2025/iconweb.png" alt="Dreamland - Icône Web">
-                            </div>
-                        </div>
-                        <button class="carousel-btn next" onclick="changeMedia(this, 1)">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-                    <h3 class="project-title">Dreamland - Game on Web 2025</h3>
-                    <p class="project-description">
-                        Dernière création pour le concours Game on Web 2025 sur le thème Dreamland.
-                        Expérience immersive développée avec Babylon.js démontrant une progression dans le game
-                        development.
-                    </p>
-                    <div class="project-tech">
-                        <span class="tech-tag">Babylon.js</span>
-                        <span class="tech-tag">TypeScript</span>
-                        <span class="tech-tag">WebGL</span>
-                        <span class="tech-tag">3D Game</span>
-                    </div>
-                </div>
-
-                <!-- Project 4 - Angular Application -->
-                <div class="project-card">
-                    <div class="project-header">
-                        <div class="project-icon">
-                            <i class="fab fa-angular"></i>
-                        </div>
-                        <div class="project-actions">
-                            <a href="https://angular-m1s1-assignments-front.onrender.com/login" target="_blank"
-                                class="project-link">
-                                <i class="fas fa-external-link-alt"></i>
-                            </a>
-                        </div>
-                    </div>
-                    <div class="project-media">
-                        <button class="carousel-btn prev" onclick="changeMedia(this, -1)">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <div class="media-carousel">
-                            <div class="media-item active">
-                                <img src="assets/angular/placeholder.jpg" alt="Application Angular - DS4H MIAGE">
-                            </div>
-                        </div>
-                        <button class="carousel-btn next" onclick="changeMedia(this, 1)">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-                    <h3 class="project-title">Application Angular - DS4H MIAGE</h3>
-                    <p class="project-description">
-                        Application web développée avec Angular dans le cadre du Master MIAGE.
-                        Projet académique démontrant la maîtrise du framework Angular et des bonnes pratiques de
-                        développement frontend.
-                    </p>
-                    <div class="project-tech">
-                        <span class="tech-tag">Angular</span>
-                        <span class="tech-tag">TypeScript</span>
-                        <span class="tech-tag">HTML5</span>
-                        <span class="tech-tag">CSS3</span>
-                    </div>
-                </div>
-
-                <!-- Project 5 - Dashboard Analytics Power BI -->
-                <div class="project-card">
-                    <div class="project-header">
-                        <div class="project-icon">
-                            <i class="fas fa-chart-bar"></i>
-                        </div>
-                        <div class="project-actions">
-                            <!-- Projet privé - pas de lien demo -->
-                        </div>
-                    </div>
-                    <div class="project-media">
-                        <button class="carousel-btn prev" onclick="changeMedia(this, -1)">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <div class="media-carousel">
-                            <div class="media-item active">
-                                <img src="assets/powerbi/placeholder.jpg" alt="Dashboard Analytics Power BI">
-                            </div>
-                        </div>
-                        <button class="carousel-btn next" onclick="changeMedia(this, 1)">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-                    <h3 class="project-title">Dashboard Analytics Power BI</h3>
-                    <p class="project-description">
-                        Tableau de bord interactif créé avec Power BI pour l'analyse de données business,
-                        avec intégration de sources multiples et visualisations avancées.
-                    </p>
-                    <div class="project-tech">
-                        <span class="tech-tag">Power BI</span>
-                        <span class="tech-tag">SQL</span>
-                        <span class="tech-tag">Excel</span>
-                    </div>
-                </div>
-
-
+    <section id="projects" class="projects-space">
+        <div id="space-projects-bg"></div>
+        <div id="ufo-projects-space">
+            <!-- Les soucoupes/projets seront générées ici par JS -->
+        </div>
+        <!-- Modale projet (affichée au clic sur une soucoupe) -->
+        <div id="project-modal" class="project-modal" style="display:none;">
+            <div class="project-modal-content">
+                <span class="close-modal" id="close-project-modal">&times;</span>
+                <div id="project-modal-body"></div>
             </div>
         </div>
+        <!-- Easter egg Rick & Morty et Space Invader à venir ici -->
     </section>
 
     <!-- Contact Section -->
@@ -599,6 +339,7 @@
     <script src="js/planet-background.js"></script>
     <script src="js/orbit-skills.js"></script>
     <script src="js/carousel.js"></script>
+    <script src="js/projects-space.js"></script>
     <script src="js/main.js"></script>
 </body>
 

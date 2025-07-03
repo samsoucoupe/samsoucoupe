@@ -1,0 +1,235 @@
+/* projects-space.css : Styles pour la section projets UFO spatiale */
+
+.projects-space {
+    position: relative;
+    min-height: 80vh;
+    width: 100vw;
+    overflow: visible;
+    background: transparent;
+    z-index: 2;
+    padding: 0;
+}
+#space-projects-bg {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+}
+#space-projects-container {
+    position: relative;
+    width: 100vw;
+    min-height: 80vh;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    gap: 2.5rem;
+    z-index: 2;
+    padding: 3rem 0 4rem 0;
+}
+.space-ufo {
+    position: relative;
+    width: 220px;
+    height: 220px;
+    margin: 1.5rem 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.4s cubic-bezier(.4,2,.3,1), box-shadow 0.3s;
+    animation: ufo-float-2 7.5s cubic-bezier(.4,2,.3,1) infinite;
+    filter: drop-shadow(0 0 16px var(--ufo-color, #fff));
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+}
+.space-ufo:hover, .space-ufo.active {
+    transform: scale(1.08) rotate(-2deg) translateY(-10px);
+    z-index: 99;
+    box-shadow: 0 0 32px 8px var(--ufo-color, #fff7), 0 2px 32px #0008;
+}
+@keyframes ufo-float-2 {
+    0% { transform: translateY(0) translateX(0) scale(1); }
+    20% { transform: translateY(-7px) translateX(3px) scale(1.01); }
+    40% { transform: translateY(-13px) translateX(-4px) scale(1.02); }
+    60% { transform: translateY(-8px) translateX(2px) scale(1.01); }
+    80% { transform: translateY(-3px) translateX(-2px) scale(1.01); }
+    100% { transform: translateY(0) translateX(0) scale(1); }
+}
+.ufo-body {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+    width: 120px;
+    height: 60px;
+    z-index: 2;
+    pointer-events: none;
+}
+.ufo-glow {
+    position: absolute;
+    left: 50%;
+    top: 60%;
+    width: 120px;
+    height: 40px;
+    background: radial-gradient(ellipse at center, var(--ufo-color, #fff) 0%, transparent 80%);
+    opacity: 0.25;
+    filter: blur(8px);
+    border-radius: 50%;
+    transform: translate(-50%,0);
+    z-index: 1;
+}
+.ufo-top {
+    position: absolute;
+    left: 50%;
+    top: 0;
+    width: 80px;
+    height: 32px;
+    background: linear-gradient(180deg, #fff 60%, var(--ufo-color, #fff) 100%);
+    border-radius: 50% 50% 40% 40%/60% 60% 40% 40%;
+    box-shadow: 0 2px 12px #fff8;
+    transform: translate(-50%,0);
+    z-index: 2;
+}
+.ufo-window {
+    position: absolute;
+    left: 50%;
+    top: 16px;
+    width: 32px;
+    height: 32px;
+    background: #232946;
+    border-radius: 50%;
+    border: 3px solid var(--ufo-color, #fff);
+    box-shadow: 0 0 12px var(--ufo-color, #fff7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--ufo-color, #fff);
+    font-size: 1.3em;
+    transform: translate(-50%,0);
+    z-index: 3;
+}
+.ufo-bottom {
+    position: absolute;
+    left: 50%;
+    top: 32px;
+    width: 120px;
+    height: 32px;
+    background: linear-gradient(180deg, var(--ufo-color, #fff) 0%, #232946 100%);
+    border-radius: 50% 50% 60% 60%/40% 40% 60% 60%;
+    box-shadow: 0 8px 24px var(--ufo-color, #fff3);
+    transform: translate(-50%,0);
+    z-index: 2;
+}
+.ufo-beam {
+    position: absolute;
+    left: 50%;
+    top: 60px;
+    width: 60px;
+    height: 80px;
+    background: linear-gradient(180deg, var(--ufo-color, #fff7) 0%, transparent 100%);
+    opacity: 0.18;
+    border-radius: 50% 50% 80% 80%/40% 40% 100% 100%;
+    transform: translate(-50%,0);
+    z-index: 1;
+    pointer-events: none;
+}
+.ufo-project-card {
+    display: none !important;
+}
+.space-ufo.active .ufo-project-card {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translate(-50%, 0) scale(1.04);
+}
+.ufo-project-card h3 {
+    font-size: 1.1rem;
+    margin-bottom: 0.2rem;
+    color: var(--ufo-color, #fff);
+    font-weight: 700;
+}
+.ufo-project-card p {
+    color: #cbd5e1;
+    font-size: 0.98rem;
+    margin-bottom: 0.2rem;
+}
+.ufo-tech {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    margin-bottom: 0.2rem;
+}
+.ufo-tech span {
+    background: var(--ufo-color, #fff2);
+    color: var(--ufo-color, #fff);
+    border-radius: 0.5rem;
+    padding: 0.18rem 0.7rem;
+    font-size: 0.85em;
+    font-weight: 600;
+}
+.ufo-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    color: var(--ufo-color, #fff);
+    font-weight: 600;
+    text-decoration: none;
+    margin-bottom: 0.2rem;
+    font-size: 0.98em;
+}
+.ufo-link:hover {
+    text-decoration: underline;
+    color: #fff;
+}
+.ufo-media {
+    display: flex;
+    gap: 0.7rem;
+    margin-top: 0.2rem;
+    flex-wrap: wrap;
+}
+.ufo-media img, .ufo-media video {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 0.7rem;
+    border: 2px solid var(--ufo-color, #fff);
+    background: #232946;
+    box-shadow: 0 2px 8px #0005;
+}
+.rick-portal {
+    position: absolute;
+    z-index: 100;
+    pointer-events: none;
+    animation: portal-fade 4s linear;
+}
+@keyframes portal-fade {
+    0% { opacity: 0; transform: scale(0.7) rotate(-10deg); }
+    10% { opacity: 1; transform: scale(1.1) rotate(2deg); }
+    80% { opacity: 1; transform: scale(1) rotate(-2deg); }
+    100% { opacity: 0; transform: scale(0.7) rotate(10deg); }
+}
+@media (max-width: 900px) {
+  #space-projects-container {
+    flex-wrap: wrap;
+    gap: 1.2rem;
+    padding: 1.5rem 0 2.5rem 0;
+  }
+  .space-ufo {
+    width: 98vw;
+    max-width: 340px;
+    height: 180px;
+    margin: 0.7rem 0;
+  }
+  .ufo-project-card {
+    width: 92vw;
+    max-width: 340px;
+    left: 50%;
+    top: 90px;
+    font-size: 0.98rem;
+    padding: 0.8rem 0.7rem 1rem 0.7rem;
+  }
+  .ufo-media img, .ufo-media video {
+    width: 48px;
+    height: 48px;
+  }
+}
