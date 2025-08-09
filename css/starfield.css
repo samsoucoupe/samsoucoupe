@@ -9,4 +9,7 @@
     z-index: -1;
     pointer-events: none;
     background: #0f172a;
+    max-width: 100vw;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }

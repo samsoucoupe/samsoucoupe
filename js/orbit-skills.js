@@ -18,11 +18,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function getResponsiveSkills() {
+        const containerSize = Math.min(orbit.offsetWidth, orbit.offsetHeight);
+        // On garde une marge de sécurité pour éviter tout débordement
+        const maxOrbit = Math.max(0, (containerSize / 2) - 48);
         // Si écran petit → cercle compact autour de la photo
         if (window.innerWidth <= 768) {
-            return skills.map(s => ({ ...s, orbit: 168 , speed: 0.12 }));
+            return skills.map(s => ({ ...s, orbit: Math.min(168, maxOrbit), speed: 0.12 }));
         }
-        return skills;
+        // Pour les grands écrans, on ajuste chaque orbite pour ne jamais dépasser le conteneur
+        return skills.map((s, i) => ({
+            ...s,
+            orbit: Math.min(s.orbit, maxOrbit)
+        }));
     }
 
     let currentSkills = getResponsiveSkills();

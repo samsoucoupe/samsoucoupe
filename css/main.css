@@ -24,6 +24,11 @@
     box-sizing: border-box;
 }
 
+html, body {
+    overflow-x: hidden !important;
+    max-width: 100vw;
+}
+
 body {
     font-family: 'Inter', sans-serif;
     background-color: var(--background-color);
@@ -111,6 +116,12 @@ body {
     pointer-events: auto;
     padding-top: 48px;
     padding-bottom: 48px;
+}
+
+.container, .hero-container, .projects-grid, .skills-grid {
+    max-width: 100vw;
+    box-sizing: border-box;
+    overflow-x: hidden;
 }
 
 .hero-content {
@@ -355,7 +366,7 @@ section {
 
 .projects-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
     gap: 2.5rem 2.5rem;
     width: 100%;
     margin: 0 auto;
@@ -364,6 +375,9 @@ section {
     padding-bottom: 3rem;
     background: radial-gradient(ellipse at 50% 0%, #232946 60%, #0f172a 100%);
     justify-items: stretch;
+    box-sizing: border-box;
+    max-width: 100vw;
+    overflow-x: hidden;
 }
 
 .project-card {
@@ -455,12 +469,6 @@ section {
     transform: scaleX(1);
 }
 
-.project-card:hover {
-    border-color: #6366f1;
-    transform: translateY(-18px) scale(1.025) rotate(-1deg);
-    box-shadow: 0 32px 64px 0 rgba(80,120,255,0.22), 0 2px 12px 0 rgba(80,120,255,0.12);
-    z-index: 2;
-}
 
 .project-header {
     display: flex;
@@ -521,6 +529,13 @@ section {
     align-items: center;
     gap: 15px;
     padding: 0 10px;
+}
+
+img, video, iframe {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    box-sizing: border-box;
 }
 
 .media-carousel {
@@ -591,8 +606,8 @@ section {
 .carousel-btn {
     background: rgba(59, 130, 246, 0.9);
     border: none;
-    width: 45px;
-    height: 45px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     color: white;
     cursor: pointer;
@@ -606,7 +621,6 @@ section {
 
 .carousel-btn:hover {
     background: rgba(59, 130, 246, 1);
-    transform: scale(1.1);
     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
 }
 
@@ -628,9 +642,7 @@ section {
     text-align: justify;
 }
 
-.project-card:not(.large-content) .project-description {
-    /* Suppression de la limitation à 4 lignes */
-}
+
 
 .project-tech {
     display: flex;
