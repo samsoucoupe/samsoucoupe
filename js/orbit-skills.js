@@ -1,5 +1,3 @@
-
-
 document.addEventListener('DOMContentLoaded', () => {
     const skills = [
         { icon: 'fas fa-cogs', label: 'DevOps', color: '#10b981', orbit: 120, speed: 0.10 },
@@ -8,19 +6,34 @@ document.addEventListener('DOMContentLoaded', () => {
         { icon: 'fas fa-brain', label: 'IA', color: '#6366f1', orbit: 240, speed: 0.06 },
         { icon: 'fas fa-server', label: 'Backend', color: '#3776AB', orbit: 280, speed: 0.05 }
     ];
+
     const orbit = document.getElementById('orbit-skills');
     if (!orbit) return;
+
     function getCenter() {
         return {
             x: orbit.offsetWidth / 2,
             y: orbit.offsetHeight / 2
         };
     }
-    // Create skill planets (icon only, tooltip on hover)
-    skills.forEach((skill, i) => {
+
+    function getResponsiveSkills() {
+        // Si écran petit → cercle compact autour de la photo
+        if (window.innerWidth <= 768) {
+            return skills.map(s => ({ ...s, orbit: 168 , speed: 0.12 }));
+        }
+        return skills;
+    }
+
+    let currentSkills = getResponsiveSkills();
+
+    // Création des planètes
+    currentSkills.forEach((skill) => {
         const el = document.createElement('div');
         el.className = 'orbit-planet';
-        el.innerHTML = `<span class="planet-icon" style="color:${skill.color}" title="${skill.label}"><i class="${skill.icon}"></i></span>`;
+        el.innerHTML = `<span class="planet-icon" style="color:${skill.color}" title="${skill.label}">
+                            <i class="${skill.icon}"></i>
+                        </span>`;
         el.style.position = 'absolute';
         el.style.width = '48px';
         el.style.height = '48px';
@@ -32,11 +45,11 @@ document.addEventListener('DOMContentLoaded', () => {
         el.style.cursor = 'pointer';
         el.style.fontSize = '2em';
         el.style.zIndex = 2;
-        // Tooltip custom (pour un style plus joli que le title natif)
         el.setAttribute('data-tooltip', skill.label);
         orbit.appendChild(el);
     });
-    // Tooltip custom (simple, optionnel)
+
+    // Tooltip custom
     document.body.addEventListener('mousemove', function(e) {
         const tooltip = document.getElementById('orbit-tooltip');
         if (tooltip) {
@@ -44,6 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             tooltip.style.top = (e.clientY + 12) + 'px';
         }
     });
+
     orbit.addEventListener('mouseover', function(e) {
         const planet = e.target.closest('.orbit-planet');
         if (planet && planet.dataset.tooltip) {
@@ -66,18 +80,20 @@ document.addEventListener('DOMContentLoaded', () => {
             tooltip.style.display = 'block';
         }
     });
-    orbit.addEventListener('mouseout', function(e) {
+
+    orbit.addEventListener('mouseout', function() {
         const tooltip = document.getElementById('orbit-tooltip');
         if (tooltip) tooltip.style.display = 'none';
     });
-    // Animate orbit (solar system style)
+
+    // Animation des orbites
     function animateOrbit() {
         const planets = orbit.querySelectorAll('.orbit-planet');
         const t = Date.now() / 2000;
         const center = getCenter();
         planets.forEach((el, i) => {
-            const skill = skills[i];
-            const angle = t * skill.speed + (i * (2 * Math.PI / skills.length));
+            const skill = currentSkills[i];
+            const angle = t * skill.speed + (i * (2 * Math.PI / currentSkills.length));
             const x = center.x + skill.orbit * Math.cos(angle) - 30;
             const y = center.y + skill.orbit * Math.sin(angle) - 30;
             el.style.transform = `translate(${x}px,${y}px)`;
@@ -85,8 +101,9 @@ document.addEventListener('DOMContentLoaded', () => {
         requestAnimationFrame(animateOrbit);
     }
     animateOrbit();
-    // Responsive: update on resize
+
+    // Mise à jour responsive
     window.addEventListener('resize', () => {
-        // nothing needed, getCenter is dynamic
+        currentSkills = getResponsiveSkills();
     });
 });

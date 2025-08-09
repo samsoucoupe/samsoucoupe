@@ -1,4 +1,3 @@
-
 // main.js : point d'entrée principal pour l'app (navigation, carrousel, etc.)
 
 // --- Navigation hamburger & scroll ---
@@ -30,6 +29,11 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             navbar.style.background = 'rgba(15, 23, 42, 0.95)';
             navbar.style.boxShadow = 'none';
+        }
+        // Si menu mobile ouvert, le fermer au scroll
+        if (navMenu.classList.contains('active')) {
+            navMenu.classList.remove('active');
+            hamburger.classList.remove('active');
         }
     });
 
