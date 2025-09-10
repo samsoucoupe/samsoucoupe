@@ -22,7 +22,7 @@
 ![](https://quotes-github-readme.vercel.app/api?type=horizontal&theme=tokyonight)
 
 <!-- GIF_SECTION -->
-![Trending GIF](https://media1.giphy.com/media/v1.Y2lkPThiYjIxNzcycjl3aDhocm1meDdxMGViaDJ4b2drZXg1d2RteW14aXF0Yzk5YjhqMSZlcD12MV9naWZzX3NlYXJjaCZjdD1n/YYKoJL28YtscdUTGWA/giphy.gif)
+![Trending GIF](https://media3.giphy.com/media/v1.Y2lkPThiYjIxNzcyOHJwbjh6eTBsbHg0anE1NWZjMXhoZzVieTF1NzVtOGRrbTIwZXl1ZyZlcD12MV9naWZzX3NlYXJjaCZjdD1n/ENY5vJgJPEfG3Ym14H/giphy.gif)
 <!-- END_GIF_SECTION -->
 
 
