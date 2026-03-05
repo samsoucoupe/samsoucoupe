@@ -5,6 +5,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const hamburger = document.querySelector('.hamburger');
     const navMenu = document.querySelector('.nav-menu');
     const navLinks = document.querySelectorAll('.nav-link');
+    const footerYear = document.getElementById('footer-year');
+
+    if (footerYear) {
+        footerYear.textContent = new Date().getFullYear();
+    }
 
     // Toggle mobile menu
     hamburger.addEventListener('click', () => {
@@ -67,6 +72,6 @@ const observer = new IntersectionObserver((entries) => {
 }, observerOptions);
 
 document.addEventListener('DOMContentLoaded', () => {
-    const animateElements = document.querySelectorAll('.project-card, .skill-category, .about-text, .contact-item');
+    const animateElements = document.querySelectorAll('.project-card, .skill-category, .about-text, .contact-item, .roadmap-card');
     animateElements.forEach(el => observer.observe(el));
 });
