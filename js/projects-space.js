@@ -62,9 +62,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Carrousel avec flèches
             const mediaItems = project.media.map((m, i) => {
                 if (m.type === 'img') {
-                    return `<div class="media-item${i === 0 ? ' active' : ''}"><img src="${m.src}" alt="${m.alt}"></div>`;
+                    return `<div class="media-item${i === 0 ? ' active' : ''}"><img src="${m.src}" alt="${m.alt}" loading="lazy"></div>`;
                 } else if (m.type === 'video') {
-                    return `<div class="media-item${i === 0 ? ' active' : ''}"><video controls><source src="${m.src}" type="video/mp4">Votre navigateur ne supporte pas la lecture de vidéos.</video></div>`;
+                    return `<div class="media-item${i === 0 ? ' active' : ''}"><video controls preload="none" poster="${m.poster || ''}"><source src="${m.src}" type="video/mp4">Votre navigateur ne supporte pas la lecture de vidéos.</video></div>`;
                 } else if (m.type === 'youtube') {
                     // Bouton stylé avec icône YouTube
                     return `<div class="media-item${i === 0 ? ' active' : ''}"><button class='youtube-btn' onclick="window.open('${m.src}', '_blank')"><i class='fab fa-youtube'></i> Voir la vidéo YouTube</button></div>`;
@@ -81,9 +81,9 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (project.media && project.media.length === 1) {
             const m = project.media[0];
             if (m.type === 'img') {
-                mediaHtml = `<div class="project-media"><div class="media-carousel"><div class="media-item active"><img src="${m.src}" alt="${m.alt}"></div></div></div>`;
+                mediaHtml = `<div class="project-media"><div class="media-carousel"><div class="media-item active"><img src="${m.src}" alt="${m.alt}" loading="lazy"></div></div></div>`;
             } else if (m.type === 'video') {
-                mediaHtml = `<div class="project-media"><div class="media-carousel"><div class="media-item active"><video controls><source src="${m.src}" type="video/mp4">Votre navigateur ne supporte pas la lecture de vidéos.</video></div></div></div>`;
+                mediaHtml = `<div class="project-media"><div class="media-carousel"><div class="media-item active"><video controls preload="none" poster="${m.poster || ''}"><source src="${m.src}" type="video/mp4">Votre navigateur ne supporte pas la lecture de vidéos.</video></div></div></div>`;
             } else if (m.type === 'youtube') {
                 // Remplacement de l'iframe par un bouton
                 mediaHtml = `<div class="project-media"><div class="media-carousel"><div class="media-item active"><button class='youtube-btn' onclick=\"window.open('${m.src}', '_blank')\">Voir la vidéo YouTube</button></div></div></div>`;
@@ -114,6 +114,25 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('ufo-projects-space');
         container.className = 'projects-grid';
         container.innerHTML = PROJECTS.map(createProjectCard).join('');
+
+        // IntersectionObserver pour fade-in/slide-in
+        const cards = container.querySelectorAll('.project-card');
+        if ('IntersectionObserver' in window) {
+            const obs = new window.IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        observer.unobserve(entry.target);
+                    }
+                });
+            }, { threshold: 0.15 });
+            cards.forEach(card => {
+                obs.observe(card);
+            });
+        } else {
+            // Fallback: tout visible
+            cards.forEach(card => card.classList.add('visible'));
+        }
     }
 
     // Carrousel médias (simple, sans dépendance)

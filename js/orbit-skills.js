@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
     currentSkills.forEach((skill) => {
         const el = document.createElement('div');
         el.className = 'orbit-planet';
+        el.style.setProperty('--planet-color', skill.color);
         el.innerHTML = `<span class="planet-icon" style="color:${skill.color}" title="${skill.label}">
                             <i class="${skill.icon}"></i>
                         </span>`;
