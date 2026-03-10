@@ -2,6 +2,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const skills = [
         { icon: 'fas fa-cogs', label: 'DevOps', color: '#10b981', orbit: 120, speed: 0.10 },
         { icon: 'fas fa-database', label: 'Data', color: '#eab308', orbit: 160, speed: 0.08 },
+        { icon: 'fab fa-java', label: 'Java', color: '#f59e0b', orbit: 180, speed: 0.09 },
         { icon: 'fas fa-laptop-code', label: 'Web', color: '#4f46e5', orbit: 200, speed: 0.07 },
         { icon: 'fas fa-brain', label: 'IA', color: '#6366f1', orbit: 240, speed: 0.06 },
         { icon: 'fas fa-server', label: 'Backend', color: '#3776AB', orbit: 280, speed: 0.05 }
