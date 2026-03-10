@@ -7,7 +7,6 @@ let stars = [];
 const STAR_COUNT = 180;
 const STAR_SPEED = 0.7;
 const STAR_SIZE = 1.2;
-let parallaxOffset = 0;
 function resizeStarfield() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
@@ -28,9 +27,9 @@ function drawStars() {
     for (let i = 0; i < STAR_COUNT; i++) {
         let star = stars[i];
         let k = 128.0 / star.z;
-        // Parallax: décale les étoiles selon le scroll vertical
+        // Plus de parallax : effet warp classique
         let sx = star.x * k + canvas.width / 2;
-        let sy = star.y * k + canvas.height / 2 + parallaxOffset * (1 - star.z / canvas.width) * 0.7;
+        let sy = star.y * k + canvas.height / 2;
         if (sx < 0 || sx >= canvas.width || sy < 0 || sy >= canvas.height) {
             // Reset star
             star.x = Math.random() * canvas.width - canvas.width / 2;
@@ -68,7 +67,7 @@ function animateStarfield(timestamp) {
 }
 // Parallax scroll
 window.addEventListener('scroll', () => {
-    parallaxOffset = window.scrollY || window.pageYOffset;
+    // Aucun effet parallax
 });
 window.addEventListener('resize', () => {
     resizeStarfield();
