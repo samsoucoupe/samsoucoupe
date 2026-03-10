@@ -363,7 +363,7 @@ section {
     grid-auto-flow: dense;
     align-items: stretch;
     padding-bottom: 3rem;
-    background: radial-gradient(ellipse at 50% 0%, #232946 60%, #0f172a 100%);
+    background: transparent;
     justify-items: stretch;
     box-sizing: border-box;
     max-width: 100vw;

@@ -15,8 +15,8 @@ function createStars() {
     stars = [];
     for (let i = 0; i < STAR_COUNT; i++) {
         stars.push({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
+            x: Math.random() * canvas.width - canvas.width / 2,
+            y: Math.random() * canvas.height - canvas.height / 2,
             z: Math.random() * canvas.width,
             o: 0.7 + Math.random() * 0.3
         });
@@ -53,9 +53,15 @@ function moveStars() {
         }
     }
 }
-function animateStarfield() {
-    moveStars();
-    drawStars();
+const TARGET_FPS = 15;
+const FRAME_INTERVAL = 1000 / TARGET_FPS;
+let lastFrameTime = 0;
+function animateStarfield(timestamp) {
+    if (timestamp - lastFrameTime >= FRAME_INTERVAL) {
+        lastFrameTime = timestamp;
+        moveStars();
+        drawStars();
+    }
     requestAnimationFrame(animateStarfield);
 }
 window.addEventListener('resize', () => {
@@ -65,5 +71,5 @@ window.addEventListener('resize', () => {
 window.addEventListener('DOMContentLoaded', () => {
     resizeStarfield();
     createStars();
-    animateStarfield();
+    requestAnimationFrame(animateStarfield);
 });
