@@ -144,21 +144,6 @@ window.SpaceCockpit = (function () {
             engineGlow.push(e);
         }
 
-        // Écran décoratif à l'intérieur du cockpit (photo de profil)
-        const cockpitScreen = BABYLON.MeshBuilder.CreatePlane('cockpitScreen',
-            { width: 1.6, height: 1.2 }, scene);
-        const screenMat = new BABYLON.StandardMaterial('screenMat', scene);
-        try {
-            const tex = new BABYLON.Texture('assets/pdpSamsoucoupe.gif', scene);
-            screenMat.diffuseTexture = tex;
-            screenMat.emissiveTexture = tex;
-            screenMat.emissiveColor = new BABYLON.Color3(0.5, 0.5, 0.5);
-        } catch (err) { /* texture échec → écran noir */ }
-        screenMat.diffuseColor = new BABYLON.Color3(0.05, 0.08, 0.15);
-        cockpitScreen.material = screenMat;
-        cockpitScreen.position = new BABYLON.Vector3(0, 0.8, -1);   // devant le pilote, dans le dôme
-        cockpitScreen.parent = ship;
-        cockpitScreen.isPickable = false;
     }
 
     /* ============================================================ SOLEIL (home) */
@@ -1066,41 +1051,38 @@ window.SpaceCockpit = (function () {
                 }
             }
         } else if (mode === 'idle') {
-            // Orbite autour du soleil (overview) — copyFrom direct (pas de Lerp mouvant)
+            // Spline Lissajous : traverse toutes les orbites planétaires
+            // x(t) = A·cos(ω·t), y(t) = B·sin(3·t), z(t) = A·sin(ω·t)
+            // A=230 couvre contact (r=215), B=25 couvre hauteurs (-8 à +10)
             orbitAngle += dt * 0.08;
-            const target = idleOrbitPos(orbitAngle);
-            shipPos.copyFrom(target);
-            // Tangent au cercle : direction du mouvement tangentiel
-            // Position = (R*cos(θ), H, R*sin(θ)) → tangente = (-R*sin(θ), 0, R*cos(θ))
-            // Yaw = atan2(-sin(θ), cos(θ)) = -θ
-            const tangentYaw = -orbitAngle;
+            const LJA = 230, LJB = 25, LJW = orbitAngle, LJW3 = orbitAngle * 3;
+            shipPos.x = LJA * Math.cos(LJW);
+            shipPos.y = LJB * Math.sin(LJW3);
+            shipPos.z = LJA * Math.sin(LJW);
+            const tdx = -LJA * Math.sin(LJW);
+            const tdz = LJA * Math.cos(LJW);
+            const tangentYaw = Math.atan2(-tdx, tdz);
             shipYaw = lerpAngle(shipYaw, tangentYaw, Math.min(1, dt * 3));
             enginesBoost(dt, false);
         } else if (mode === 'orbiting') {
             const center = planets[targetPlanet].root.position;
-
-            // Toutes les planètes (MISSIONS incluse) : stationnaire face à elle
-            // (suit juste la dérive orbitale de la planète)
             const toPlanet = center.subtract(shipPos);
             const distToPlanet = toPlanet.length();
             if (distToPlanet > 0.5) toPlanet.normalize();
-            // Léger flottement sur place (évite le 100% figé)
             const bobX = Math.sin(elapsed * 0.6) * 0.3;
             const bobY = Math.cos(elapsed * 0.5) * 0.2;
             shipPos.x += bobX * dt;
             shipPos.y += bobY * dt;
-            // Compense la dérive de la planète : reste à distance fixe
             const desiredDist = PLANET_ORBIT_R;
             const ajust = toPlanet.scale((distToPlanet - desiredDist) * dt * 1.5);
             shipPos.addInPlace(ajust);
             currentSpeed = 0;
             const lookAt = center.subtract(shipPos);
             if (lookAt.lengthSquared() > 0.01) {
-                shipYaw = lerpAngle(shipYaw, Math.atan2(-lookAt.x, -lookAt.z), Math.min(1, dt * 5));
+                shipYaw = lerpAngle(shipYaw, Math.atan2(-lookAt.x, lookAt.z), Math.min(1, dt * 5));
             }
             enginesBoost(dt, false);
         } else if (mode === 'flying_moon') {
-            // Vol vers une lune précise
             const moon = PROJECT_MOONS[targetMoon];
             if (!moon) { mode = 'flying'; return; }
             const targetWorld = moon.root.position.clone();
@@ -1117,21 +1099,19 @@ window.SpaceCockpit = (function () {
             if (dist < 8) {
                 currentSpeed = 0;
                 mode = 'orbiting_moon';
-                orbitAngle = Math.atan2(shipPos.z - targetWorld.z, shipPos.x - targetWorld.x);
+                orbitAngle = Math.atan2(
+                    moon.root.position.z - shipPos.z,
+                    moon.root.position.x - shipPos.x
+                );
                 setModeCb('orbiting');
             }
         } else if (mode === 'orbiting_moon') {
-            // Position fixe face à la lune (on n'orbit plus autour)
-            const moon = PROJECT_MOONS[targetMoon];
-            if (!moon) { mode = 'flying'; return; }
             const center = moon.root.position;
             const toMoon = center.subtract(shipPos);
             const distToMoon = toMoon.length();
             if (distToMoon > 0.5) toMoon.normalize();
-            // Flottement léger
             shipPos.x += Math.sin(elapsed * 0.7) * 0.2 * dt;
             shipPos.y += Math.cos(elapsed * 0.6) * 0.15 * dt;
-            // Maintient une distance confortable
             const desiredDist = 8;
             const ajust = toMoon.scale((distToMoon - desiredDist) * dt * 2);
             shipPos.addInPlace(ajust);
@@ -1141,7 +1121,6 @@ window.SpaceCockpit = (function () {
                 shipYaw = lerpAngle(shipYaw, Math.atan2(-lookAt.x, -lookAt.z), Math.min(1, dt * 5));
             }
             enginesBoost(dt, false);
-            // Scan project de la lune
             scanProgress = Math.min(1, scanProgress + dt / 1.5);
             if (scanProgress >= 1) {
                 if (onScanCb) onScanCb('projects');
