@@ -30,7 +30,11 @@
                         document.addEventListener('keydown', function (e) {
                             if (!window.SpaceCockpit) return;
                             if (e.key === 'Escape' || e.key === 'x' || e.key === 'X') {
-                                closePanel();
+                                if (el('panel').classList.contains('open')) {
+                                    closePanel();
+                                } else if (SpaceCockpit.getMode() === 'orbiting') {
+                                    SpaceCockpit.setIdleMode();
+                                }
                             } else if (e.key === 'ArrowRight') {
                                 SpaceCockpit.flyTo(SpaceCockpit.nextSection());
                             } else if (e.key === 'ArrowLeft') {

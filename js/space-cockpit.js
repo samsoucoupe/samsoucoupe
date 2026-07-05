@@ -22,6 +22,11 @@ window.SpaceCockpit = (function () {
     let mode = 'orbiting';
     let shipPos = new BABYLON.Vector3(0, 8, 70);
     let targetPlanet = 'home';
+    // Idle path state
+    let idlePath = [];       // array of BABYLON.Vector3 waypoints
+    let idlePathIdx = 0;     // current waypoint index
+    let idlePathT = 0;       // interpolation [0,1] between idx and idx+1
+    let idleSpeed = 28;      // units/sec along the spline
     let orbitAngle = 0;               // angle d'orbite courant (idle et orbiting)
     let shipYaw = 0;
     let currentSpeed = 0;
@@ -69,6 +74,32 @@ const PLANET_ORBIT_R = 20;
     }
 
     /* ============================================================ INIT */
+
+    // Précalcule une spline Lissajous-like passant par toutes les planètes (boucle fermée)
+    function buildIdlePath() {
+        const pts = Object.keys(planets).map(id => {
+            const p = planets[id].root.position;
+            return new BABYLON.Vector3(p.x, p.y + 4, p.z);
+        });
+        if (pts.length < 2) return;
+        // Nearest-neighbor TSP closes loop
+        const visited = new Array(pts.length).fill(false);
+        const order = [0]; visited[0] = true;
+        for (let n = 1; n < pts.length; n++) {
+            let best = -1, bestD = Infinity;
+            for (let i = 0; i < pts.length; i++) {
+                if (visited[i]) continue;
+                const d = BABYLON.Vector3.Distance(pts[order[n-1]], pts[i]);
+                if (d < bestD) { bestD = d; best = i; }
+            }
+            order.push(best); visited[best] = true;
+        }
+        const loop = order.concat([order[0]]);
+        const nn = loop.map(i => pts[i]);
+        const spline = BABYLON.Curve3.CreateCatmullRomSpline(nn, 60, true);
+        idlePath = spline.getPoints();
+    }
+
     function init() {
         canvas = document.getElementById('renderCanvas');
         if (!canvas || typeof BABYLON === 'undefined') { console.error('[SC] missing'); return; }
@@ -92,8 +123,10 @@ const PLANET_ORBIT_R = 20;
         buildEnemies();           // Drones hostiles
         attachPicking();
 
+        buildIdlePath();
         shipPos = planets.home.root.position.clone();
         ship.position.copyFrom(shipPos);
+        mode = 'idle';
         startPortalsTimer();
         engine.runRenderLoop(renderLoop);
         window.addEventListener('resize', () => engine.resize());
@@ -987,23 +1020,19 @@ const PLANET_ORBIT_R = 20;
     }
 
     function updateShip(dt) {
-        // Direction de déplacement du vaisseau (vecteur stable, sans lire rotation qui saute)
         let moveDir = null;
 
         if (mode === 'flying') {
-                    // Cible vol : position de la planète à l'instant T
-                    const targetWorld = planets[targetPlanet].root.position.clone();
-                    const toTarget = targetWorld.subtract(shipPos);
+            const targetWorld = planets[targetPlanet].root.position.clone();
+            const toTarget = targetWorld.subtract(shipPos);
             const dist = toTarget.length();
             moveDir = toTarget.clone();
             if (dist > 0.01) moveDir.normalize();
 
-            // Accélération progressive, frein à l'approche
             const desiredSpeed = dist < ARRIVE_DIST * 2 ? dist * 2.5 : MAX_SPEED;
             currentSpeed += (desiredSpeed - currentSpeed) * Math.min(1, dt * 2.5);
             shipPos.addInPlace(moveDir.scale(currentSpeed * dt));
 
-            // Oriente le vaisseau vers sa direction de vol (yaw lerpé)
             if (moveDir.lengthSquared() > 0.01) {
                 const targetYaw = Math.atan2(-moveDir.x, -moveDir.z);
                 shipYaw = lerpAngle(shipYaw, targetYaw, Math.min(1, dt * 4));
@@ -1027,10 +1056,8 @@ const PLANET_ORBIT_R = 20;
             const toPlanet = center.subtract(shipPos);
             const distToPlanet = toPlanet.length();
             if (distToPlanet > 0.5) toPlanet.normalize();
-            const bobX = Math.sin(elapsed * 0.6) * 0.3;
-            const bobY = Math.cos(elapsed * 0.5) * 0.2;
-            shipPos.x += bobX * dt;
-            shipPos.y += bobY * dt;
+            shipPos.x += Math.sin(elapsed * 0.6) * 0.3 * dt;
+            shipPos.y += Math.cos(elapsed * 0.5) * 0.2 * dt;
             const desiredDist = PLANET_ORBIT_R;
             const ajust = toPlanet.scale((distToPlanet - desiredDist) * dt * 1.5);
             shipPos.addInPlace(ajust);
@@ -1051,7 +1078,7 @@ const PLANET_ORBIT_R = 20;
             currentSpeed += (desiredSpeed - currentSpeed) * Math.min(1, dt * 2.5);
             shipPos.addInPlace(moveDir.scale(currentSpeed * dt));
             if (moveDir.lengthSquared() > 0.01) {
-                shipYaw = lerpAngle(shipYaw, Math.atan2(-moveDir.x, -moveDir.z), Math.min(1, dt * 4));
+                shipYaw = lerpAngle(shipYaw, Math.atan2(-moveDir.x, moveDir.z), Math.min(1, dt * 4));
             }
             enginesBoost(dt, currentSpeed > 3);
             if (dist < 8) {
@@ -1083,9 +1110,24 @@ const PLANET_ORBIT_R = 20;
             if (scanProgress >= 1) {
                 if (onScanCb) onScanCb('projects');
             }
+        } else if (mode === 'idle') {
+            if (idlePath.length === 0) { mode = 'orbiting'; return; }
+            const from = idlePath[idlePathIdx];
+            const to = idlePath[(idlePathIdx + 1) % idlePath.length];
+            const t = idlePathT;
+            shipPos.x = from.x + (to.x - from.x) * t;
+            shipPos.y = from.y + (to.y - from.y) * t;
+            shipPos.z = from.z + (to.z - from.z) * t;
+            const dx = to.x - from.x, dz = to.z - from.z;
+            if (dx * dx + dz * dz > 0.01) {
+                shipYaw = lerpAngle(shipYaw, Math.atan2(-dx, -dz), Math.min(1, dt * 3));
+            }
+            const segLen = Math.hypot(dx, dz);
+            idlePathT += (idleSpeed * dt) / (segLen || 1);
+            if (idlePathT >= 1) { idlePathT -= 1; idlePathIdx = (idlePathIdx + 1) % idlePath.length; }
+            enginesBoost(dt, false);
         }
 
-        // Applique orientation (sans lookAt qui saccade)
         ship.position.copyFrom(shipPos);
         ship.rotation.y = shipYaw;
         ship.rotation.x = 0;
@@ -1207,6 +1249,8 @@ const PLANET_ORBIT_R = 20;
         setOnDiscoverCb: cb => { onDiscoverCb = cb; },
         setOnModeCb: cb => { onModeCb = cb; },
         setOnPortalCb: cb => { onPortalCb = cb; },
-        setOnScoreCb: cb => { onScoreCb = cb; }
+        setOnScoreCb: cb => { onScoreCb = cb; },
+        setIdleMode: () => { mode = "idle"; }
+
     };
 })();
