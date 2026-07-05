@@ -991,16 +991,9 @@ const PLANET_ORBIT_R = 20;
         let moveDir = null;
 
         if (mode === 'flying') {
-            // Cible vol : position de la planète à l'instant T
-            let targetWorld;
-            if (targetPlanet === 'home') {
-                // Cible un point de l'orbite idle dans la direction actuelle
-                const toSun = shipPos.subtract(SUN_POS);
-                orbitAngle = Math.atan2(toSun.z, toSun.x);
-            } else {
-                targetWorld = planets[targetPlanet].root.position.clone();
-            }
-            const toTarget = targetWorld.subtract(shipPos);
+                    // Cible vol : position de la planète à l'instant T
+                    const targetWorld = planets[targetPlanet].root.position.clone();
+                    const toTarget = targetWorld.subtract(shipPos);
             const dist = toTarget.length();
             moveDir = toTarget.clone();
             if (dist > 0.01) moveDir.normalize();
