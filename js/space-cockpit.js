@@ -1129,17 +1129,19 @@ const PLANET_ORBIT_R = 20;
             );
             camera.setTarget(BABYLON.Vector3.Lerp(camera.getTarget(), look, Math.min(1, dt * 6)));
         } else {
-            const fx = -Math.sin(shipYaw), fz = -Math.cos(shipYaw);
-            const back = 18, up = 6;
+            // Caméra orbitale autour de la planète, dézoomée
+            const orbitCamAngle = elapsed * 0.15;
+            const cx = Math.sin(orbitCamAngle), cz = Math.cos(orbitCamAngle);
+            const back = 28, up = 8;
             const camPos = new BABYLON.Vector3(
-                planetCenter.x - fx * back, planetCenter.y + up, planetCenter.z - fz * back
+                planetCenter.x + cx * back, planetCenter.y + up, planetCenter.z + cz * back
             );
-            camera.position = BABYLON.Vector3.Lerp(camera.position, camPos, Math.min(1, dt * 3));
+            camera.position = BABYLON.Vector3.Lerp(camera.position, camPos, Math.min(1, dt * 2));
             camera.setTarget(BABYLON.Vector3.Lerp(camera.getTarget(), planetCenter, Math.min(1, dt * 6)));
         }
 
         camera.fov = 1.05 + (mode === 'flying' ? Math.min(0.2, currentSpeed / MAX_SPEED * 0.2) : 0);
-        }
+    }
 
     function updateScanner(dt) {
         if (mode !== 'orbiting') { scanProgress = 0; return; }
