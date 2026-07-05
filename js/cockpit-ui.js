@@ -26,19 +26,19 @@
 
         // Fermer le panneau (Échap ou bouton)
         el('panel-close').addEventListener('click', closePanel);
-        // Flèches ← → = navigation entre stations, Échap = ferme panneau
-                document.addEventListener('keydown', function (e) {
-                    if (!window.SpaceCockpit) return;
-                    if (e.key === 'Escape') {
-                        closePanel();
-                    } else if (e.key === 'ArrowRight') {
-                        SpaceCockpit.flyTo(SpaceCockpit.nextSection());
-                    } else if (e.key === 'ArrowLeft') {
-                        SpaceCockpit.flyTo(SpaceCockpit.prevSection());
-                    } else if (e.key === 'm' || e.key === 'M') {
-                        toggleMap();
-                    }
-                });
+        // Flèches ← → = navigation entre stations, Échap/X = ferme panneau
+                        document.addEventListener('keydown', function (e) {
+                            if (!window.SpaceCockpit) return;
+                            if (e.key === 'Escape' || e.key === 'x' || e.key === 'X') {
+                                closePanel();
+                            } else if (e.key === 'ArrowRight') {
+                                SpaceCockpit.flyTo(SpaceCockpit.nextSection());
+                            } else if (e.key === 'ArrowLeft') {
+                                SpaceCockpit.flyTo(SpaceCockpit.prevSection());
+                            } else if (e.key === 'm' || e.key === 'M') {
+                                toggleMap();
+                            }
+                        });
 
         // Bouton MAP
         var mapBtn = el('map-btn');
