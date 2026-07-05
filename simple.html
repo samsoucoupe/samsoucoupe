@@ -13,99 +13,122 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/gif" href="assets/pdpSamsoucoupe.gif">
     <style>
-        /* Override everything for the fixed section view */
         #renderCanvas, #starfield, .vignette { display: none; }
         .hud, .map-overlay, .briefing { display: none !important; }
-        .panel { position: static; display: block; width: 100%; max-width: 900px; margin: 0 auto; padding: 60px 20px 40px; min-height: 100vh; }
+        body { background: #080c12; }
 
-        .panel-head {
-            border-bottom: 1px solid rgba(0, 225, 255, 0.2);
-            padding-bottom: 16px;
-            margin-bottom: 32px;
-            text-align: center;
-        }
-        .panel-head .panel-title { font-size: 10px; letter-spacing: 6px; opacity: 0.5; }
-        .panel-close { display: none; }
-        .panel-hint { display: none; }
-        .panel-foot { display: none; }
+        /* ── Base ──────────────────────────── */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { overflow-y: scroll !important; position: static !important; height: auto !important; width: auto !important; }
+        .page { max-width: 600px; margin: 0 auto; padding: 32px 20px 80px; }
 
-        /* Sections as a clean list */
-        .section-block {
-            margin-bottom: 64px;
-            padding: 32px;
-            background: rgba(0, 225, 255, 0.03);
-            border: 1px solid rgba(0, 225, 255, 0.12);
-            border-radius: 4px;
-        }
-        .section-block h3 {
+        /* ── Section titre ─────────────────── */
+        .sec-title {
             font-family: 'Orbitron', monospace;
-            font-size: 10px;
+            font-size: 9px;
             letter-spacing: 5px;
-            color: rgba(0, 225, 255, 0.6);
-            margin-bottom: 24px;
+            color: rgba(0,225,255,0.45);
             text-transform: uppercase;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(0,225,255,0.12);
+            margin-bottom: 24px;
         }
 
-        /* Projects grid */
-        .projects { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
-        .project {
-            padding: 18px;
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 4px;
-            transition: border-color 0.2s;
-            background: rgba(255,255,255,0.02);
+        /* ── Hero ───────────────────────────── */
+        .hero { text-align: center; margin-bottom: 48px; }
+        .hero-avatar {
+            width: 80px; height: 80px; border-radius: 50%;
+            object-fit: cover; margin: 0 auto 16px;
+            border: 2px solid rgba(0,225,255,0.3);
+            box-shadow: 0 0 20px rgba(0,225,255,0.12);
         }
-        .project:hover { border-color: var(--accent, rgba(0,225,255,0.4)); }
-        .project .proj-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .project .proj-code { font-size: 9px; letter-spacing: 2px; color: rgba(255,255,255,0.3); font-family: 'Orbitron', monospace; }
-        .project .proj-status { font-size: 8px; letter-spacing: 2px; padding: 3px 8px; border-radius: 2px; font-family: 'Orbitron', monospace; }
-        .project .proj-status.terminée { background: rgba(0,225,255,0.1); color: #00e1ff; border: 1px solid rgba(0,225,255,0.3); }
-        .project .proj-status.actif { background: rgba(0,255,100,0.1); color: #00ff64; border: 1px solid rgba(0,255,100,0.3); }
-        .project .proj-status.en-cours { background: rgba(255,180,0,0.1); color: #ffb400; border: 1px solid rgba(255,180,0,0.3); }
-        .project .proj-status.archivé { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.15); }
-        .project h4 { font-size: 13px; font-weight: 600; margin: 6px 0 8px; }
-        .project p { font-size: 12px; line-height: 1.5; color: rgba(255,255,255,0.6); margin: 8px 0; }
-        .project .proj-media { margin: 8px 0; }
-        .project .proj-media img { width: 100%; border-radius: 3px; max-height: 160px; object-fit: cover; }
-        .project .proj-stack { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
-        .project .proj-stack span { font-size: 9px; padding: 2px 7px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 2px; color: rgba(255,255,255,0.5); }
-        .project .cta { display: inline-block; margin-top: 10px; font-size: 11px; padding: 7px 16px; border: 1px solid var(--accent, #00e1ff); color: var(--accent, #00e1ff); border-radius: 3px; text-decoration: none; transition: background 0.2s; font-family: 'Orbitron', monospace; letter-spacing: 1px; }
-        .project .cta:hover { background: rgba(0,225,255,0.1); }
-
-        /* Contact grid */
-        .contact-grid { display: flex; flex-wrap: wrap; gap: 12px; }
-        .contact-card {
-            display: flex; flex-direction: column; align-items: center; gap: 6px;
-            padding: 20px 28px; text-decoration: none; color: rgba(255,255,255,0.7);
-            border: 1px solid rgba(255,255,255,0.1); border-radius: 4px;
-            background: rgba(255,255,255,0.02); min-width: 130px;
-            transition: border-color 0.2s, color 0.2s;
+        .hero-name {
+            font-family: 'Orbitron', monospace;
+            font-size: 20px; font-weight: 800; color: #fff;
+            letter-spacing: 3px; margin-bottom: 6px;
         }
-        .contact-card:hover { border-color: rgba(0,225,255,0.5); color: #00e1ff; }
-        .contact-card i { font-size: 24px; }
-        .contact-card b { font-size: 12px; font-weight: 600; }
-        .contact-card small { font-size: 10px; opacity: 0.5; }
-
-        /* Identity section */
-        .identity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .identity-item { display: flex; flex-direction: column; gap: 4px; }
-        .identity-item label { font-size: 9px; letter-spacing: 3px; color: rgba(0,225,255,0.5); font-family: 'Orbitron', monospace; text-transform: uppercase; }
-        .identity-item span { font-size: 14px; color: rgba(255,255,255,0.85); }
-
-        /* Wars section */
-        .wars-list { display: flex; flex-direction: column; gap: 14px; }
-        .war-item {
-            padding: 16px 20px;
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 4px;
-            background: rgba(255,255,255,0.02);
-            display: flex; justify-content: space-between; align-items: center;
+        .hero-role {
+            font-size: 10px; letter-spacing: 3px; color: #00e1ff;
+            font-family: 'Orbitron', monospace; text-transform: uppercase;
+            margin-bottom: 12px;
         }
-        .war-item .war-title { font-size: 13px; font-weight: 600; }
-        .war-item .war-sub { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 3px; }
-        .war-item .war-score { font-family: 'Orbitron', monospace; font-size: 18px; color: #ff4466; }
+        .hero-tagline {
+            font-size: 12px; color: rgba(255,255,255,0.5);
+            line-height: 1.6; margin-bottom: 16px;
+        }
 
-        .footer { display: block; text-align: center; padding: 20px; font-size: 11px; color: rgba(255,255,255,0.25); }
+        /* ── Stats ─────────────────────────── */
+        .stats { display: flex; gap: 0; justify-content: center; }
+        .stat {
+            display: flex; flex-direction: column; align-items: center;
+            padding: 12px 20px;
+            border-right: 1px solid rgba(255,255,255,0.06);
+        }
+        .stat:last-child { border-right: none; }
+        .stat-n { font-size: 18px; font-weight: 700; color: #00e1ff; font-family: 'Orbitron', monospace; }
+        .stat-l { font-size: 9px; color: rgba(255,255,255,0.4); letter-spacing: 2px; text-transform: uppercase; margin-top: 3px; }
+
+        /* ── About ─────────────────────────── */
+        .about { margin-bottom: 40px; }
+        .about-text { font-size: 12px; line-height: 1.75; color: rgba(255,255,255,0.55); margin-bottom: 12px; }
+
+        /* ── Skills ────────────────────────── */
+        .skills { margin-bottom: 40px; }
+        .skill-cat { margin-bottom: 20px; }
+        .skill-cat-name {
+            font-size: 10px; letter-spacing: 2px; color: rgba(255,255,255,0.35);
+            text-transform: uppercase; margin-bottom: 8px; font-family: 'Orbitron', monospace;
+        }
+        .skill-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+        .skill-tags span {
+            font-size: 10px; padding: 4px 10px;
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 3px; color: rgba(255,255,255,0.6);
+        }
+
+        /* ── Projects ──────────────────────── */
+        .projects { margin-bottom: 40px; }
+        .proj-card {
+            padding: 16px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+        }
+        .proj-card:first-child { border-top: 1px solid rgba(255,255,255,0.06); }
+        .proj-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+        .proj-title { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.85); }
+        .proj-status {
+            font-size: 8px; letter-spacing: 1.5px; padding: 2px 7px;
+            border-radius: 2px; font-family: 'Orbitron', monospace; flex-shrink: 0; margin-left: 10px;
+        }
+        .proj-status.terminée { background: rgba(0,225,255,0.08); color: #00e1ff; border: 1px solid rgba(0,225,255,0.2); }
+        .proj-status.actif { background: rgba(0,255,100,0.08); color: #00ff64; border: 1px solid rgba(0,255,100,0.2); }
+        .proj-status.en-cours { background: rgba(255,180,0,0.08); color: #ffb400; border: 1px solid rgba(255,180,0,0.2); }
+        .proj-status.archivé { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.1); }
+        .proj-desc { font-size: 11px; line-height: 1.55; color: rgba(255,255,255,0.45); margin-bottom: 8px; }
+        .proj-img { width: 100%; border-radius: 3px; margin-bottom: 8px; max-height: 180px; object-fit: cover; }
+        .proj-tech { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
+        .proj-tech span { font-size: 9px; padding: 2px 6px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 2px; color: rgba(255,255,255,0.4); }
+        .proj-link { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; padding: 5px 12px; border: 1px solid #00e1ff; color: #00e1ff; border-radius: 3px; text-decoration: none; font-family: 'Orbitron', monospace; letter-spacing: 1px; }
+
+        /* ── Contact ────────────────────────── */
+        .contact { margin-bottom: 40px; }
+        .contact-desc { font-size: 12px; color: rgba(255,255,255,0.45); margin-bottom: 16px; line-height: 1.6; }
+        .contact-links { display: flex; flex-direction: column; gap: 8px; }
+        .contact-link {
+            display: flex; align-items: center; gap: 12px;
+            padding: 14px 16px;
+            border: 1px solid rgba(255,255,255,0.08); border-radius: 4px;
+            background: rgba(255,255,255,0.025);
+            text-decoration: none; color: rgba(255,255,255,0.65);
+            font-size: 12px; transition: border-color 0.2s, color 0.2s;
+        }
+        .contact-link:hover { border-color: rgba(0,225,255,0.35); color: #00e1ff; }
+        .contact-link i { font-size: 18px; width: 20px; text-align: center; }
+        .contact-link b { font-weight: 600; }
+        .contact-link small { margin-left: auto; font-size: 10px; opacity: 0.4; }
+
+        /* ── Footer ────────────────────────── */
+        .footer { text-align: center; font-size: 10px; color: rgba(255,255,255,0.18); padding-top: 32px; border-top: 1px solid rgba(255,255,255,0.05); }
     </style>
 </head>
 
@@ -114,7 +137,7 @@
     <canvas id="renderCanvas"></canvas>
     <div class="vignette" aria-hidden="true"></div>
 
-    <div id="sections-root"></div>
+    <div id="sections-root" class="page"></div>
 
     <footer class="footer">
         <span>© 2026 samsoucoupe</span>
@@ -125,7 +148,6 @@
     <script src="js/starfield-background.js"></script>
     <script src="js/portfolio-data.js"></script>
     <script>
-        // Render all sections in one fixed layout
         var P = window.PORTFOLIO || {};
         var STATUS = P.statusLabels || { 'terminée': 'TERMINÉE', 'actif': 'ACTIF', 'archivé': 'ARCHIVÉ', 'en cours': 'EN COURS' };
 
@@ -135,78 +157,88 @@
 
         var root = document.getElementById('sections-root');
 
-        // ── BASE / IDENTITY
+        // ── Hero + Stats ───────────────────
         var id = P.identity || {};
-        var identityHtml = '';
-        if (id.name || id.location || id.role) {
-            var rows = [
-                ['NOM', id.name], ['RÔLE', id.role], ['LIEU', id.location],
-                ['UNIVERSITÉ', id.university], ['DISCORD', id.discord]
-            ].filter(function(r) { return r[1]; });
-            if (rows.length) {
-                identityHtml = '<div class="section-block"><h3>Base Operative</h3><div class="identity-grid">';
-                rows.forEach(function(r) {
-                    identityHtml += '<div class="identity-item"><label>' + esc(r[0]) + '</label><span>' + esc(r[1]) + '</span></div>';
-                });
-                identityHtml += '</div></div>';
-            }
+        var ab = P.about || {};
+
+        var statsHtml = '';
+        if (ab.stats && ab.stats.length) {
+            statsHtml = '<div class="stats">';
+            ab.stats.forEach(function(s) {
+                statsHtml += '<div class="stat"><div class="stat-n">' + esc(s.number) + '</div><div class="stat-l">' + esc(s.label) + '</div></div>';
+            });
+            statsHtml += '</div>';
         }
-        root.innerHTML += identityHtml;
 
-        // ── PROJECTS
-        var pr = P.projects || {};
-        var projHtml = '<div class="section-block" id="sec-projects"><h3>Projets</h3><div class="projects">';
-        (pr.items || []).forEach(function(p, i) {
-            var media = '';
-            if (p.media && p.media.length) {
-                var m = p.media[0];
-                if (m.type === 'img') media = '<div class="proj-media"><img src="' + esc(m.src) + '" alt="' + esc(m.alt || '') + '" loading="lazy"></div>';
-                else if (m.type === 'youtube') media = '<div class="proj-media"><a href="' + esc(m.src) + '" target="_blank" style="color:#00e1ff;font-size:12px;"><i class="fab fa-youtube"></i> Voir la vidéo</a></div>';
-            }
-            var tags = (p.tech || []).map(function(t) { return '<span>' + esc(t) + '</span>'; }).join('');
-            var link = p.link ? '<a class="cta" href="' + esc(p.link) + '" target="_blank"><i class="fas fa-rocket"></i> Lancer</a>' : '';
-            var st = p.status || 'terminée';
-            var sl = STATUS[st] || st.toUpperCase();
-            projHtml += '<div class="project" style="--accent:' + esc(p.color || '#00e1ff') + '">' +
-                '<div class="proj-top"><span class="proj-code">M-' + (101 + i) + '</span><span class="proj-status ' + esc(st) + '">' + esc(sl) + '</span></div>' +
-                '<h4><i class="' + esc(p.icon || '') + '"></i> ' + esc(p.title) + '</h4>' +
-                media +
-                '<p>' + esc(p.description) + '</p>' +
-                '<div class="proj-stack">' + tags + '</div>' +
-                link +
+        root.innerHTML +=
+            '<div class="hero">' +
+                '<img class="hero-avatar" src="' + esc(id.avatar || 'assets/pdpSamsoucoupe.gif') + '" alt="' + esc(id.name) + '" loading="lazy">' +
+                '<div class="hero-name">' + esc(id.name) + '</div>' +
+                (id.role ? '<div class="hero-role">' + esc(id.role) + '</div>' : '') +
+                (id.tagline ? '<div class="hero-tagline">' + esc(id.tagline) + '</div>' : '') +
+                statsHtml +
             '</div>';
-        });
-        projHtml += '</div></div>';
-        root.innerHTML += projHtml;
 
-        // ── CONTACT
-        var ct = P.contact || {};
-        var contactHtml = '<div class="section-block"><h3>Contact</h3>';
-        if (ct.description) contactHtml += '<p style="color:rgba(255,255,255,0.55);font-size:13px;margin-bottom:20px;">' + esc(ct.description) + '</p>';
-        contactHtml += '<div class="contact-grid">';
-        if (id.discord) contactHtml += '<a class="contact-card" href="' + esc(id.discord) + '" target="_blank"><i class="fab fa-discord"></i><b>Discord</b><small>#samsoucoupe</small></a>';
-        if (id.github)  contactHtml += '<a class="contact-card" href="' + esc(id.github) + '" target="_blank"><i class="fab fa-github"></i><b>GitHub</b><small>/samsoucoupe</small></a>';
-        if (id.bmc)     contactHtml += '<a class="contact-card" href="' + esc(id.bmc) + '" target="_blank"><i class="fas fa-coffee"></i><b>Buy Me a Coffee</b><small>soutien</small></a>';
-        if (id.kofi)    contactHtml += '<a class="contact-card" href="' + esc(id.kofi) + '" target="_blank"><i class="fas fa-heart"></i><b>Ko-fi</b><small>soutien</small></a>';
-        contactHtml += '</div></div>';
-        root.innerHTML += contactHtml;
+        // ── About ───────────────────────────
+        if (ab.paragraphs && ab.paragraphs.length) {
+            root.innerHTML += '<div class="about"><div class="sec-title">À propos</div>';
+            ab.paragraphs.forEach(function(p) {
+                root.innerHTML += '<p class="about-text">' + esc(p) + '</p>';
+            });
+            root.innerHTML += '</div>';
+        }
 
-        // ── WARS
-        var ws = P.wars || {};
-        var warsHtml = '';
-        if (ws.items && ws.items.length) {
-            warsHtml = '<div class="section-block"><h3>Palmarès de Guerre</h3><div class="wars-list">';
-            ws.items.forEach(function(w) {
-                var best = w.scores && w.scores.length ? Math.max.apply(null, w.scores) : 0;
-                warsHtml += '<div class="war-item">' +
-                    '<div><div class="war-title">' + esc(w.name || '') + '</div>' +
-                    '<div class="war-sub">' + esc(w.description || '') + '</div></div>' +
-                    '<div class="war-score">' + best + '</div>' +
+        // ── Skills ──────────────────────────
+        var sk = P.skills || {};
+        if (sk.categories && sk.categories.length) {
+            root.innerHTML += '<div class="skills"><div class="sec-title">Compétences</div>';
+            sk.categories.forEach(function(cat) {
+                var tags = cat.tags.map(function(t) { return '<span>' + esc(t.label) + '</span>'; }).join('');
+                root.innerHTML += '<div class="skill-cat">' +
+                    '<div class="skill-cat-name"><i class="' + esc(cat.icon) + '"></i> ' + esc(cat.name) + '</div>' +
+                    '<div class="skill-tags">' + tags + '</div>' +
                 '</div>';
             });
-            warsHtml += '</div></div>';
+            root.innerHTML += '</div>';
         }
-        root.innerHTML += warsHtml;
+
+        // ── Projects ────────────────────────
+        var pr = P.projects || {};
+        if (pr.items && pr.items.length) {
+            root.innerHTML += '<div class="projects"><div class="sec-title">Projets</div>';
+            pr.items.forEach(function(p) {
+                var img = '';
+                if (p.media && p.media.length) {
+                    var m = p.media[0];
+                    if (m.type === 'img') img = '<img class="proj-img" src="' + esc(m.src) + '" alt="' + esc(m.alt || '') + '" loading="lazy">';
+                }
+                var tech = (p.tech || []).map(function(t) { return '<span>' + esc(t) + '</span>'; }).join('');
+                var link = p.link ? '<a class="proj-link" href="' + esc(p.link) + '" target="_blank"><i class="fas fa-rocket"></i> Lancer</a>' : '';
+                var st = p.status || 'terminée';
+                var sl = STATUS[st] || st.toUpperCase();
+                root.innerHTML += '<div class="proj-card">' +
+                    '<div class="proj-top"><span class="proj-title">' + esc(p.title) + '</span><span class="proj-status ' + esc(st) + '">' + esc(sl) + '</span></div>' +
+                    img +
+                    '<p class="proj-desc">' + esc(p.description) + '</p>' +
+                    '<div class="proj-tech">' + tech + '</div>' +
+                    link +
+                '</div>';
+            });
+            root.innerHTML += '</div>';
+        }
+
+        // ── Contact ──────────────────────────
+        var ct = P.contact || {};
+        if (ct.title || ct.description || id.discord || id.github || id.bmc || id.kofi) {
+            root.innerHTML += '<div class="contact"><div class="sec-title">Contact</div>';
+            if (ct.description) root.innerHTML += '<p class="contact-desc">' + esc(ct.description) + '</p>';
+            root.innerHTML += '<div class="contact-links">';
+            if (id.discord) root.innerHTML += '<a class="contact-link" href="' + esc(id.discord) + '" target="_blank"><i class="fab fa-discord"></i><b>Discord</b><small>#samsoucoupe</small></a>';
+            if (id.github)  root.innerHTML += '<a class="contact-link" href="' + esc(id.github) + '" target="_blank"><i class="fab fa-github"></i><b>GitHub</b><small>/samsoucoupe</small></a>';
+            if (id.bmc)     root.innerHTML += '<a class="contact-link" href="' + esc(id.bmc) + '" target="_blank"><i class="fas fa-coffee"></i><b>Buy Me a Coffee</b><small>soutien</small></a>';
+            if (id.kofi)    root.innerHTML += '<a class="contact-link" href="' + esc(id.kofi) + '" target="_blank"><i class="fas fa-heart"></i><b>Ko-fi</b><small>soutien</small></a>';
+            root.innerHTML += '</div></div>';
+        }
     </script>
 </body>
 </html>

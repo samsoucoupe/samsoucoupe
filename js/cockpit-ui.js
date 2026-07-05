@@ -22,7 +22,17 @@
         el('footer-year').textContent = new Date().getFullYear();
 
         // Wire le bouton briefing → lance la 3D
-        el('briefing-start').addEventListener('click', startGame);
+                el('briefing-start').addEventListener('click', startGame);
+
+                // Version simple
+                el('briefing-simple').addEventListener('click', function() {
+                    window.location.href = 'simple.html';
+                });
+
+                // Auto-redirect mobile (< 768px) → simple directement
+                if (window.innerWidth < 768) {
+                    window.location.href = 'simple.html';
+                }
 
         // Fermer le panneau (Échap ou bouton)
         el('panel-close').addEventListener('click', closePanel);
