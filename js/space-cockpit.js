@@ -1046,10 +1046,9 @@ const PLANET_ORBIT_R = 20;
                 orbitAngle = Math.atan2(d2.z, d2.x);
                 setModeCb('orbiting');
                 if (!planets[targetPlanet].discovered) {
-                    planets[targetPlanet].discovered = true;
-                    if (onDiscoverCb) onDiscoverCb(targetPlanet);
-                }
-                if (onScanCb) onScanCb(targetPlanet);
+                planets[targetPlanet].discovered = true;
+                if (onDiscoverCb) onDiscoverCb(targetPlanet);
+            }
             }
         } else if (mode === 'orbiting') {
             const center = planets[targetPlanet].root.position;
