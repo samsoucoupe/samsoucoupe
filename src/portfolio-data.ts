@@ -4,8 +4,8 @@
  * Utilisé par l'overlay holographique du cockpit.
  */
 
-// Asset : Vite résout le path en dev et hashe en build
-import avatarUrl from '../assets/pdpSamsoucoupe.gif';
+// Asset statique servi depuis public/assets/
+const avatarUrl = 'assets/pdpSamsoucoupe.gif';
 
 export interface Identity {
     name: string;
