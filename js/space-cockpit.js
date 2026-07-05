@@ -1264,7 +1264,10 @@ const PLANET_ORBIT_R = 20;
         setOnModeCb: cb => { onModeCb = cb; },
         setOnPortalCb: cb => { onPortalCb = cb; },
         setOnScoreCb: cb => { onScoreCb = cb; },
-        setIdleMode: () => { mode = "idle"; },
+        setIdleMode: () => {
+            mode = "idle";
+            idleT = 0; // reset path progression
+        },
         getIdlePathPoints,
 
     };
