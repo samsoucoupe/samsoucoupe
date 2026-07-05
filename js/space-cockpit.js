@@ -1170,8 +1170,10 @@ const PLANET_ORBIT_R = 20;
                 shipPos.x + fx * 20, shipPos.y - 1, shipPos.z + fz * 20
             );
             camera.setTarget(BABYLON.Vector3.Lerp(camera.getTarget(), look, Math.min(1, dt * 6)));
+        } else if (mode === 'idle') {
+            // Camera stays exactly where it is — no tracking at all
         } else {
-            // Caméra orbitale autour de la planète, dézoomée
+            // Orbiting: orbit slowly around the planet, zoomed out
             const orbitCamAngle = elapsed * 0.15;
             const cx = Math.sin(orbitCamAngle), cz = Math.cos(orbitCamAngle);
             const back = 28, up = 8;
