@@ -1,47 +1,166 @@
 /* ============================================================
- * space-cockpit.js — samsoucoupe universe
+ * space-cockpit.ts — samsoucoupe universe
  *
  * Système solaire : home au centre, 4 planètes orbitent autour.
  * Clic une planète → vol automatique + orbite autour à l'arrivée.
  * Échap → retour au centre, orbite d'overview.
  * Bouton Map → carte 2D du système (géré côté UI).
  * ============================================================ */
-window.SpaceCockpit = (function () {
-    'use strict';
+import { PORTFOLIO, Project } from './portfolio-data';
 
-    let canvas, engine, scene, camera, glow;
-    let ship, engineGlow = [], engineParticles;
-    let sunCore;
+// Babylon.js — import global (ESM)
+import * as BABYLON from '@babylonjs/core';
 
-    // --- les planètes (orbitent autour du centre) ---
-    let planets = {};
-    const SUN_POS = BABYLON.Vector3.Zero();
+// Types minimaux pour les objets métier
+type Mode = 'idle' | 'flying' | 'orbiting' | 'flying_moon' | 'orbiting_moon';
 
-    // --- état du vaisseau ---
-    // mode: 'idle' (orbite centre) | 'flying' (en route) | 'orbiting' (autour planète)
-    let mode = 'orbiting';
-    let shipPos = new BABYLON.Vector3(0, 8, 70);
-    let targetPlanet = 'home';
-    // Idle path state
-    let idlePath = [];       // array of BABYLON.Vector3 waypoints
-    let idlePathIdx = 0;     // current waypoint index
-    let idlePathT = 0;       // interpolation [0,1] between idx and idx+1
-    let idleSpeed = 28;      // units/sec along the spline
-    let orbitAngle = 0;               // angle d'orbite courant (idle et orbiting)
-    let shipYaw = 0;
-    let currentSpeed = 0;
+interface SectionCfg {
+    color: string;
+    label: string;
+    glyph: string;
+    size: number;
+    orbit: { radius: number; height: number; angle: number; speed: number };
+    hasRing?: boolean;
+}
 
-    // --- scanner ---
-    let scanProgress = 0;
+interface PlanetEntry {
+    root: BABYLON.TransformNode;
+    body?: BABYLON.Mesh;
+    halo?: BABYLON.Mesh;
+    ring?: BABYLON.Mesh;
+    pos: BABYLON.Vector3;
+    cfg: SectionCfg;
+    color?: BABYLON.Color3;
+    discovered: boolean;
+    signal: unknown;
+}
 
-    const readyCallbacks = [];
-    let ready = false;
-    let onScanCb = null, onDiscoverCb = null, onModeCb = null, onScoreCb = null;
+interface MoonEntry {
+    root: BABYLON.TransformNode;
+    body: BABYLON.Mesh;
+    halo: BABYLON.Mesh;
+    moonDist: number;
+    moonSpeed: number;
+    moonAngle: number;
+    moonTilt: number;
+    moonColor: BABYLON.Color3;
+}
 
-    // --- système de score / combat ---
-    let score = 0;
-    let combo = 0;
-    let lastKillTime = 0;
+interface PortalEntry {
+    id: number;
+    root: BABYLON.TransformNode;
+    ring: BABYLON.Mesh;
+    core: BABYLON.Mesh;
+    ps: BABYLON.ParticleSystem;
+    hit: BABYLON.Mesh;
+    pos: BABYLON.Vector3;
+    life: number;
+    triggered: boolean;
+    _spin: number;
+}
+
+interface EnemyEntry {
+    id: number;
+    root: BABYLON.TransformNode;
+    body: BABYLON.Mesh;
+    core: BABYLON.Mesh;
+    hit: BABYLON.Mesh;
+    pos: BABYLON.Vector3;
+    speed: number;
+    strafeOffset: number;
+    life: number;
+}
+
+interface CometEntry {
+    core: BABYLON.Mesh;
+    ps: BABYLON.ParticleSystem;
+    pos: BABYLON.Vector3;
+    vel: BABYLON.Vector3;
+    life: number;
+}
+
+interface ShipState { x: number; y: number; z: number; speed: number; target: string; mode: Mode; }
+interface ScanState { id: string | null; progress: number; discoveredCount: number; total: number; }
+interface RadarBlip { id: string; dx: number; dz: number; d: number; discovered: boolean; color: string; label: string; }
+interface SystemSnap { id: string; x: number; z: number; color: string; label: string; glyph: string; radius: number; discovered: boolean; }
+interface ScoreEvent { score: number; gained: number; combo: number; reason: string; }
+interface IdlePathPoint { x: number; z: number; }
+
+type ScanCb = (sectionId: string) => void;
+type DiscoverCb = (sectionId: string) => void;
+type ModeCb = (m: Mode) => void;
+type PortalCb = (quote: string) => void;
+type ScoreCb = (evt: ScoreEvent) => void;
+
+export interface SpaceCockpitAPI {
+    init: () => void;
+    onReady: (cb: () => void) => void;
+    isMobile: () => boolean;
+    SECTIONS: Record<string, SectionCfg>;
+    SECTION_ORDER: string[];
+    flyTo: (sectionId: string) => void;
+    returnToCenter: () => void;
+    getMode: () => Mode;
+    getIdlePathPoints: () => IdlePathPoint[];
+    getShipState: () => ShipState;
+    getScanState: () => ScanState;
+    getStationsForRadar: () => RadarBlip[];
+    getSystemSnapshot: () => SystemSnap[];
+    nextSection: () => string;
+    prevSection: () => string;
+    getScore: () => { score: number; combo: number };
+    setOnScanCb: (cb: ScanCb) => void;
+    setOnDiscoverCb: (cb: DiscoverCb) => void;
+    setOnModeCb: (cb: ModeCb) => void;
+    setOnPortalCb: (cb: PortalCb) => void;
+    setOnScoreCb: (cb: ScoreCb) => void;
+    setIdleMode: () => void;
+}
+
+// ───────────────────────── module state ─────────────────────────
+let canvas: HTMLCanvasElement;
+let engine: BABYLON.Engine;
+let scene: BABYLON.Scene;
+let camera: BABYLON.UniversalCamera;
+let glow: BABYLON.GlowLayer;
+let ship: BABYLON.TransformNode;
+let engineGlow: BABYLON.Mesh[] = [];
+let engineParticles: BABYLON.ParticleSystem;
+let sunCore: BABYLON.Mesh;
+
+// --- les planètes (orbitent autour du centre) ---
+let planets: Record<string, PlanetEntry> = {};
+const SUN_POS = BABYLON.Vector3.Zero();
+
+// --- état du vaisseau ---
+let mode: Mode = 'orbiting';
+let shipPos = new BABYLON.Vector3(0, 8, 70);
+let targetPlanet = 'home';
+let targetMoon = -1;
+// Idle path state
+let idlePath: BABYLON.Vector3[] = [];       // array of BABYLON.Vector3 waypoints
+let idlePathIdx = 0;     // current waypoint index
+let idlePathT = 0;       // interpolation [0,1] between idx and idx+1
+const idleSpeed = 28;      // units/sec along the spline
+let orbitAngle = 0;               // angle d'orbite courant (idle et orbiting)
+let shipYaw = 0;
+let currentSpeed = 0;
+
+// --- scanner ---
+let scanProgress = 0;
+
+const readyCallbacks: (() => void)[] = [];
+let ready = false;
+let onScanCb: ScanCb | null = null;
+let onDiscoverCb: DiscoverCb | null = null;
+let onModeCb: ModeCb | null = null;
+let onScoreCb: ScoreCb | null = null;
+let onPortalCb: PortalCb | null = null;
+
+// --- système de score / combat ---
+let score = 0;
+let combo = 0;
+let lastKillTime = 0;
 
     /*
      * Configuration : home = soleil central, les autres = planètes orbitantes.
@@ -101,7 +220,7 @@ const PLANET_ORBIT_R = 20;
     }
 
     function init() {
-        canvas = document.getElementById('renderCanvas');
+        canvas = document.getElementById('renderCanvas') as HTMLCanvasElement;
         if (!canvas || typeof BABYLON === 'undefined') { console.error('[SC] missing'); return; }
         engine = new BABYLON.Engine(canvas, true, {
             preserveDrawingBuffer: true, stencil: true, antialias: true,
@@ -384,8 +503,7 @@ const PLANET_ORBIT_R = 20;
     function buildEngineParticles() {
         const ps = new BABYLON.ParticleSystem('enginePS', 180, scene);
         ps.particleTexture = makeStarTexture();
-        ps.emitter = ship;
-        ps.minEmitBox = vec([-1.2, -0.15, 2]);    // arrière du vaisseau
+        ps.emitter = ship as unknown as BABYLON.AbstractMesh;
         ps.maxEmitBox = vec([1.2, 0.15, 2.2]);
         ps.direction1 = vec([-0.3, -0.3, 2]);     // vers l'arrière (z+)
         ps.direction2 = vec([0.3, 0.3, 4]);
@@ -409,7 +527,6 @@ const PLANET_ORBIT_R = 20;
     let portals = [];
     let portalTimer = 0;
     let nextSpawn = 15;               // les prochaines secondes avant l'apparition
-    let onPortalCb = null;            // callback quand un message est déclenché
     const PORTAL_QUOTES = [
         "Wubba lubba dub dub !",
         "C'est ça, Morty. On est dans l'espace de ce portfolio. Profite.",
@@ -503,7 +620,7 @@ const PLANET_ORBIT_R = 20;
         // Particules vertes en spirale serrée autour du portail
         const ps = new BABYLON.ParticleSystem('pPs_' + pid, 80, scene);
         ps.particleTexture = makeStarTexture();
-        ps.emitter = root;
+        ps.emitter = root as unknown as BABYLON.AbstractMesh;
         ps.minEmitBox = vec([-2, -2, -0.3]);
         ps.maxEmitBox = vec([2, 2, 0.3]);
         ps.color1 = new BABYLON.Color4(0.1, 1, 0.4, 1);
@@ -1090,6 +1207,8 @@ const PLANET_ORBIT_R = 20;
                 setModeCb('orbiting');
             }
         } else if (mode === 'orbiting_moon') {
+            const moon = PROJECT_MOONS[targetMoon];
+            if (!moon) { mode = 'orbiting'; return; }
             const center = moon.root.position;
             const toMoon = center.subtract(shipPos);
             const distToMoon = toMoon.length();
@@ -1204,7 +1323,7 @@ const PLANET_ORBIT_R = 20;
                 planets[targetPlanet].discovered = true;
                 if (onDiscoverCb) onDiscoverCb(targetPlanet);
                 const p = planets[targetPlanet];
-                if (p.body) p.body.material.emissiveColor = p.color.scale(0.6);
+                if (p.body) (p.body.material as BABYLON.StandardMaterial).emissiveColor = p.color!.scale(0.6);
             }
             if (onScanCb) onScanCb(targetPlanet);
         }
@@ -1253,21 +1372,40 @@ const PLANET_ORBIT_R = 20;
     function getMode() { return mode; }
     function isMobile() { return ('ontouchstart' in window && window.innerWidth < 900); }
 
-    return {
-        init, onReady, isMobile, SECTIONS, SECTION_ORDER,
-        flyTo, returnToCenter, getMode,
-        getShipState, getScanState, getStationsForRadar, getSystemSnapshot,
-        nextSection, prevSection, getScore,
-        setOnScanCb: cb => { onScanCb = cb; },
-        setOnDiscoverCb: cb => { onDiscoverCb = cb; },
-        setOnModeCb: cb => { onModeCb = cb; },
-        setOnPortalCb: cb => { onPortalCb = cb; },
-        setOnScoreCb: cb => { onScoreCb = cb; },
-        setIdleMode: () => {
-            mode = "idle";
-            idlePathT = 0; idlePathIdx = 0; // reset path progression
-        },
-        getIdlePathPoints,
+// ───────────────────────── API publique ─────────────────────────
+export const SpaceCockpit: SpaceCockpitAPI = {
+    init,
+    onReady,
+    isMobile,
+    SECTIONS,
+    SECTION_ORDER,
+    flyTo,
+    returnToCenter,
+    getMode,
+    getShipState,
+    getScanState,
+    getStationsForRadar,
+    getSystemSnapshot,
+    nextSection,
+    prevSection,
+    getScore,
+    setOnScanCb: (cb: ScanCb) => { onScanCb = cb; },
+    setOnDiscoverCb: (cb: DiscoverCb) => { onDiscoverCb = cb; },
+    setOnModeCb: (cb: ModeCb) => { onModeCb = cb; },
+    setOnPortalCb: (cb: PortalCb) => { onPortalCb = cb; },
+    setOnScoreCb: (cb: ScoreCb) => { onScoreCb = cb; },
+    setIdleMode: () => {
+        mode = 'idle';
+        idlePathT = 0; idlePathIdx = 0; // reset path progression
+    },
+    getIdlePathPoints,
+};
 
-    };
-})();
+// Rétro-compatibilité : window.SpaceCockpit pour les scripts non-module
+declare global {
+    interface Window {
+        SpaceCockpit: SpaceCockpitAPI;
+        StarfieldBG: { setBoost: (f: number) => void; getBoost: () => number };
+    }
+}
+window.SpaceCockpit = SpaceCockpit;

@@ -19,7 +19,7 @@
 
         /* ── Base ──────────────────────────── */
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { overflow-y: scroll !important; position: static !important; height: auto !important; width: auto !important; }
+        html, body { overflow: auto !important; overflow-y: scroll !important; position: static !important; height: auto !important; width: auto !important; overscroll-behavior: auto !important; }
         .page { max-width: 600px; margin: 0 auto; padding: 32px 20px 80px; }
 
         /* ── Section titre ─────────────────── */
@@ -145,10 +145,11 @@
         <span>Babylon.js · 3D Portfolio</span>
     </footer>
 
-    <script src="js/starfield-background.js"></script>
-    <script src="js/portfolio-data.js"></script>
-    <script>
-        var P = window.PORTFOLIO || {};
+    <script type="module" src="/src/starfield-background.ts"></script>
+    <script type="module" src="/src/portfolio-data.ts"></script>
+    <script type="module">
+        import { PORTFOLIO } from '/src/portfolio-data';
+        var P = PORTFOLIO || {};
         var STATUS = P.statusLabels || { 'terminée': 'TERMINÉE', 'actif': 'ACTIF', 'archivé': 'ARCHIVÉ', 'en cours': 'EN COURS' };
 
         function esc(s) {

@@ -1,15 +1,38 @@
-// starfield-background.js : fond spatial warp (canvas 2D) — par samsoucoupe
-// Conservé comme backdrop permanent.API: window.StarfieldBG.setBoost(factor)
-const canvas = document.getElementById('starfield');
-const ctx = canvas.getContext('2d');
-let stars = [];
+/* ============================================================
+ * starfield-background.ts — fond spatial warp (canvas 2D)
+ * Conservé comme backdrop permanent. API: window.StarfieldBG.setBoost(factor)
+ * ============================================================ */
+
+interface Star {
+    x: number;
+    y: number;
+    z: number;
+    o: number;
+}
+
+interface StarfieldBG {
+    setBoost: (f: number) => void;
+    getBoost: () => number;
+}
+
+declare global {
+    interface Window {
+        StarfieldBG: StarfieldBG;
+    }
+}
+
+const canvas = document.getElementById('starfield') as HTMLCanvasElement;
+const ctx = canvas.getContext('2d')!;
+let stars: Star[] = [];
 const STAR_COUNT = 220;
 let starSpeed = 0.7;          // base
 let boostFactor = 1;          // multiplicateur runtime
+
 function resizeStarfield() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 }
+
 function createStars() {
     stars = [];
     for (let i = 0; i < STAR_COUNT; i++) {
@@ -21,20 +44,21 @@ function createStars() {
         });
     }
 }
+
 function drawStars() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     const speed = starSpeed * boostFactor;
     for (let i = 0; i < STAR_COUNT; i++) {
-        let star = stars[i];
-        let k = 128.0 / star.z;
-        let sx = star.x * k + canvas.width / 2;
-        let sy = star.y * k + canvas.height / 2;
+        const star = stars[i];
+        const k = 128.0 / star.z;
+        const sx = star.x * k + canvas.width / 2;
+        const sy = star.y * k + canvas.height / 2;
         if (sx < 0 || sx >= canvas.width || sy < 0 || sy >= canvas.height) {
             star.x = Math.random() * canvas.width - canvas.width / 2;
             star.y = Math.random() * canvas.height - canvas.height / 2;
             star.z = canvas.width;
         }
-        let size = 1.2 * (1 - star.z / canvas.width) * (1 + boostFactor * 0.8);
+        const size = 1.2 * (1 - star.z / canvas.width) * (1 + boostFactor * 0.8);
         ctx.beginPath();
         ctx.arc(sx, sy, size, 0, 2 * Math.PI);
         // Teinte légèrement plus froide quand on booste (hyperspace)
@@ -59,24 +83,30 @@ function drawStars() {
         if (star.z <= 0) star.z = canvas.width;
     }
 }
+
 const TARGET_FPS = 60;
 const FRAME_INTERVAL = 1000 / TARGET_FPS;
 let lastFrameTime = 0;
-function animateStarfield(timestamp) {
+
+function animateStarfield(timestamp: number) {
     if (timestamp - lastFrameTime >= FRAME_INTERVAL) {
         lastFrameTime = timestamp;
         drawStars();
     }
     requestAnimationFrame(animateStarfield);
 }
+
 window.addEventListener('resize', () => { resizeStarfield(); createStars(); });
 window.addEventListener('DOMContentLoaded', () => {
     resizeStarfield();
     createStars();
     requestAnimationFrame(animateStarfield);
 });
+
 // API publique : permet à la 3D de booster le warp pendant un saut hyperspace
 window.StarfieldBG = {
-    setBoost: function (f) { boostFactor = f; },
+    setBoost: function (f: number) { boostFactor = f; },
     getBoost: function () { return boostFactor; }
 };
+
+export {};

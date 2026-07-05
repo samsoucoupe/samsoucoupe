@@ -1,25 +1,27 @@
 /* ============================================================
- * cockpit-ui.js — Boucle de jeu HUD + briefing + panneau station
+ * cockpit-ui.ts — Boucle de jeu HUD + briefing + panneau station
  * ============================================================ */
-(function () {
-    'use strict';
+import { SpaceCockpit } from './space-cockpit';
+import { PORTFOLIO } from './portfolio-data';
 
-    function el(id) { return document.getElementById(id); }
-    function esc(s) {
+    function el(id: string): HTMLElement { return document.getElementById(id) as HTMLElement; }
+    function esc(s: unknown) {
         return String(s == null ? '' : s).replace(/[&<>"']/g, function (c) {
-            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+            return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!;
         });
     }
-    function $all(sel, ctx) { return Array.prototype.slice.call((ctx || document).querySelectorAll(sel)); }
+    function $all(sel: string, ctx?: ParentNode) { return Array.prototype.slice.call((ctx || document).querySelectorAll(sel)) as HTMLElement[]; }
+    function svgEl(tag: string): SVGElement { return document.createElementNS('http://www.w3.org/2000/svg', tag) as SVGElement; }
+    function attr(e: SVGElement | HTMLElement, name: string, val: string | number) { e.setAttribute(name, String(val)); }
 
-    var lastScanned = null;
+    var lastScanned: string | null = null;
     var hudStarted = false;
 
     // ----------------------------------------------------------
     // DÉMARRAGE
     // ----------------------------------------------------------
     function init() {
-        el('footer-year').textContent = new Date().getFullYear();
+        el('footer-year').textContent = String(new Date().getFullYear());
 
         // Wire le bouton briefing → lance la 3D
                 el('briefing-start').addEventListener('click', startGame);
@@ -148,7 +150,7 @@
         var mpFill = el('mp-fill');
         var mpCount = el('mp-count');
         if (mpFill) mpFill.style.width = ((scan.discoveredCount / scan.total) * 100) + '%';
-        if (mpCount) mpCount.textContent = scan.discoveredCount;
+        if (mpCount) mpCount.textContent = String(scan.discoveredCount);
 
         // Score de combat
         var scoreEl = el('score-val');
@@ -157,7 +159,7 @@
         if (scoreEl) scoreEl.textContent = scoreState.score.toLocaleString('fr-FR');
         if (comboEl) {
             comboEl.textContent = scoreState.combo > 1 ? 'x' + scoreState.combo : '';
-            comboEl.style.opacity = scoreState.combo > 1 ? 1 : 0;
+            comboEl.style.opacity = String(scoreState.combo > 1 ? 1 : 0);
         }
 
         // Rafraîchit la map si ouverte
@@ -177,7 +179,7 @@
         var rr = 70;     // rayon radar en % (0 = centre)
         // Garde un div par blip (stable) + clic pour voler
         blips.forEach(function (b) {
-            var node = container.querySelector('[data-id="' + b.id + '"]');
+            var node = container.querySelector('[data-id="' + b.id + '"]') as HTMLElement | null;
             if (!node) {
                 node = document.createElement('div');
                 node.className = 'radar-blip';
@@ -255,7 +257,7 @@
             list.dataset.signature = html;
             list.querySelectorAll('.nav-log-row').forEach(function (row) {
                 row.addEventListener('click', function () {
-                    SpaceCockpit.flyTo(row.dataset.id);
+                    SpaceCockpit.flyTo((row as HTMLElement).dataset.id!);
                 });
             });
         } else {
@@ -303,7 +305,7 @@
         var vb = Math.max(maxX - minX, maxZ - minZ) / 2 + pad;
         var cx = (minX + maxX) / 2, cz = (minZ + maxZ) / 2;
         svg.setAttribute('viewBox', (cx - vb) + ' ' + (cz - vb) + ' ' + (vb * 2) + ' ' + (vb * 2));
-        svg.dataset.vb = vb;
+        svg.dataset.vb = String(vb);
 
         // --- couches statiques ---
         var orbitsGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
@@ -311,7 +313,7 @@
         snapshot.forEach(function (s) {
             if (s.radius > 0) {
                 var c = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-                c.setAttribute('cx', 0); c.setAttribute('cy', 0); c.setAttribute('r', s.radius);
+                c.setAttribute('cx', '0'); c.setAttribute('cy', '0'); c.setAttribute('r', String(s.radius));
                 c.setAttribute('fill', 'none');
                 c.setAttribute('stroke', 'rgba(0,225,255,0.12)');
                 c.setAttribute('stroke-width', '1');
@@ -330,15 +332,15 @@
 
             var hit = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             hit.dataset.part = 'hit';
-            hit.setAttribute('r', s.id === 'home' ? 16 : 13);
+            hit.setAttribute('r', String(s.id === 'home' ? 16 : 13));
             hit.setAttribute('fill', 'transparent');
             g.appendChild(hit);
 
             var planet = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
             planet.dataset.part = 'planet';
-            planet.setAttribute('r', s.id === 'home' ? 10 : 7);
+            planet.setAttribute('r', String(s.id === 'home' ? 10 : 7));
             planet.setAttribute('fill', s.color);
-            planet.setAttribute('opacity', s.discovered ? 1 : 0.4);
+            planet.setAttribute('opacity', String(s.discovered ? 1 : 0.4));
             planet.style.filter = 'drop-shadow(0 0 6px ' + s.color + ')';
             g.appendChild(planet);
 
@@ -348,7 +350,7 @@
             label.setAttribute('font-family', 'Orbitron');
             label.setAttribute('font-size', '8');
             label.setAttribute('text-anchor', 'middle');
-            label.setAttribute('opacity', s.discovered ? 1 : 0.4);
+            label.setAttribute('opacity', String(s.discovered ? 1 : 0.4));
             label.textContent = esc(s.label);
             g.appendChild(label);
 
@@ -428,11 +430,11 @@
             if (hit) { hit.setAttribute('cx', s.x.toFixed(1)); hit.setAttribute('cy', s.z.toFixed(1)); }
             if (planet) {
                 planet.setAttribute('cx', s.x.toFixed(1)); planet.setAttribute('cy', s.z.toFixed(1));
-                planet.setAttribute('opacity', s.discovered ? 1 : 0.4);
+                planet.setAttribute('opacity', String(s.discovered ? 1 : 0.4));
             }
             if (label) {
                 label.setAttribute('x', s.x.toFixed(1)); label.setAttribute('y', (s.z + r + 14).toFixed(1));
-                label.setAttribute('opacity', s.discovered ? 1 : 0.4);
+                label.setAttribute('opacity', String(s.discovered ? 1 : 0.4));
             }
         });
 
@@ -541,4 +543,3 @@
 
     if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
     else init();
-})();

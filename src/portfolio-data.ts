@@ -1,15 +1,95 @@
 /**
- * portfolio-data.js
- * Toutes les données du portfolio, structurées en JS.
+ * portfolio-data.ts
+ * Toutes les données du portfolio, structurées en TS.
  * Utilisé par l'overlay holographique du cockpit.
  */
-window.PORTFOLIO = {
+
+// Asset : Vite résout le path en dev et hashe en build
+import avatarUrl from '../assets/pdpSamsoucoupe.gif';
+
+export interface Identity {
+    name: string;
+    role: string;
+    tagline: string;
+    details: string;
+    avatar: string;
+    discord: string;
+    github: string;
+    bmc: string;
+    kofi: string;
+}
+
+export interface Stat {
+    number: string;
+    label: string;
+}
+
+export interface About {
+    title: string;
+    subtitle: string;
+    paragraphs: string[];
+    stats: Stat[];
+}
+
+export interface SkillTag {
+    label: string;
+    cls: string;
+}
+
+export interface SkillCategory {
+    icon: string;
+    name: string;
+    tags: SkillTag[];
+}
+
+export interface Skills {
+    title: string;
+    categories: SkillCategory[];
+}
+
+export interface ProjectMedia {
+    type: 'img' | 'video' | 'youtube';
+    src: string;
+    alt: string;
+}
+
+export interface Project {
+    title: string;
+    description: string;
+    tech: string[];
+    media: ProjectMedia[];
+    link: string | null;
+    icon: string;
+    color: string;
+    status: string;
+}
+
+export interface Projects {
+    title: string;
+    items: Project[];
+}
+
+export interface Contact {
+    title: string;
+    description: string;
+}
+
+export interface Portfolio {
+    identity: Identity;
+    about: About;
+    skills: Skills;
+    projects: Projects;
+    contact: Contact;
+    statusLabels: Record<string, string>;
+}
+
+export const PORTFOLIO: Portfolio = {
     identity: {
         name: "samsoucoupe",
         role: "Développeur Backend à tendance Full Stack",
         tagline: "Passionné par le développement backend et les technologies de données.",
         details: "Spécialisé en Python, R, SQL avec une expertise en outils de data comme Excel et Power BI.",
-        avatar: "assets/pdpSamsoucoupe.gif",
+        avatar: avatarUrl,
         discord: "https://discord.com/users/388993523715801088",
         github: "https://github.com/samsoucoupe",
         bmc: "https://buymeacoffee.com/samsoucoupe",
@@ -195,3 +275,11 @@ window.PORTFOLIO = {
         'en cours': 'EN COURS'
     }
 };
+
+// Rétro-compatibilité : les scripts non-module qui liraient window.PORTFOLIO
+declare global {
+    interface Window {
+        PORTFOLIO: Portfolio;
+    }
+}
+window.PORTFOLIO = PORTFOLIO;
