@@ -19,7 +19,7 @@ window.SpaceCockpit = (function () {
 
     // --- état du vaisseau ---
     // mode: 'idle' (orbite centre) | 'flying' (en route) | 'orbiting' (autour planète)
-    let mode = 'idle';
+    let mode = 'orbiting';
     let shipPos = new BABYLON.Vector3(0, 8, 70);
     let targetPlanet = 'home';
     let orbitAngle = 0;               // angle d'orbite courant (idle et orbiting)
@@ -53,9 +53,7 @@ window.SpaceCockpit = (function () {
     const PROJECT_MOONS = [];
     const SECTION_ORDER = ['home', 'about', 'skills', 'projects', 'contact'];
     const ARRIVE_DIST = 18;
-    const IDLE_ORBIT_R = 26;        // proche du soleil
-    const IDLE_ORBIT_H = 6;         // au niveau du soleil (pas trop haut)
-    const PLANET_ORBIT_R = 20;
+const PLANET_ORBIT_R = 20;
     const MAX_SPEED = 100;
 
     function vec(a) { return new BABYLON.Vector3(a[0], a[1], a[2]); }
@@ -94,8 +92,7 @@ window.SpaceCockpit = (function () {
         buildEnemies();           // Drones hostiles
         attachPicking();
 
-        // Position initiale propre sur l'orbite idle (évite le saut au démarrage)
-        shipPos = idleOrbitPos(orbitAngle);
+        shipPos = planets.home.root.position.clone();
         ship.position.copyFrom(shipPos);
         startPortalsTimer();
         engine.runRenderLoop(renderLoop);
@@ -927,15 +924,6 @@ window.SpaceCockpit = (function () {
 
     function setModeCb(m) { if (onModeCb) onModeCb(m); }
 
-    /* ============================================================ RAYON D'ORBITE IDLE */
-    function idleOrbitPos(theta) {
-        return new BABYLON.Vector3(
-            IDLE_ORBIT_R * Math.cos(theta),
-            IDLE_ORBIT_H,
-            IDLE_ORBIT_R * Math.sin(theta)
-        );
-    }
-
     /* ============================================================ RENDER */
     let elapsed = 0;
     function renderLoop() {
@@ -1009,7 +997,6 @@ window.SpaceCockpit = (function () {
                 // Cible un point de l'orbite idle dans la direction actuelle
                 const toSun = shipPos.subtract(SUN_POS);
                 orbitAngle = Math.atan2(toSun.z, toSun.x);
-                targetWorld = idleOrbitPos(orbitAngle);
             } else {
                 targetWorld = planets[targetPlanet].root.position.clone();
             }
@@ -1032,38 +1019,16 @@ window.SpaceCockpit = (function () {
 
             if (dist < ARRIVE_DIST) {
                 currentSpeed = 0;
-                if (targetPlanet === 'home') {
-                    mode = 'idle';
-                    // orbitAngle est déjà aligné avec la direction d'arrivée → pas de saut
-                    // Marque home découverte et déclenche le panneau d'accueil
-                    if (!planets.home.discovered) {
-                        planets.home.discovered = true;
-                        if (onDiscoverCb) onDiscoverCb('home');
-                    }
-                    if (onScanCb) onScanCb('home');
-                    setModeCb('idle');
-                } else {
-                    mode = 'orbiting';
-                    // Angle initial = direction actuelle vers la planète
-                    const d2 = planets[targetPlanet].root.position.subtract(shipPos);
-                    orbitAngle = Math.atan2(d2.z, d2.x);
-                    setModeCb('orbiting');
+                mode = 'orbiting';
+                const d2 = planets[targetPlanet].root.position.subtract(shipPos);
+                orbitAngle = Math.atan2(d2.z, d2.x);
+                setModeCb('orbiting');
+                if (!planets[targetPlanet].discovered) {
+                    planets[targetPlanet].discovered = true;
+                    if (onDiscoverCb) onDiscoverCb(targetPlanet);
                 }
+                if (onScanCb) onScanCb(targetPlanet);
             }
-        } else if (mode === 'idle') {
-            // Spline Lissajous : traverse toutes les orbites planétaires
-            // x(t) = A·cos(ω·t), y(t) = B·sin(3·t), z(t) = A·sin(ω·t)
-            // A=230 couvre contact (r=215), B=25 couvre hauteurs (-8 à +10)
-            orbitAngle += dt * 0.08;
-            const LJA = 230, LJB = 25, LJW = orbitAngle, LJW3 = orbitAngle * 3;
-            shipPos.x = LJA * Math.cos(LJW);
-            shipPos.y = LJB * Math.sin(LJW3);
-            shipPos.z = LJA * Math.sin(LJW);
-            const tdx = -LJA * Math.sin(LJW);
-            const tdz = LJA * Math.cos(LJW);
-            const tangentYaw = Math.atan2(-tdx, tdz);
-            shipYaw = lerpAngle(shipYaw, tangentYaw, Math.min(1, dt * 3));
-            enginesBoost(dt, false);
         } else if (mode === 'orbiting') {
             const center = planets[targetPlanet].root.position;
             const toPlanet = center.subtract(shipPos);
