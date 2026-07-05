@@ -1244,6 +1244,9 @@ const PLANET_ORBIT_R = 20;
         const i = SECTION_ORDER.indexOf(targetPlanet);
         return SECTION_ORDER[(i + 1) % SECTION_ORDER.length];
     }
+    function getIdlePathPoints() {
+        return idlePath.map(p => ({ x: p.x, z: p.z }));
+    }
     function prevSection() {
         const i = SECTION_ORDER.indexOf(targetPlanet);
         return SECTION_ORDER[(i - 1 + SECTION_ORDER.length) % SECTION_ORDER.length];
@@ -1261,7 +1264,8 @@ const PLANET_ORBIT_R = 20;
         setOnModeCb: cb => { onModeCb = cb; },
         setOnPortalCb: cb => { onPortalCb = cb; },
         setOnScoreCb: cb => { onScoreCb = cb; },
-        setIdleMode: () => { mode = "idle"; }
+        setIdleMode: () => { mode = "idle"; },
+        getIdlePathPoints,
 
     };
 })();

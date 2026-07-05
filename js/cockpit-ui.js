@@ -345,6 +345,36 @@
             nodesGroup.appendChild(g);
         });
 
+        // --- idle path (TSP loop through all planets) ---
+        var pathPoints = SpaceCockpit.getIdlePathPoints();
+        if (pathPoints && pathPoints.length > 1) {
+            var pathGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+            pathGroup.id = 'map-idle-path';
+
+            // Dashed line through all path points
+            var poly = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+            var pts = pathPoints.map(p => p.x.toFixed(1) + ',' + p.z.toFixed(1)).join(' ');
+            poly.setAttribute('points', pts);
+            poly.setAttribute('fill', 'none');
+            poly.setAttribute('stroke', 'rgba(0,225,255,0.25)');
+            poly.setAttribute('stroke-width', '1.5');
+            poly.setAttribute('stroke-dasharray', '4 4');
+            poly.setAttribute('stroke-linejoin', 'round');
+            pathGroup.appendChild(poly);
+
+            // Dots at each planet waypoint
+            pathPoints.forEach(function(p) {
+                var dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                dot.setAttribute('cx', p.x.toFixed(1));
+                dot.setAttribute('cy', p.z.toFixed(1));
+                dot.setAttribute('r', '3');
+                dot.setAttribute('fill', 'rgba(0,225,255,0.5)');
+                pathGroup.appendChild(dot);
+            });
+
+            svg.appendChild(pathGroup);
+        }
+
         var shipGroup = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         shipGroup.id = 'map-ship';
         var shipMarker = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
