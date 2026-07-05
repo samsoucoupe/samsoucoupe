@@ -1170,7 +1170,17 @@ const PLANET_ORBIT_R = 20;
             );
             camera.setTarget(BABYLON.Vector3.Lerp(camera.getTarget(), look, Math.min(1, dt * 6)));
         } else if (mode === 'idle') {
-            // Camera stays exactly where it is — no tracking at all
+            // Camera follows the ship loosely — show the saucer drifting by
+            const fx = -Math.sin(shipYaw), fz = -Math.cos(shipYaw);
+            const back = 18, up = 6;
+            const desired = new BABYLON.Vector3(
+                shipPos.x - fx * back, shipPos.y + up, shipPos.z - fz * back
+            );
+            camera.position = BABYLON.Vector3.Lerp(camera.position, desired, Math.min(1, dt * 2));
+            const look = new BABYLON.Vector3(
+                shipPos.x + fx * 20, shipPos.y - 1, shipPos.z + fz * 20
+            );
+            camera.setTarget(BABYLON.Vector3.Lerp(camera.getTarget(), look, Math.min(1, dt * 4)));
         } else {
             // Orbiting: orbit slowly around the planet, zoomed out
             const orbitCamAngle = elapsed * 0.15;
