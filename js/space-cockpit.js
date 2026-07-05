@@ -1203,7 +1203,6 @@ const PLANET_ORBIT_R = 20;
             if (!planets[targetPlanet].discovered) {
                 planets[targetPlanet].discovered = true;
                 if (onDiscoverCb) onDiscoverCb(targetPlanet);
-                // Rend la planète plus brillante
                 const p = planets[targetPlanet];
                 if (p.body) p.body.material.emissiveColor = p.color.scale(0.6);
             }
@@ -1266,7 +1265,7 @@ const PLANET_ORBIT_R = 20;
         setOnScoreCb: cb => { onScoreCb = cb; },
         setIdleMode: () => {
             mode = "idle";
-            idleT = 0; // reset path progression
+            idlePathT = 0; idlePathIdx = 0; // reset path progression
         },
         getIdlePathPoints,
 

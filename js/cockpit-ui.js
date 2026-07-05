@@ -443,7 +443,7 @@
 
     function closePanel() {
             el('panel').classList.remove('open');
-            lastScanned = null;
+            // lastScanned intentionally kept — prevents onScanCb from re-opening stale station
         }
 
     // ---------- Renderers (identiques, briques cockpit) ----------
