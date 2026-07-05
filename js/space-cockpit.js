@@ -1114,20 +1114,32 @@ const PLANET_ORBIT_R = 20;
     }
 
     function updateCamera(dt) {
-        // Chase cam derrière le vaisseau (utilise shipYaw, pas ship.rotation)
-        const fx = -Math.sin(shipYaw), fz = -Math.cos(shipYaw);
-        const back = 12, up = 5;
-        const desired = new BABYLON.Vector3(
-            shipPos.x - fx * back, shipPos.y + up, shipPos.z - fz * back
-        );
-        camera.position = BABYLON.Vector3.Lerp(camera.position, desired, Math.min(1, dt * 3.5));
-        // Regarde devant le vaisseau
-        const look = new BABYLON.Vector3(
-            shipPos.x + fx * 20, shipPos.y - 1, shipPos.z + fz * 20
-        );
-        camera.setTarget(BABYLON.Vector3.Lerp(camera.getTarget(), look, Math.min(1, dt * 6)));
+        const planet = planets[targetPlanet];
+        const planetCenter = planet ? planet.root.position : SUN_POS;
+
+        if (mode === 'flying') {
+            const fx = -Math.sin(shipYaw), fz = -Math.cos(shipYaw);
+            const back = 12, up = 5;
+            const desired = new BABYLON.Vector3(
+                shipPos.x - fx * back, shipPos.y + up, shipPos.z - fz * back
+            );
+            camera.position = BABYLON.Vector3.Lerp(camera.position, desired, Math.min(1, dt * 3.5));
+            const look = new BABYLON.Vector3(
+                shipPos.x + fx * 20, shipPos.y - 1, shipPos.z + fz * 20
+            );
+            camera.setTarget(BABYLON.Vector3.Lerp(camera.getTarget(), look, Math.min(1, dt * 6)));
+        } else {
+            const fx = -Math.sin(shipYaw), fz = -Math.cos(shipYaw);
+            const back = 18, up = 6;
+            const camPos = new BABYLON.Vector3(
+                planetCenter.x - fx * back, planetCenter.y + up, planetCenter.z - fz * back
+            );
+            camera.position = BABYLON.Vector3.Lerp(camera.position, camPos, Math.min(1, dt * 3));
+            camera.setTarget(BABYLON.Vector3.Lerp(camera.getTarget(), planetCenter, Math.min(1, dt * 6)));
+        }
+
         camera.fov = 1.05 + (mode === 'flying' ? Math.min(0.2, currentSpeed / MAX_SPEED * 0.2) : 0);
-    }
+        }
 
     function updateScanner(dt) {
         if (mode !== 'orbiting') { scanProgress = 0; return; }
