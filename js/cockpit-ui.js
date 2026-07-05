@@ -282,10 +282,17 @@
         var svg = el('map-svg');
         if (!svg || !window.SpaceCockpit) return;
         var snapshot = SpaceCockpit.getSystemSnapshot();
-        var maxR = 150;
-        snapshot.forEach(function (s) { if (s.radius > maxR) maxR = s.radius; });
-        var vb = maxR + 60;
-        svg.setAttribute('viewBox', (-vb) + ' ' + (-vb) + ' ' + (vb * 2) + ' ' + (vb * 2));
+
+        // Determine SVG viewBox from actual planet positions (not orbit radii)
+        var minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
+        snapshot.forEach(function (s) {
+            if (s.x < minX) minX = s.x; if (s.x > maxX) maxX = s.x;
+            if (s.z < minZ) minZ = s.z; if (s.z > maxZ) maxZ = s.z;
+        });
+        var pad = 80;
+        var vb = Math.max(maxX - minX, maxZ - minZ) / 2 + pad;
+        var cx = (minX + maxX) / 2, cz = (minZ + maxZ) / 2;
+        svg.setAttribute('viewBox', (cx - vb) + ' ' + (cz - vb) + ' ' + (vb * 2) + ' ' + (vb * 2));
         svg.dataset.vb = vb;
 
         // --- couches statiques ---
