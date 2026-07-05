@@ -289,7 +289,7 @@
             if (s.x < minX) minX = s.x; if (s.x > maxX) maxX = s.x;
             if (s.z < minZ) minZ = s.z; if (s.z > maxZ) maxZ = s.z;
         });
-        var pad = 80;
+        var pad = 180;
         var vb = Math.max(maxX - minX, maxZ - minZ) / 2 + pad;
         var cx = (minX + maxX) / 2, cz = (minZ + maxZ) / 2;
         svg.setAttribute('viewBox', (cx - vb) + ' ' + (cz - vb) + ' ' + (vb * 2) + ' ' + (vb * 2));
@@ -396,6 +396,17 @@
         if (!svg || !window.SpaceCockpit) return;
         var snapshot = SpaceCockpit.getSystemSnapshot();
         var ship = SpaceCockpit.getShipState();
+
+        // Recalculate viewBox from actual planet positions
+        var minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
+        snapshot.forEach(function (s) {
+            if (s.x < minX) minX = s.x; if (s.x > maxX) maxX = s.x;
+            if (s.z < minZ) minZ = s.z; if (s.z > maxZ) maxZ = s.z;
+        });
+        var pad = 180;
+        var vb = Math.max(maxX - minX, maxZ - minZ) / 2 + pad;
+        var cx = (minX + maxX) / 2, cz = (minZ + maxZ) / 2;
+        svg.setAttribute('viewBox', (cx - vb) + ' ' + (cz - vb) + ' ' + (vb * 2) + ' ' + (vb * 2));
 
         snapshot.forEach(function (s) {
             var g = svg.querySelector('.map-node[data-id="' + s.id + '"]');
