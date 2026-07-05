@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Portfolio de samsoucoupe — vue simplifiée en sections.">
+    <title>samsoucoupe — sections</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="css/cockpit.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/gif" href="assets/pdpSamsoucoupe.gif">
+    <style>
+        /* Override everything for the fixed section view */
+        #renderCanvas, #starfield, .vignette { display: none; }
+        .hud, .map-overlay, .briefing { display: none !important; }
+        .panel { position: static; display: block; width: 100%; max-width: 900px; margin: 0 auto; padding: 60px 20px 40px; min-height: 100vh; }
+
+        .panel-head {
+            border-bottom: 1px solid rgba(0, 225, 255, 0.2);
+            padding-bottom: 16px;
+            margin-bottom: 32px;
+            text-align: center;
+        }
+        .panel-head .panel-title { font-size: 10px; letter-spacing: 6px; opacity: 0.5; }
+        .panel-close { display: none; }
+        .panel-hint { display: none; }
+        .panel-foot { display: none; }
+
+        /* Sections as a clean list */
+        .section-block {
+            margin-bottom: 64px;
+            padding: 32px;
+            background: rgba(0, 225, 255, 0.03);
+            border: 1px solid rgba(0, 225, 255, 0.12);
+            border-radius: 4px;
+        }
+        .section-block h3 {
+            font-family: 'Orbitron', monospace;
+            font-size: 10px;
+            letter-spacing: 5px;
+            color: rgba(0, 225, 255, 0.6);
+            margin-bottom: 24px;
+            text-transform: uppercase;
+        }
+
+        /* Projects grid */
+        .projects { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+        .project {
+            padding: 18px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 4px;
+            transition: border-color 0.2s;
+            background: rgba(255,255,255,0.02);
+        }
+        .project:hover { border-color: var(--accent, rgba(0,225,255,0.4)); }
+        .project .proj-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .project .proj-code { font-size: 9px; letter-spacing: 2px; color: rgba(255,255,255,0.3); font-family: 'Orbitron', monospace; }
+        .project .proj-status { font-size: 8px; letter-spacing: 2px; padding: 3px 8px; border-radius: 2px; font-family: 'Orbitron', monospace; }
+        .project .proj-status.terminée { background: rgba(0,225,255,0.1); color: #00e1ff; border: 1px solid rgba(0,225,255,0.3); }
+        .project .proj-status.actif { background: rgba(0,255,100,0.1); color: #00ff64; border: 1px solid rgba(0,255,100,0.3); }
+        .project .proj-status.en-cours { background: rgba(255,180,0,0.1); color: #ffb400; border: 1px solid rgba(255,180,0,0.3); }
+        .project .proj-status.archivé { background: rgba(255,255,255,0.05); color: rgba(255,255,255,0.4); border: 1px solid rgba(255,255,255,0.15); }
+        .project h4 { font-size: 13px; font-weight: 600; margin: 6px 0 8px; }
+        .project p { font-size: 12px; line-height: 1.5; color: rgba(255,255,255,0.6); margin: 8px 0; }
+        .project .proj-media { margin: 8px 0; }
+        .project .proj-media img { width: 100%; border-radius: 3px; max-height: 160px; object-fit: cover; }
+        .project .proj-stack { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+        .project .proj-stack span { font-size: 9px; padding: 2px 7px; background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.12); border-radius: 2px; color: rgba(255,255,255,0.5); }
+        .project .cta { display: inline-block; margin-top: 10px; font-size: 11px; padding: 7px 16px; border: 1px solid var(--accent, #00e1ff); color: var(--accent, #00e1ff); border-radius: 3px; text-decoration: none; transition: background 0.2s; font-family: 'Orbitron', monospace; letter-spacing: 1px; }
+        .project .cta:hover { background: rgba(0,225,255,0.1); }
+
+        /* Contact grid */
+        .contact-grid { display: flex; flex-wrap: wrap; gap: 12px; }
+        .contact-card {
+            display: flex; flex-direction: column; align-items: center; gap: 6px;
+            padding: 20px 28px; text-decoration: none; color: rgba(255,255,255,0.7);
+            border: 1px solid rgba(255,255,255,0.1); border-radius: 4px;
+            background: rgba(255,255,255,0.02); min-width: 130px;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .contact-card:hover { border-color: rgba(0,225,255,0.5); color: #00e1ff; }
+        .contact-card i { font-size: 24px; }
+        .contact-card b { font-size: 12px; font-weight: 600; }
+        .contact-card small { font-size: 10px; opacity: 0.5; }
+
+        /* Identity section */
+        .identity-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .identity-item { display: flex; flex-direction: column; gap: 4px; }
+        .identity-item label { font-size: 9px; letter-spacing: 3px; color: rgba(0,225,255,0.5); font-family: 'Orbitron', monospace; text-transform: uppercase; }
+        .identity-item span { font-size: 14px; color: rgba(255,255,255,0.85); }
+
+        /* Wars section */
+        .wars-list { display: flex; flex-direction: column; gap: 14px; }
+        .war-item {
+            padding: 16px 20px;
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 4px;
+            background: rgba(255,255,255,0.02);
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .war-item .war-title { font-size: 13px; font-weight: 600; }
+        .war-item .war-sub { font-size: 11px; color: rgba(255,255,255,0.45); margin-top: 3px; }
+        .war-item .war-score { font-family: 'Orbitron', monospace; font-size: 18px; color: #ff4466; }
+
+        .footer { display: block; text-align: center; padding: 20px; font-size: 11px; color: rgba(255,255,255,0.25); }
+    </style>
+</head>
+
+<body>
+    <canvas id="starfield"></canvas>
+    <canvas id="renderCanvas"></canvas>
+    <div class="vignette" aria-hidden="true"></div>
+
+    <div id="sections-root"></div>
+
+    <footer class="footer">
+        <span>© 2026 samsoucoupe</span>
+        <span class="footer-sep">•</span>
+        <span>Babylon.js · 3D Portfolio</span>
+    </footer>
+
+    <script src="js/starfield-background.js"></script>
+    <script src="js/portfolio-data.js"></script>
+    <script>
+        // Render all sections in one fixed layout
+        var P = window.PORTFOLIO || {};
+        var STATUS = P.statusLabels || { 'terminée': 'TERMINÉE', 'actif': 'ACTIF', 'archivé': 'ARCHIVÉ', 'en cours': 'EN COURS' };
+
+        function esc(s) {
+            return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+        }
+
+        var root = document.getElementById('sections-root');
+
+        // ── BASE / IDENTITY
+        var id = P.identity || {};
+        var identityHtml = '';
+        if (id.name || id.location || id.role) {
+            var rows = [
+                ['NOM', id.name], ['RÔLE', id.role], ['LIEU', id.location],
+                ['UNIVERSITÉ', id.university], ['DISCORD', id.discord]
+            ].filter(function(r) { return r[1]; });
+            if (rows.length) {
+                identityHtml = '<div class="section-block"><h3>Base Operative</h3><div class="identity-grid">';
+                rows.forEach(function(r) {
+                    identityHtml += '<div class="identity-item"><label>' + esc(r[0]) + '</label><span>' + esc(r[1]) + '</span></div>';
+                });
+                identityHtml += '</div></div>';
+            }
+        }
+        root.innerHTML += identityHtml;
+
+        // ── PROJECTS
+        var pr = P.projects || {};
+        var projHtml = '<div class="section-block" id="sec-projects"><h3>Projets</h3><div class="projects">';
+        (pr.items || []).forEach(function(p, i) {
+            var media = '';
+            if (p.media && p.media.length) {
+                var m = p.media[0];
+                if (m.type === 'img') media = '<div class="proj-media"><img src="' + esc(m.src) + '" alt="' + esc(m.alt || '') + '" loading="lazy"></div>';
+                else if (m.type === 'youtube') media = '<div class="proj-media"><a href="' + esc(m.src) + '" target="_blank" style="color:#00e1ff;font-size:12px;"><i class="fab fa-youtube"></i> Voir la vidéo</a></div>';
+            }
+            var tags = (p.tech || []).map(function(t) { return '<span>' + esc(t) + '</span>'; }).join('');
+            var link = p.link ? '<a class="cta" href="' + esc(p.link) + '" target="_blank"><i class="fas fa-rocket"></i> Lancer</a>' : '';
+            var st = p.status || 'terminée';
+            var sl = STATUS[st] || st.toUpperCase();
+            projHtml += '<div class="project" style="--accent:' + esc(p.color || '#00e1ff') + '">' +
+                '<div class="proj-top"><span class="proj-code">M-' + (101 + i) + '</span><span class="proj-status ' + esc(st) + '">' + esc(sl) + '</span></div>' +
+                '<h4><i class="' + esc(p.icon || '') + '"></i> ' + esc(p.title) + '</h4>' +
+                media +
+                '<p>' + esc(p.description) + '</p>' +
+                '<div class="proj-stack">' + tags + '</div>' +
+                link +
+            '</div>';
+        });
+        projHtml += '</div></div>';
+        root.innerHTML += projHtml;
+
+        // ── CONTACT
+        var ct = P.contact || {};
+        var contactHtml = '<div class="section-block"><h3>Contact</h3>';
+        if (ct.description) contactHtml += '<p style="color:rgba(255,255,255,0.55);font-size:13px;margin-bottom:20px;">' + esc(ct.description) + '</p>';
+        contactHtml += '<div class="contact-grid">';
+        if (id.discord) contactHtml += '<a class="contact-card" href="' + esc(id.discord) + '" target="_blank"><i class="fab fa-discord"></i><b>Discord</b><small>#samsoucoupe</small></a>';
+        if (id.github)  contactHtml += '<a class="contact-card" href="' + esc(id.github) + '" target="_blank"><i class="fab fa-github"></i><b>GitHub</b><small>/samsoucoupe</small></a>';
+        if (id.bmc)     contactHtml += '<a class="contact-card" href="' + esc(id.bmc) + '" target="_blank"><i class="fas fa-coffee"></i><b>Buy Me a Coffee</b><small>soutien</small></a>';
+        if (id.kofi)    contactHtml += '<a class="contact-card" href="' + esc(id.kofi) + '" target="_blank"><i class="fas fa-heart"></i><b>Ko-fi</b><small>soutien</small></a>';
+        contactHtml += '</div></div>';
+        root.innerHTML += contactHtml;
+
+        // ── WARS
+        var ws = P.wars || {};
+        var warsHtml = '';
+        if (ws.items && ws.items.length) {
+            warsHtml = '<div class="section-block"><h3>Palmarès de Guerre</h3><div class="wars-list">';
+            ws.items.forEach(function(w) {
+                var best = w.scores && w.scores.length ? Math.max.apply(null, w.scores) : 0;
+                warsHtml += '<div class="war-item">' +
+                    '<div><div class="war-title">' + esc(w.name || '') + '</div>' +
+                    '<div class="war-sub">' + esc(w.description || '') + '</div></div>' +
+                    '<div class="war-score">' + best + '</div>' +
+                '</div>';
+            });
+            warsHtml += '</div></div>';
+        }
+        root.innerHTML += warsHtml;
+    </script>
+</body>
+</html>

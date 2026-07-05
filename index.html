@@ -4,378 +4,154 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Portfolio de samsoucoupe, développeur backend orienté full stack et data. Projets en Python, SQL, Java, Angular et Babylon.js.">
-    <meta name="author" content="samsoucoupe">
-    <meta name="robots" content="index,follow">
-    <link rel="canonical" href="https://samsoucoupe.github.io/samsoucoupe/">
-
-    <meta property="og:type" content="website">
-    <meta property="og:locale" content="fr_FR">
-    <meta property="og:title" content="samsoucoupe - Développeur Backend & Data">
-    <meta property="og:description" content="Portfolio développeur backend/data avec projets techniques, jeux web et case studies.">
-    <meta property="og:url" content="https://samsoucoupe.github.io/samsoucoupe/">
-    <meta property="og:image" content="https://samsoucoupe.github.io/samsoucoupe/assets/pdpSamsoucoupe.gif">
-
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="samsoucoupe - Développeur Backend & Data">
-    <meta name="twitter:description" content="Portfolio développeur backend/data avec projets techniques, jeux web et case studies.">
-    <meta name="twitter:image" content="https://samsoucoupe.github.io/samsoucoupe/assets/pdpSamsoucoupe.gif">
-
-    <title>samsoucoupe - Développeur Backend & Data</title>
+    <meta name="description" content="Portfolio de samsoucoupe — pilote une soucoupe, explore l'espace, découvre les stations.">
+    <title>samsoucoupe — Universe</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
-    <link rel="stylesheet" href="css/main.css">
-    <link rel="stylesheet" href="css/orbit.css">
-    <link rel="stylesheet" href="css/starfield.css">
-    <link rel="stylesheet" href="css/projects-space.css">
-    <!-- <link rel="stylesheet" href="css/projects-space-modal.css"> -->
+    <link rel="stylesheet" href="css/cockpit.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/gif" href="assets/pdpSamsoucoupe.gif">
-    <script type="application/ld+json">
-        {
-            "@context": "https://schema.org",
-            "@type": "Person",
-            "name": "samsoucoupe",
-            "url": "https://samsoucoupe.github.io/samsoucoupe/",
-            "jobTitle": "Développeur Backend à tendance Full Stack",
-            "sameAs": [
-                "https://github.com/samsoucoupe",
-                "https://discord.com/users/388993523715801088"
-            ]
-        }
-    </script>
 </head>
 
 <body>
-    <!-- Navigation -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-logo">
-                <span class="logo-text">samsoucoupe</span>
-            </div>
-            <ul class="nav-menu">
-                <li><a href="#home" class="nav-link">Accueil</a></li>
-                <li><a href="#about" class="nav-link">À propos</a></li>
-                <li><a href="#skills" class="nav-link">Compétences</a></li>
-                <li><a href="#projects" class="nav-link">Projets</a></li>
-                <li><a href="#contact" class="nav-link">Contact</a></li>
-            </ul>
-            <div class="hamburger">
-                <span class="bar"></span>
-                <span class="bar"></span>
-                <span class="bar"></span>
-            </div>
-        </div>
-    </nav>
+    <!-- Fond starfield warp 2D -->
+    <canvas id="starfield"></canvas>
+    <!-- Scène 3D Babylon -->
+    <canvas id="renderCanvas"></canvas>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="hero-container">
-            <div class="hero-content" >
-                <h1 class="hero-title">
-                    Salut 👋, je suis <span class="highlight">samsoucoupe</span>
-                </h1>
-                <h2 class="hero-subtitle">
-                    Développeur Backend à tendance <span class="highlight">Full Stack</span>
-                </h2>
-                <p class="hero-description">
-                    Passionné par le développement backend et les technologies de données.<br>
-                    Spécialisé en Python, R, SQL avec une expertise en outils de data comme Excel et Power BI.
-                </p>
-                <div class="hero-buttons">
-                    <a href="#projects" class="btn btn-primary">Voir mes projets</a>
-                    <a href="#contact" class="btn btn-secondary">Me contacter</a>
-                </div>
-                <div class="hero-social">
-                    <a href="https://discord.com/users/388993523715801088" target="_blank" class="social-link">
-                        <i class="fab fa-discord"></i>
-                    </a>
-                    <a href="https://github.com/samsoucoupe" target="_blank" class="social-link">
-                        <i class="fab fa-github"></i>
-                    </a>
-                </div>
-            </div>
-            <div style="flex:1;min-width:320px;position:relative;display:flex;align-items:center;justify-content:center;min-height:340px;">
-                <div id="orbit-center" style="position:relative;z-index:2;">
-                    <img src="assets/pdpSamsoucoupe.gif" alt="Photo de profil samsoucoupe" loading="eager" decoding="async" fetchpriority="high" style="width:160px;height:160px;border-radius:50%;border:4px solid #fff;box-shadow:0 0 32px #0ff7;object-fit:cover;background:#222;">
-                </div>
-                <div id="orbit-skills" style="position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none;z-index:1;"></div>
+    <!-- Vignette -->
+    <div class="vignette" aria-hidden="true"></div>
+
+    <!-- ======================= HUD JEU ======================= -->
+    <div id="hud" class="hud">
+
+
+
+        <!-- Top-left : progression -->
+        <div class="hud-top-left">
+            <div class="mission-progress">
+                <div class="mp-label">STATIONS DÉCOUVERTES</div>
+                <div class="mp-bar"><div class="mp-fill" id="mp-fill"></div></div>
+                <div class="mp-count"><span id="mp-count">0</span> / 5</div>
             </div>
         </div>
-    </section>
 
-    <!-- About Section -->
-    <section id="about" class="about">
-        <div class="container">
-            <h2 class="section-title">À propos de moi</h2>
-            <div class="about-content">
-                <div class="about-text">
-                    <h3>Développeur Backend passionné 🚀</h3>
-                    <p>
-                        Je suis un étudiant développeur français passionné par les technologies backend
-                        et la data science. Actuellement en apprentissage de l'IA et du développement backend,
-                        j'aime créer des solutions robustes et efficaces.
-                    </p>
-                    <p>
-                        Mon expertise se concentre sur le développement backend avec une approche full-stack,
-                        combinée à une solide maîtrise des outils de données comme Excel et Power BI.
-                        Je suis particulièrement à l'aise avec Python, R et SQL.
-                    </p>
-                    <div class="about-stats">
-                        <div class="stat-item">
-                            <span class="stat-number">15+</span>
-                            <span class="stat-label">Technologies maîtrisées</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number">Backend</span>
-                            <span class="stat-label">Spécialisation</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-number">Data</span>
-                            <span class="stat-label">Passion</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="about-image">
-                    <div class="skills-preview">
-                        <div class="skill-item active">
-                            <i class="fab fa-python"></i>
-                            <span>Python</span>
-                        </div>
-                        <div class="skill-item">
-                            <i class="fas fa-database"></i>
-                            <span>SQL</span>
-                        </div>
-                        <div class="skill-item">
-                            <i class="fab fa-r-project"></i>
-                            <span>R</span>
-                        </div>
-                        <div class="skill-item">
-                            <i class="fas fa-chart-bar"></i>
-                            <span>Power BI</span>
-                        </div>
-                    </div>
-                </div>
+        <!-- Top-right : titre + score + bouton map -->
+        <div class="hud-top-right">
+            <div class="game-title">&lt;samsoucoupe/&gt;</div>
+            <div class="score-hud" id="score-hud">
+                <span class="sh-label">SCORE</span>
+                <span class="sh-value" id="score-val">0</span>
+                <span class="sh-combo" id="combo-val"></span>
+            </div>
+            <button class="map-btn" id="map-btn" title="Carte du système (M)">
+                <i class="fas fa-map"></i> <span>MAP</span>
+            </button>
+        </div>
+
+        <!-- Bottom-left : journal de bord -->
+        <div class="hud-bot-left">
+            <div class="nav-log" id="nav-log" aria-label="Journal de bord">
+                <div class="nav-log-header">JOURNAL DE BORD</div>
+                <ul class="nav-log-list" id="nav-log-list"></ul>
             </div>
         </div>
-    </section>
 
-    <!-- Skills Section -->
-    <section id="skills" class="skills">
-        <div class="container">
-            <h2 class="section-title">Mes Compétences</h2>
-            <div class="skills-grid">
-                <!-- Backend & Languages -->
-                <div class="skill-category">
-                    <h3 class="category-title">
-                        <i class="fas fa-server"></i>
-                        Backend & Langages
-                    </h3>
-                    <div class="skill-tags">
-                        <span class="skill-tag python">Python</span>
-                        <span class="skill-tag java">Java</span>
-                        <span class="skill-tag go">Go</span>
-                        <span class="skill-tag kotlin">Kotlin</span>
-                        <span class="skill-tag c">C</span>
-                        <span class="skill-tag r">R</span>
-                        <span class="skill-tag sql">SQL</span>
-                    </div>
-                </div>
+        <!-- Bottom-right : radar/minimap -->
+        <div class="hud-bot-right">
+            <div class="radar" id="radar">
+                <div class="radar-sweep"></div>
+                <div class="radar-range" aria-label="Portée radar"></div>
+                <div class="radar-player" aria-label="Vous êtes ici"></div>
+                <div class="radar-blips" id="radar-blips"></div>
+            </div>
+            <div class="radar-label">RADAR · <span id="radar-range-val">200</span>u</div>
+        </div>
 
-                <!-- Frameworks & Libraries -->
-                <div class="skill-category">
-                    <h3 class="category-title">
-                        <i class="fas fa-code"></i>
-                        Frameworks & APIs
-                    </h3>
-                    <div class="skill-tags">
-                        <span class="skill-tag spring">Spring</span>
-                        <span class="skill-tag flask">Flask</span>
-                        <span class="skill-tag angular">Angular</span>
-                        <span class="skill-tag graphql">GraphQL</span>
-                        <span class="skill-tag swagger">Swagger</span>
-                    </div>
-                </div>
-
-                <!-- Data Science & AI -->
-                <div class="skill-category">
-                    <h3 class="category-title">
-                        <i class="fas fa-brain"></i>
-                        Data Science & IA
-                    </h3>
-                    <div class="skill-tags">
-                        <span class="skill-tag pandas">Pandas</span>
-                        <span class="skill-tag numpy">NumPy</span>
-                        <span class="skill-tag sklearn">Scikit-learn</span>
-                        <span class="skill-tag pytorch">PyTorch</span>
-                        <span class="skill-tag tensorflow">TensorFlow</span>
-                        <span class="skill-tag opencv">OpenCV</span>
-                        <span class="skill-tag matplotlib">Matplotlib</span>
-                        <span class="skill-tag plotly">Plotly</span>
-                        <span class="skill-tag scipy">SciPy</span>
-                    </div>
-                </div>
-
-                <!-- Data Tools -->
-                <div class="skill-category">
-                    <h3 class="category-title">
-                        <i class="fas fa-chart-line"></i>
-                        Outils Data & BI
-                    </h3>
-                    <div class="skill-tags">
-                        <span class="skill-tag powerbi">Power BI</span>
-                        <span class="skill-tag excel">Excel</span>
-                        <span class="skill-tag mongodb">MongoDB</span>
-                    </div>
-                </div>
-
-                <!-- Frontend & Web -->
-                <div class="skill-category">
-                    <h3 class="category-title">
-                        <i class="fas fa-laptop-code"></i>
-                        Frontend & Web
-                    </h3>
-                    <div class="skill-tags">
-                        <span class="skill-tag html">HTML5</span>
-                        <span class="skill-tag css">CSS3</span>
-                        <span class="skill-tag js">JavaScript</span>
-                        <span class="skill-tag typescript">TypeScript</span>
-                        <span class="skill-tag babylonjs">Babylon.js</span>
-                        <span class="skill-tag markdown">Markdown</span>
-                    </div>
-                </div>
-
-                <!-- Game Development -->
-                <div class="skill-category">
-                    <h3 class="category-title">
-                        <i class="fas fa-gamepad"></i>
-                        Game Development
-                    </h3>
-                    <div class="skill-tags">
-                        <span class="skill-tag babylonjs">Babylon.js</span>
-                        <span class="skill-tag webgl">WebGL</span>
-                        <span class="skill-tag gamedev">Game Design</span>
-                        <span class="skill-tag js">JavaScript Games</span>
-                    </div>
-                </div>
-
-                <!-- DevOps & Tools -->
-                <div class="skill-category">
-                    <h3 class="category-title">
-                        <i class="fas fa-tools"></i>
-                        DevOps & Outils
-                    </h3>
-                    <div class="skill-tags">
-                        <span class="skill-tag docker">Docker</span>
-                        <span class="skill-tag git">Git</span>
-                        <span class="skill-tag github">GitHub Actions</span>
-                        <span class="skill-tag render">Render</span>
-                    </div>
-                </div>
+        <!-- Scanner banner (quand on scanne) -->
+        <div class="scanner" id="scanner">
+            <div class="scanner-icon"><i class="fas fa-satellite-dish"></i></div>
+            <div class="scanner-info">
+                <div class="scanner-label" id="scanner-label">SCAN EN COURS…</div>
+                <div class="scanner-bar"><div class="scanner-fill" id="scanner-fill"></div></div>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Projects Section -->
-    <section id="projects" class="projects-space">
-        <div id="space-projects-bg"></div>
-        <div id="ufo-projects-space">
-            <!-- Les soucoupes/projets seront générées ici par JS -->
+    <!-- ======================= PANNEAU CONTENU STATION ======================= -->
+    <main class="panel" id="panel" aria-live="polite">
+        <header class="panel-head">
+            <h2 class="panel-title" id="panel-title">STATION</h2>
+            <button class="panel-close" id="panel-close" aria-label="Reprendre le vol"><i class="fas fa-times"></i></button>
+        </header>
+        <div class="panel-body" id="panel-body"></div>
+        <footer class="panel-foot">
+            <span class="panel-hint"><i class="fas fa-arrow-left"></i> Reprends le vol pour explorer (Échap)</span>
+        </footer>
+    </main>
+
+    <!-- ======================= TOAST PORTAIL (Rick & Morty) ======================= -->
+    <div class="portal-toast" id="portal-toast">
+        <div class="portal-toast-inner">
+            <span class="portal-icon"><i class="fas fa-vial"></i></span>
+            <span class="portal-quote" id="portal-quote"></span>
         </div>
-        <!-- Modale projet (affichée au clic sur une soucoupe) -->
-        <div id="project-modal" class="project-modal" style="display:none;">
-            <div class="project-modal-content">
-                <span class="close-modal" id="close-project-modal">&times;</span>
-                <div id="project-modal-body"></div>
+    </div>
+
+    <!-- ======================= TOAST COMBAT (score) ======================= -->
+    <div class="combat-toast" id="combat-toast"></div>
+
+    <!-- ======================= MAP DU SYSTÈME ======================= -->
+    <div class="map-overlay" id="map-overlay">
+        <div class="map-panel">
+            <header class="map-header">
+                <h3><i class="fas fa-globe"></i> SYSTÈME SOLAIRE</h3>
+                <button class="map-close" id="map-close" aria-label="Fermer"><i class="fas fa-times"></i></button>
+            </header>
+            <div class="map-canvas">
+                <svg id="map-svg" class="map-svg" preserveAspectRatio="xMidYMid meet"></svg>
             </div>
+            <footer class="map-footer">
+                <span class="map-hint">Clique une planète pour y voyager</span>
+            </footer>
         </div>
-        <!-- Easter egg Rick & Morty et Space Invader à venir ici -->
-    </section>
+    </div>
 
-
-    <!-- Contact Section -->
-    <section id="contact" class="contact">
-        <div class="container">
-            <h2 class="section-title">Restons en contact</h2>
-            <p class="section-description">
-                N'hésitez pas à me contacter pour discuter de projets, d'opportunités ou simplement pour échanger !
-            </p>
-            <div class="contact-content">
-                <div class="contact-info">
-                    <div class="contact-item">
-                        <div class="contact-icon">
-                            <i class="fab fa-discord"></i>
-                        </div>
-                        <div class="contact-details">
-                            <h3>Discord</h3>
-                            <p>Rejoignez-moi sur Discord</p>
-                            <a href="https://discord.com/users/388993523715801088" target="_blank" class="contact-link">
-                                Me contacter
-                            </a>
-                        </div>
-                    </div>
-                    <div class="contact-item">
-                        <div class="contact-icon">
-                            <i class="fab fa-github"></i>
-                        </div>
-                        <div class="contact-details">
-                            <h3>GitHub</h3>
-                            <p>Consultez mes projets</p>
-                            <a href="https://github.com/samsoucoupe" target="_blank" class="contact-link">
-                                Voir mon profil
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="contact-support">
-                    <h3>Soutenez mon travail</h3>
-                    <p>Si vous appréciez mes projets, vous pouvez me soutenir :</p>
-                    <div class="support-buttons">
-                        <a href="https://buymeacoffee.com/samsoucoupe" target="_blank" class="support-btn coffee">
-                            <i class="fas fa-coffee"></i>
-                            Buy me a coffee
-                        </a>
-                        <a href="https://ko-fi.com/samsoucoupe" target="_blank" class="support-btn kofi">
-                            <i class="fas fa-heart"></i>
-                            Ko-fi
-                        </a>
-                    </div>
-                </div>
+    <!-- ======================= ÉCRAN D'ACCUEIL / BRIEFING ======================= -->
+    <div class="briefing" id="briefing">
+        <div class="briefing-inner">
+            <div class="briefing-logo">
+                <span class="bl-bracket">&lt;</span>samsoucoupe<span class="bl-bracket">/&gt;</span>
             </div>
+            <h1 class="briefing-title">samsoucoupe universe</h1>
+            <p class="briefing-sub">Pilote ta soucoupe à travers mon système solaire. Chaque planète révèle une partie de mon profil. Découvre les 5.</p>
+            <div class="briefing-controls">
+                <div class="bc-item"><span class="bc-key">CLIC</span><span>sur une planète pour y voyager</span></div>
+                <div class="bc-item"><span class="bc-key">← →</span><span>planète précédente / suivante</span></div>
+                <div class="bc-item"><span class="bc-key">M</span><span>ouvrir la carte du système</span></div>
+                <div class="bc-item"><span class="bc-key">ESC</span><span>retour au centre du système</span></div>
+            </div>
+            <button class="briefing-start" id="briefing-start">
+                <i class="fas fa-rocket"></i> LANCER LE VOL
+            </button>
+            <div class="briefing-tip">Clique sur l'écran pour capturer la souris · Échap pour libérer</div>
         </div>
-    </section>
+    </div>
 
-    <!-- Footer -->
+    <!-- ======================= FOOTER ======================= -->
     <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-text">
-                    <p>&copy; <span id="footer-year">2026</span> samsoucoupe. Tous droits réservés.</p>
-                    <p>Développé avec ❤️ • Déployé automatiquement avec GitHub Actions</p>
-                </div>
-                <div class="footer-social">
-                    <a href="https://discord.com/users/388993523715801088" target="_blank" class="social-link">
-                        <i class="fab fa-discord"></i>
-                    </a>
-                    <a href="https://github.com/samsoucoupe" target="_blank" class="social-link">
-                        <i class="fab fa-github"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
+        <span>© <span id="footer-year">2026</span> samsoucoupe</span>
+        <span class="footer-sep">•</span>
+        <span>Babylon.js · 3D Portfolio</span>
     </footer>
 
-    <canvas id="starfield" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-1;pointer-events:none;"></canvas>
-    <!-- Starfield Controls -->
-    <!-- Starfield Controls removed: always in étoile mode -->
+    <!-- Scripts -->
     <script src="js/starfield-background.js"></script>
-    <script src="js/planet-background.js"></script>
-    <script src="js/orbit-skills.js"></script>
-    <script src="js/carousel.js"></script>
-    <script src="js/projects-space.js"></script>
-    <script src="js/main.js"></script>
+    <script src="https://cdn.babylonjs.com/babylon.js"></script>
+    <script src="js/portfolio-data.js"></script>
+    <script src="js/space-cockpit.js"></script>
+    <script src="js/cockpit-ui.js"></script>
 </body>
 
 </html>
