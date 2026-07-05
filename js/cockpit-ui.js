@@ -470,7 +470,8 @@
 
     function closePanel() {
             el('panel').classList.remove('open');
-            // lastScanned intentionally kept — prevents onScanCb from re-opening stale station
+            lastScanned = null;
+            if (window.SpaceCockpit && SpaceCockpit.getMode() !== 'idle') SpaceCockpit.setIdleMode();
         }
 
     // ---------- Renderers (identiques, briques cockpit) ----------
