@@ -26,20 +26,19 @@
 
         // Fermer le panneau (Échap ou bouton)
         el('panel-close').addEventListener('click', closePanel);
-        // Flèches ← → = navigation entre stations, Échap = retour centre
-        document.addEventListener('keydown', function (e) {
-            if (!window.SpaceCockpit) return;
-            if (e.key === 'Escape') {
-                closePanel();
-                SpaceCockpit.returnToCenter();
-            } else if (e.key === 'ArrowRight') {
-                SpaceCockpit.flyTo(SpaceCockpit.nextSection());
-            } else if (e.key === 'ArrowLeft') {
-                SpaceCockpit.flyTo(SpaceCockpit.prevSection());
-            } else if (e.key === 'm' || e.key === 'M') {
-                toggleMap();
-            }
-        });
+        // Flèches ← → = navigation entre stations, Échap = ferme panneau
+                document.addEventListener('keydown', function (e) {
+                    if (!window.SpaceCockpit) return;
+                    if (e.key === 'Escape') {
+                        closePanel();
+                    } else if (e.key === 'ArrowRight') {
+                        SpaceCockpit.flyTo(SpaceCockpit.nextSection());
+                    } else if (e.key === 'ArrowLeft') {
+                        SpaceCockpit.flyTo(SpaceCockpit.prevSection());
+                    } else if (e.key === 'm' || e.key === 'M') {
+                        toggleMap();
+                    }
+                });
 
         // Bouton MAP
         var mapBtn = el('map-btn');
@@ -412,13 +411,9 @@
     }
 
     function closePanel() {
-        el('panel').classList.remove('open');
-        lastScanned = null;
-        // Quitte l'orbite de la planète → retour au centre du système
-        if (window.SpaceCockpit && SpaceCockpit.getMode() === 'orbiting') {
-            SpaceCockpit.returnToCenter();
+            el('panel').classList.remove('open');
+            lastScanned = null;
         }
-    }
 
     // ---------- Renderers (identiques, briques cockpit) ----------
     function renderHome(P) {

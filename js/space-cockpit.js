@@ -887,14 +887,22 @@ window.SpaceCockpit = (function () {
     function attachPicking() {
         scene.onPointerObservable.add(info => {
             if (info.type === BABYLON.PointerEventTypes.POINTERPICK) {
-                // Priorité 1 : lune de projet (navigation)
-                const moonPick = scene.pick(scene.pointerX, scene.pointerY,
-                    m => m.metadata && m.metadata.projectIndex !== undefined);
-                if (moonPick.hit && moonPick.pickedMesh && !moonPick.pickedMesh.metadata.isMissionMoon) {
-                    flyToMoon(moonPick.pickedMesh.metadata.projectIndex);
+
+                // Priorité  : ennemis (combat)
+                const enemyPick = scene.pick(scene.pointerX, scene.pointerY,
+                    m => m.metadata && m.metadata.enemyId !== undefined);
+                if (enemyPick.hit && enemyPick.pickedMesh) {
+                    destroyEnemy(enemyPick.pickedMesh.metadata.enemyId, true);
                     return;
                 }
-                // Priorité 2 : soleil / planètes (navigation)
+                // Priorité  : anomalies vertes (combat / easter egg)
+                const portalPick = scene.pick(scene.pointerX, scene.pointerY,
+                    m => m.metadata && m.metadata.portalIndex !== undefined);
+                if (portalPick.hit && portalPick.pickedMesh) {
+                    destroyPortal(portalPick.pickedMesh.metadata.portalIndex, true);
+                    return;
+                }
+                                // Priorité  : soleil / planètes (navigation)
                 let pickedSun = scene.pick(scene.pointerX, scene.pointerY,
                     m => m === sunCore || (m.metadata && m.metadata.section === 'home'));
                 if (pickedSun.hit) { flyTo('home'); return; }
@@ -902,20 +910,6 @@ window.SpaceCockpit = (function () {
                     m => m.metadata && m.metadata.section);
                 if (pick.hit && pick.pickedMesh) {
                     flyTo(pick.pickedMesh.metadata.section);
-                    return;
-                }
-                // Priorité 3 : ennemis (combat)
-                const enemyPick = scene.pick(scene.pointerX, scene.pointerY,
-                    m => m.metadata && m.metadata.enemyId !== undefined);
-                if (enemyPick.hit && enemyPick.pickedMesh) {
-                    destroyEnemy(enemyPick.pickedMesh.metadata.enemyId, true);
-                    return;
-                }
-                // Priorité 4 : anomalies vertes (combat / easter egg)
-                const portalPick = scene.pick(scene.pointerX, scene.pointerY,
-                    m => m.metadata && m.metadata.portalIndex !== undefined);
-                if (portalPick.hit && portalPick.pickedMesh) {
-                    destroyPortal(portalPick.pickedMesh.metadata.portalIndex, true);
                     return;
                 }
             }
@@ -945,16 +939,6 @@ window.SpaceCockpit = (function () {
         setModeCb('flying');
     }
 
-    // Clic sur une lune de projet : vol + mini-orbite
-    let targetMoon = -1;
-    function flyToMoon(idx) {
-        if (idx < 0 || idx >= PROJECT_MOONS.length) return;
-        targetMoon = idx;
-        targetPlanet = 'projects';
-        mode = 'flying_moon';
-        scanProgress = 0;
-        setModeCb('flying');
-    }
 
     function setModeCb(m) { if (onModeCb) onModeCb(m); }
 
