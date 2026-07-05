@@ -6,6 +6,8 @@ import { fileURLToPath, URL } from 'node:url';
 // - simple.html    = version mobile statique
 // - assets/ css/   = ressources statiques
 export default defineConfig({
+  // GitHub Pages sert sous /samsoucoupe/ — tous les assets doivent utiliser cette base
+  base: '/samsoucoupe/',
   // On garde les deux pages comme entrypoints HTML
   build: {
     rollupOptions: {
