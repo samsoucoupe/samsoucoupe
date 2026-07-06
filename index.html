@@ -44,6 +44,7 @@
                 <span class="sh-label">SCORE</span>
                 <span class="sh-value" id="score-val">0</span>
                 <span class="sh-combo" id="combo-val"></span>
+                <div class="score-tooltip" id="score-tooltip"></div>
             </div>
             <button class="map-btn" id="map-btn" title="Carte du système (M)">
                 <i class="fas fa-map"></i> <span>MAP</span>
@@ -126,7 +127,7 @@
         <div class="games-panel">
             <header class="games-header">
                 <h3><i class="fas fa-gamepad"></i> MINI-JEUX</h3>
-                <div class="games-score">
+                <div class="games-score" id="games-score-bar" style="display:none">
                     <span class="is-label">SCORE</span>
                     <span class="is-value" id="game-score">0</span>
                     <span class="is-label" id="game-extra-label">VIES</span>

@@ -91,7 +91,7 @@ interface AsteroidEntry {
     life: number;
 }
 
-interface ShipState { x: number; y: number; z: number; speed: number; target: string; mode: Mode; }
+interface ShipState { x: number; y: number; z: number; speed: number; target: string; mode: Mode; yaw: number; }
 interface ScanState { id: string | null; progress: number; discoveredCount: number; total: number; }
 interface RadarBlip { id: string; dx: number; dz: number; d: number; discovered: boolean; color: string; label: string; }
 interface SystemSnap { id: string; x: number; z: number; color: string; label: string; glyph: string; radius: number; discovered: boolean; }
@@ -126,10 +126,12 @@ export interface SpaceCockpitAPI {
     getShipState: () => ShipState;
     getScanState: () => ScanState;
     getStationsForRadar: () => RadarBlip[];
+    getAsteroidsForRadar: () => { dx: number; dz: number; d: number }[];
     getSystemSnapshot: () => SystemSnap[];
     nextSection: () => string;
     prevSection: () => string;
     getScore: () => { score: number; combo: number };
+    addScore: (points: number, reason: string) => void;
     setOnScanCb: (cb: ScanCb) => void;
     setOnDiscoverCb: (cb: DiscoverCb) => void;
     setOnModeCb: (cb: ModeCb) => void;
@@ -765,22 +767,49 @@ const PLANET_ORBIT_R = 20;
     function buildAsteroids() { /* rien à pré-construire, spawn à la volée */ }
 
     function spawnAsteroid() {
-        // Nouvelle logique : traverse la scène comme une comète
-        const ang = Math.random() * Math.PI * 2;
-        const startDist = 250;
-        const startPos = new BABYLON.Vector3(
-            Math.cos(ang) * startDist,
-            60 + (Math.random() - 0.5) * 60,
-            Math.sin(ang) * startDist
-        );
-        // Cible : un point près de la soucoupe (traverse la zone visible)
-        const targetZone = new BABYLON.Vector3(
-            (Math.random() - 0.5) * 80,
-            80 + (Math.random() - 0.5) * 30,
-            (Math.random() - 0.5) * 80
-        );
-        const dir = targetZone.subtract(startPos).normalize();
-        const speed = 25 + Math.random() * 20;   // vitesse de traversée
+        // Spawn devant la soucoupe, traverse de gauche à droite (jamais vers le joueur)
+        // Direction du vaisseau
+        const fx = -Math.sin(shipYaw), fz = -Math.cos(shipYaw);
+        // Perpendiculaire (droite du vaisseau)
+        const rx = Math.cos(shipYaw), rz = -Math.sin(shipYaw);
+
+        // Anti-overlap : essaie plusieurs positions
+        let startPos: BABYLON.Vector3 | null = null;
+        let vel: BABYLON.Vector3 | null = null;
+        const MIN_DIST = 60;
+        const startDist = 200 + Math.random() * 60;   // distance devant la soucoupe
+
+        for (let attempt = 0; attempt < 8; attempt++) {
+            // Spawn devant la soucoupe, décalé latéralement
+            const sideOffset = (Math.random() - 0.5) * 200;
+            const candidate = new BABYLON.Vector3(
+                shipPos.x + fx * startDist + rx * sideOffset,
+                60 + (Math.random() - 0.5) * 50,
+                shipPos.z + fz * startDist + rz * sideOffset
+            );
+            // Vérifie distance avec astéroïdes existants
+            let ok = true;
+            for (const a of asteroids) {
+                const future = a.pos.add(a.vel.scale(5));
+                const fdx = future.x - candidate.x;
+                const fdz = future.z - candidate.z;
+                if (fdx * fdx + fdz * fdz < MIN_DIST * MIN_DIST) { ok = false; break; }
+            }
+            if (ok) {
+                startPos = candidate;
+                // Vitesse : traverse de gauche à droite (ou inverse), pas vers le joueur
+                const crossDir = Math.random() > 0.5 ? 1 : -1;
+                const speed = 25 + Math.random() * 20;
+                // Largement perpendiculaire, légère composée vers l'avant pour traverser
+                vel = new BABYLON.Vector3(
+                    rx * crossDir * speed + fx * speed * 0.15,
+                    0,
+                    rz * crossDir * speed + fz * speed * 0.15
+                );
+                break;
+            }
+        }
+        if (!startPos || !vel) return;
 
         const aid = asteroids.length;
         const root = new BABYLON.TransformNode('asteroid_' + aid, scene);
@@ -815,7 +844,7 @@ const PLANET_ORBIT_R = 20;
         asteroids.push({
             id: aid, root, body, hit,
             pos: startPos.clone(),
-            vel: dir.scale(speed),
+            vel: vel.clone(),
             rot: new BABYLON.Vector3(
                 (Math.random() - 0.5) * 0.8,
                 (Math.random() - 0.5) * 0.6,
@@ -1432,7 +1461,7 @@ const PLANET_ORBIT_R = 20;
 
     /* ============================================================ ÉTAT PUBLIQUE */
     function getShipState() {
-        return { x: shipPos.x, y: shipPos.y, z: shipPos.z, speed: currentSpeed, target: targetPlanet, mode };
+        return { x: shipPos.x, y: shipPos.y, z: shipPos.z, speed: currentSpeed, target: targetPlanet, mode, yaw: shipYaw };
     }
     function getScanState() {
         return {
@@ -1449,6 +1478,14 @@ const PLANET_ORBIT_R = 20;
             const dx = p.x - shipPos.x;
             const dz = p.z - shipPos.z;
             return { id, dx, dz, d: Math.hypot(dx, dz), discovered: planets[id].discovered, color: cfg.color, label: cfg.label };
+        });
+    }
+
+    function getAsteroidsForRadar() {
+        return asteroids.map(a => {
+            const dx = a.pos.x - shipPos.x;
+            const dz = a.pos.z - shipPos.z;
+            return { dx, dz, d: Math.hypot(dx, dz) };
         });
     }
     // Snapshots pour la map 2D (positions top-down)
@@ -1489,10 +1526,12 @@ export const SpaceCockpit: SpaceCockpitAPI = {
     getShipState,
     getScanState,
     getStationsForRadar,
+    getAsteroidsForRadar,
     getSystemSnapshot,
     nextSection,
     prevSection,
     getScore,
+    addScore,
     setOnScanCb: (cb: ScanCb) => { onScanCb = cb; },
     setOnDiscoverCb: (cb: DiscoverCb) => { onDiscoverCb = cb; },
     setOnModeCb: (cb: ModeCb) => { onModeCb = cb; },

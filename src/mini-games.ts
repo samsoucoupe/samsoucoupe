@@ -27,6 +27,24 @@ let extraVal = '';
 // --- Callback score → HUD 3D ---
 let onScoreCb: ((pts: number) => void) | null = null;
 
+// --- High scores par jeu (localStorage) ---
+const HS_KEY = 'samsoucoupe_highscores';
+function loadHighScores(): Record<string, number> {
+    try { return JSON.parse(localStorage.getItem(HS_KEY) || '{}'); } catch { return {}; }
+}
+function saveHighScore(game: string, pts: number): boolean {
+    const hs = loadHighScores();
+    if (pts > (hs[game] || 0)) { hs[game] = pts; localStorage.setItem(HS_KEY, JSON.stringify(hs)); return true; }
+    return false;
+}
+function getHighScore(game: string): number {
+    return loadHighScores()[game] || 0;
+}
+// Accumule le score mini-jeu (callback uniquement)
+function addGameScore(points: number) {
+    if (onScoreCb) onScoreCb(points);
+}
+
 // ============================================================
 // INIT / API
 // ============================================================
@@ -73,6 +91,7 @@ export function openGamesMenu() {
 }
 
 export function closeGamesMenu() {
+    saveCurrentScore();
     stopGame();
     const overlay = document.getElementById('games-overlay');
     if (overlay) overlay.classList.remove('open');
@@ -84,13 +103,16 @@ export function setOnGameScore(cb: (pts: number) => void) {
 }
 
 function showMenu() {
+    saveCurrentScore();
     stopGame();
     state = 'menu';
     currentGame = null;
     const menu = document.getElementById('games-menu');
     const play = document.getElementById('games-play');
+    const scoreBar = document.getElementById('games-score-bar');
     if (menu) menu.style.display = '';
     if (play) play.style.display = 'none';
+    if (scoreBar) scoreBar.style.display = 'none';
 }
 
 function showGame(gameId: GameId) {
@@ -99,8 +121,10 @@ function showGame(gameId: GameId) {
     currentGame = gameId;
     const menu = document.getElementById('games-menu');
     const play = document.getElementById('games-play');
+    const scoreBar = document.getElementById('games-score-bar');
     if (menu) menu.style.display = 'none';
     if (play) play.style.display = '';
+    if (scoreBar) scoreBar.style.display = '';
 
     const hint = document.getElementById('game-hint');
     const extraLbl = document.getElementById('game-extra-label');
@@ -132,7 +156,16 @@ function startLoop() {
 }
 
 function endGame() {
+    if (state === 'gameover') return;
     state = 'gameover';
+    saveCurrentScore();
+}
+
+// Sauvegarde le high score si on quitte le jeu en cours (menu/fermeture)
+function saveCurrentScore() {
+    if (currentGame && score > 0) {
+        saveHighScore(currentGame, score);
+    }
 }
 
 // ============================================================
@@ -223,11 +256,20 @@ function drawGameOver(title: string, hint: string) {
     ctx.fillStyle = '#ff4d6d';
     ctx.font = 'bold 28px Orbitron, monospace';
     ctx.textAlign = 'center';
-    ctx.fillText(title, W / 2, H / 2 - 20);
+    ctx.fillText(title, W / 2, H / 2 - 30);
     ctx.fillStyle = '#9fb0d0';
     ctx.font = '14px Inter, monospace';
-    ctx.fillText('Score: ' + score, W / 2, H / 2 + 5);
-    ctx.fillText(hint, W / 2, H / 2 + 30);
+    ctx.fillText('Score: ' + score, W / 2, H / 2 - 5);
+    // High score du jeu
+    if (currentGame) {
+        const hs = getHighScore(currentGame);
+        ctx.fillStyle = hs === score && score > 0 ? '#38ffb0' : '#5d6f95';
+        ctx.font = '11px Orbitron, monospace';
+        ctx.fillText('RECORD ' + hs, W / 2, H / 2 + 15);
+    }
+    ctx.fillStyle = '#9fb0d0';
+    ctx.font = '14px Inter, monospace';
+    ctx.fillText(hint, W / 2, H / 2 + 38);
 }
 
 // ============================================================
@@ -333,7 +375,7 @@ function updateInvader(dt: number) {
                     b.y > a.y - INV_AH / 2 && b.y < a.y + INV_AH / 2) {
                     a.alive = false; invBullets.splice(i, 1);
                     const pts = (INV_ROWS - a.row) * 10;
-                    score += pts; if (onScoreCb) onScoreCb(pts);
+                    score += pts; addGameScore(pts);
                     updateHUD(); break;
                 }
             }
@@ -439,7 +481,7 @@ function updateSnake(dt: number) {
     if (head.x === skFood.x && head.y === skFood.y) {
         score += 10; skLength++;
         extraVal = String(skLength);
-        if (onScoreCb) onScoreCb(10);
+        addGameScore(10);
         updateHUD();
         skInterval = Math.max(0.06, skInterval - 0.004);
         spawnSkFood();
@@ -478,22 +520,39 @@ function drawSnake() {
 }
 
 // ============================================================
-// GAME 3: COMET DODGE (comètes diagonales avec queue)
+// GAME 3: COMET DODGE (comètes homing + niveaux + types variés)
 // ============================================================
 let mtX = 240;
 const MT_Y = 330, MT_W = 28, MT_H = 12, MT_SPD = 5;
 
-interface Comet { x: number; y: number; vx: number; vy: number; size: number; trail: {x:number;y:number}[]; }
+type CometType = 'normal' | 'fast' | 'big' | 'zigzag' | 'missile';
+interface Comet {
+    x: number; y: number; vx: number; vy: number;
+    size: number; trail: { x: number; y: number }[];
+    type: CometType; homing: number;   // 0 = balistique, >0 = vise le joueur
+    color: string; glowColor: string;
+    phase: number;   // pour zigzag
+}
 let comets: Comet[] = [];
 let mtLives = 3;
 let mtSpawnCd = 0;
-let mtSpeedMul = 1;
+let mtLevel = 1;
 let mtSurvival = 0;
+let mtLevelTimer = 0;
+const LEVEL_DURATION = 10;   // 10s par niveau
+
+const COMET_TYPES: Record<CometType, { size: number; speed: number; homing: number; color: string; glow: string }> = {
+    normal:  { size: 7,  speed: 90,  homing: 0,    color: '#e0f4ff', glow: 'rgba(180,220,255,0.4)' },
+    fast:    { size: 5,  speed: 160, homing: 0.3,  color: '#ff6b40', glow: 'rgba(255,107,64,0.4)' },
+    big:     { size: 12, speed: 60,  homing: 0.1,  color: '#b388ff', glow: 'rgba(179,136,255,0.4)' },
+    zigzag:  { size: 6,  speed: 110, homing: 0,    color: '#38ffb0', glow: 'rgba(56,255,176,0.4)' },
+    missile: { size: 6,  speed: 70,  homing: 1.5,  color: '#ff2050', glow: 'rgba(255,32,80,0.5)' },
+};
 
 function startMeteor() {
     score = 0; mtLives = 3; extraLabel = 'VIES'; extraVal = '3';
-    mtX = 240; comets = []; mtSpawnCd = 0.5;
-    mtSpeedMul = 1; mtSurvival = 0;
+    mtX = 240; comets = []; mtSpawnCd = 1.0;
+    mtLevel = 1; mtSurvival = 0; mtLevelTimer = 0;
     keys = {}; spacePrev = false;
     state = 'playing';
     updateHUD();
@@ -509,62 +568,123 @@ function updateMeteor(dt: number) {
     if (keys['ArrowRight'] || keys['d'] || keys['D']) mtX += MT_SPD;
     mtX = Math.max(MT_W / 2, Math.min(W - MT_W / 2, mtX));
 
-    // Score de survie
+    // Niveau : augmente toutes les 10s
     mtSurvival += dt;
-    score = Math.floor(mtSurvival);
-    updateHUD();
-
-    // Accélération progressive
-    mtSpeedMul = 1 + mtSurvival * 0.02;
-
-    // Spawn comète : vient d'un bord, angle diagonal
-    mtSpawnCd -= dt;
-    if (mtSpawnCd <= 0) {
-        const side = Math.floor(Math.random() * 3);   // 0=haut, 1=haut-gauche, 2=haut-droite
-        let x: number, y: number, vx: number, vy: number;
-        const speed = (100 + Math.random() * 60) * mtSpeedMul;
-        if (side === 0) {
-            // Plonge droit depuis le haut
-            x = Math.random() * W; y = -20;
-            vx = (Math.random() - 0.5) * 40; vy = speed;
-        } else if (side === 1) {
-            // Diagonale depuis le haut-gauche
-            x = -20; y = Math.random() * H * 0.4;
-            vx = speed * 0.7; vy = speed * 0.7;
-        } else {
-            // Diagonale depuis le haut-droite
-            x = W + 20; y = Math.random() * H * 0.4;
-            vx = -speed * 0.7; vy = speed * 0.7;
-        }
-        comets.push({ x, y, vx, vy, size: 6 + Math.random() * 5, trail: [] });
-        mtSpawnCd = Math.max(0.3, 0.8 - mtSurvival * 0.004);
+    mtLevelTimer += dt;
+    if (mtLevelTimer >= LEVEL_DURATION) {
+        mtLevel++;
+        mtLevelTimer = 0;
     }
 
-    // Comètes : déplacement + trail + collision + sortie écran
+    // Score = survie × niveau (1pt/sec au lvl 1, 2pt/sec au lvl 2, etc.)
+    const pointsPerSec = mtLevel;
+    const prevScore = score;
+    score = Math.floor(mtSurvival * pointsPerSec);
+    if (score > prevScore) {
+        addGameScore(score - prevScore);
+    }
+    updateHUD();
+
+    // Spawn : fréquence et type selon le niveau
+    mtSpawnCd -= dt;
+    if (mtSpawnCd <= 0) {
+        spawnComet();
+        const baseCd = Math.max(0.25, 1.0 - mtLevel * 0.05);
+        mtSpawnCd = baseCd + Math.random() * 0.3;
+    }
+
+    // Comètes
     for (let i = comets.length - 1; i >= 0; i--) {
         const c = comets[i];
         // Trail
         c.trail.push({ x: c.x, y: c.y });
-        if (c.trail.length > 12) c.trail.shift();
+        if (c.trail.length > 14) c.trail.shift();
+
+        // Homing : ajuste la vx (et vy pour les missiles) vers le joueur
+        if (c.homing > 0) {
+            const targetDx = mtX - c.x;
+            const targetDy = MT_Y - c.y;
+            // Plus le homing est fort, plus la correction est agressive
+            c.vx += (targetDx > 0 ? 1 : -1) * c.homing * 60 * dt;
+            // Missile : traque aussi en Y (vrai autoguidage)
+            if (c.type === 'missile') {
+                const dist = Math.sqrt(targetDx * targetDx + targetDy * targetDy);
+                if (dist > 1) {
+                    // Normalise et ajuste la vélocité vers la cible
+                    const speed = Math.sqrt(c.vx * c.vx + c.vy * c.vy);
+                    const desiredVx = (targetDx / dist) * speed;
+                    const desiredVy = (targetDy / dist) * speed;
+                    c.vx += (desiredVx - c.vx) * c.homing * dt;
+                    c.vy += (desiredVy - c.vy) * c.homing * dt;
+                }
+            }
+            // Limite la vx
+            const maxVx = 150;
+            c.vx = Math.max(-maxVx, Math.min(maxVx, c.vx));
+        }
+
+        // Zigzag : oscillation horizontale
+        if (c.type === 'zigzag') {
+            c.phase += dt * 5;
+            c.x += Math.sin(c.phase) * 40 * dt;
+        }
 
         c.x += c.vx * dt;
         c.y += c.vy * dt;
 
         // Sortie d'écran → détruire
-        if (c.x < -40 || c.x > W + 40 || c.y > H + 40) {
+        if (c.x < -50 || c.x > W + 50 || c.y > H + 50) {
             comets.splice(i, 1);
             continue;
         }
 
-        // Collision joueur (hitbox serrée)
+        // Collision joueur
         const dx = c.x - mtX, dy = c.y - MT_Y;
-        const hitR = c.size + MT_W / 2 - 4;   // tolérant
+        const hitR = c.size + MT_W / 2 - 4;
         if (dx * dx + dy * dy < hitR * hitR) {
             comets.splice(i, 1);
             mtLives--; extraVal = String(mtLives); updateHUD();
             if (mtLives <= 0) { endGame(); return; }
         }
     }
+}
+
+function spawnComet() {
+    const W = canvas!.width;
+    // Type selon le niveau
+    let type: CometType = 'normal';
+    const r = Math.random();
+    if (mtLevel >= 5 && r < 0.25) type = 'missile';
+    else if (mtLevel >= 3 && r < 0.2) type = 'big';
+    else if (mtLevel >= 2 && r < 0.4) type = 'fast';
+    else if (mtLevel >= 2 && r < 0.6) type = 'zigzag';
+    else type = 'normal';
+
+    const cfg = COMET_TYPES[type];
+    const side = Math.floor(Math.random() * 3);
+    let x: number, y: number, vx: number, vy: number;
+    const speed = cfg.speed * (1 + (mtLevel - 1) * 0.08);
+
+    if (type === 'missile') {
+        // Le missile spawn loin, vitesse modeste, mais traque en continu
+        x = Math.random() * W; y = -30;
+        vx = 0; vy = speed;
+    } else if (side === 0) {
+        x = Math.random() * W; y = -20;
+        vx = (Math.random() - 0.5) * 40; vy = speed;
+    } else if (side === 1) {
+        x = -20; y = Math.random() * 120;
+        vx = speed * 0.7; vy = speed * 0.7;
+    } else {
+        x = W + 20; y = Math.random() * 120;
+        vx = -speed * 0.7; vy = speed * 0.7;
+    }
+
+    comets.push({
+        x, y, vx, vy, size: cfg.size, trail: [],
+        type, homing: cfg.homing, color: cfg.color, glowColor: cfg.glow,
+        phase: 0,
+    });
 }
 
 function drawMeteor() {
@@ -576,22 +696,37 @@ function drawMeteor() {
     for (let i = 0; i < 40; i++) ctx.fillRect((i * 73) % W, (i * 97) % H, 1, 1);
 
     if (state === 'playing' || state === 'gameover') {
+        // Niveau (en bas à gauche)
+        ctx.fillStyle = '#5d6f95';
+        ctx.font = '10px Orbitron, monospace';
+        ctx.textAlign = 'left';
+        ctx.fillText('NIVEAU ' + mtLevel, 8, H - 8);
+
         // Comètes + trails
         comets.forEach(c => {
-            // Queue
+            // Missile : trail plus long + pulsant
+            const trailAlpha = c.type === 'missile' ? 0.7 : 0.5;
             for (let i = 0; i < c.trail.length; i++) {
                 const t = c.trail[i];
-                const alpha = (i / c.trail.length) * 0.5;
+                const alpha = (i / c.trail.length) * trailAlpha;
                 const sz = c.size * (i / c.trail.length);
-                ctx!.fillStyle = `rgba(110, 180, 255, ${alpha})`;
+                const baseColor = c.color.startsWith('#')
+                    ? hexToRgb(c.color) : '110, 180, 255';
+                ctx!.fillStyle = `rgba(${baseColor}, ${alpha})`;
                 ctx!.beginPath();
                 ctx!.arc(t.x, t.y, sz, 0, Math.PI * 2);
                 ctx!.fill();
             }
             // Tête comète
-            ctx!.fillStyle = 'rgba(180, 220, 255, 0.4)';
+            ctx!.fillStyle = c.glowColor;
             ctx!.beginPath(); ctx!.arc(c.x, c.y, c.size * 1.4, 0, Math.PI * 2); ctx!.fill();
-            ctx!.fillStyle = '#e0f4ff';
+            // Missile : halo pulsant
+            if (c.type === 'missile') {
+                const pulse = 1 + Math.sin(performance.now() / 65) * 0.3;
+                ctx!.fillStyle = 'rgba(255,32,80,0.3)';
+                ctx!.beginPath(); ctx!.arc(c.x, c.y, c.size * 2 * pulse, 0, Math.PI * 2); ctx!.fill();
+            }
+            ctx!.fillStyle = c.color;
             ctx!.beginPath(); ctx!.arc(c.x, c.y, c.size, 0, Math.PI * 2); ctx!.fill();
             ctx!.fillStyle = '#ffffff';
             ctx!.beginPath(); ctx!.arc(c.x, c.y, c.size * 0.4, 0, Math.PI * 2); ctx!.fill();
@@ -606,4 +741,12 @@ function drawMeteor() {
     }
     if (state === 'gameover') drawGameOver('GAME OVER', '[ESPACE] rejouer');
     drawCanvasHUD();
+}
+
+function hexToRgb(hex: string): string {
+    const h = hex.replace('#', '');
+    const r = parseInt(h.substring(0, 2), 16);
+    const g = parseInt(h.substring(2, 4), 16);
+    const b = parseInt(h.substring(4, 6), 16);
+    return `${r}, ${g}, ${b}`;
 }

@@ -199,14 +199,35 @@ import { initMiniGames, openGamesMenu, closeGamesMenu } from './mini-games';
         if (mpFill) mpFill.style.width = ((scan.discoveredCount / scan.total) * 100) + '%';
         if (mpCount) mpCount.textContent = String(scan.discoveredCount);
 
-        // Score de combat
+        // Score de combat (astéroïdes 3D + high scores mini-jeux localStorage)
         var scoreEl = el('score-val');
         var comboEl = el('combo-val');
+        var tooltipEl = el('score-tooltip');
         var scoreState = SpaceCockpit.getScore();
-        if (scoreEl) scoreEl.textContent = scoreState.score.toLocaleString('fr-FR');
+        var hs: Record<string, number> = {};
+        try { hs = JSON.parse(localStorage.getItem('samsoucoupe_highscores') || '{}'); } catch (e) {}
+        var inv = hs['invader'] || 0;
+        var snk = hs['snake'] || 0;
+        var met = hs['meteor'] || 0;
+        var mgTotal = inv + snk + met;
+        var totalScore = scoreState.score + mgTotal;
+        if (scoreEl) scoreEl.textContent = totalScore.toLocaleString('fr-FR');
         if (comboEl) {
             comboEl.textContent = scoreState.combo > 1 ? 'x' + scoreState.combo : '';
             comboEl.style.opacity = String(scoreState.combo > 1 ? 1 : 0);
+        }
+        // Tooltip détaillé : détails par source
+        if (tooltipEl) {
+            tooltipEl.innerHTML =
+                '<div class="st-row"><span class="st-label">ASTÉROÏDES</span><span class="st-val">' + scoreState.score.toLocaleString('fr-FR') + '</span></div>' +
+                '<div class="st-row"><span class="st-label">MINI-JEUX</span><span class="st-val">' + mgTotal.toLocaleString('fr-FR') + '</span></div>' +
+                '<div class="st-divider"></div>' +
+                '<div class="st-row"><span class="st-label">INVADER</span><span class="st-val">' + inv + '</span></div>' +
+                '<div class="st-row"><span class="st-label">SNAKE</span><span class="st-val">' + snk + '</span></div>' +
+                '<div class="st-row"><span class="st-label">COMET DODGE</span><span class="st-val">' + met + '</span></div>' +
+                '<div class="st-divider"></div>' +
+                '<div class="st-row"><span class="st-label">TOTAL</span><span class="st-val st-total">' + totalScore.toLocaleString('fr-FR') + '</span></div>' +
+                '<div class="st-records">RECORDS PAR JEU</div>';
         }
 
         // Rafraîchit la map si ouverte
@@ -224,6 +245,10 @@ import { initMiniGames, openGamesMenu, closeGamesMenu } from './mini-games';
         if (!container) return;
         var range = 200; // portée radar en unités
         var rr = 70;     // rayon radar en % (0 = centre)
+        // Orientation radar : rotation selon le yaw du vaisseau
+        var ship = SpaceCockpit.getShipState();
+        var yaw = ship.yaw || 0;
+        var cosY = Math.cos(yaw), sinY = Math.sin(yaw);
         // Garde un div par blip (stable) + clic pour voler
         blips.forEach(function (b) {
             var node = container.querySelector('[data-id="' + b.id + '"]') as HTMLElement | null;
@@ -241,8 +266,42 @@ import { initMiniGames, openGamesMenu, closeGamesMenu } from './mini-games';
             node.classList.toggle('discovered', b.discovered);
             node.classList.toggle('undiscovered', !b.discovered);
             if (b.d <= range) {
-                var px = (b.dx / range) * rr;
-                var py = (b.dz / range) * rr;
+                // Rotation des coordonnées monde → coords radar (orienté vaisseau)
+                var rx = b.dx * cosY - b.dz * sinY;
+                var rz = b.dx * sinY + b.dz * cosY;
+                var px = -(rx / range) * rr;
+                var py = (rz / range) * rr;
+                node.style.left = (50 + px) + '%';
+                node.style.top = (50 + py) + '%';
+                node.style.display = 'block';
+            } else {
+                node.style.display = 'none';
+            }
+        });
+
+        // Astéroïdes sur le radar (blips rouges temporaires)
+        var astBlips = SpaceCockpit.getAsteroidsForRadar();
+        var astRange = 250;
+        // Compte les blips astéroïdes existants
+        var existingAst = container.querySelectorAll('[data-ast]');
+        existingAst.forEach(function (n) { (n as HTMLElement).style.display = 'none'; });
+        astBlips.forEach(function (b, i) {
+            var node = container.querySelector('[data-ast="' + i + '"]') as HTMLElement | null;
+            if (!node) {
+                node = document.createElement('div');
+                node.className = 'radar-blip radar-ast';
+                node.dataset.ast = String(i);
+                node.style.background = '#ff4060';
+                node.style.color = '#ff4060';
+                node.style.boxShadow = '0 0 4px #ff4060';
+                container.appendChild(node);
+            }
+            if (b.d <= astRange) {
+                // Rotation comme les planètes
+                var rx = b.dx * cosY - b.dz * sinY;
+                var rz = b.dx * sinY + b.dz * cosY;
+                var px = -(rx / astRange) * rr;
+                var py = (rz / astRange) * rr;
                 node.style.left = (50 + px) + '%';
                 node.style.top = (50 + py) + '%';
                 node.style.display = 'block';
