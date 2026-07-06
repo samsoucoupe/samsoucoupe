@@ -3,6 +3,7 @@
  * ============================================================ */
 import { SpaceCockpit } from './space-cockpit';
 import { PORTFOLIO } from './portfolio-data';
+import { initMiniGames, openGamesMenu, closeGamesMenu } from './mini-games';
 
     function el(id: string): HTMLElement { return document.getElementById(id) as HTMLElement; }
     function esc(s: unknown) {
@@ -41,15 +42,19 @@ import { PORTFOLIO } from './portfolio-data';
         // Flèches ← → = navigation entre stations, Échap/X = ferme panneau
                         document.addEventListener('keydown', function (e) {
                             if (!window.SpaceCockpit) return;
+                            // Ignore les touches si les mini-jeux sont ouverts
+                            if (el('games-overlay').classList.contains('open')) return;
                             if (e.key === 'Escape' || e.key === 'x' || e.key === 'X') {
                                 if (el('panel').classList.contains('open')) closePanel();
-                                if (SpaceCockpit.getMode() !== 'idle') SpaceCockpit.setIdleMode();
+                                if (SpaceCockpit.getMode() !== 'observing') SpaceCockpit.setObservingMode();
                             } else if (e.key === 'ArrowRight') {
                                 SpaceCockpit.flyTo(SpaceCockpit.nextSection());
                             } else if (e.key === 'ArrowLeft') {
                                 SpaceCockpit.flyTo(SpaceCockpit.prevSection());
                             } else if (e.key === 'm' || e.key === 'M') {
                                 toggleMap();
+                            } else if (e.key === 'g' || e.key === 'G') {
+                                openGamesMenu();
                             }
                         });
 
@@ -58,6 +63,13 @@ import { PORTFOLIO } from './portfolio-data';
         if (mapBtn) mapBtn.addEventListener('click', toggleMap);
         var mapClose = el('map-close');
         if (mapClose) mapClose.addEventListener('click', toggleMap);
+
+        // Bouton MINI-JEUX
+        initMiniGames();
+        var gamesBtn = el('games-btn');
+        if (gamesBtn) gamesBtn.addEventListener('click', openGamesMenu);
+        var gamesClose = el('games-close');
+        if (gamesClose) gamesClose.addEventListener('click', closeGamesMenu);
 
         // Callbacks 3D
         if (!window.SpaceCockpit) { console.error('SpaceCockpit manquant'); return; }
@@ -92,8 +104,8 @@ import { PORTFOLIO } from './portfolio-data';
         // Hint jeu après 3s — une seule fois
         setTimeout(function () {
             showGameHint(
-                'CLIQUER LES DRONES ROUGES = +100 pts · CLIQUER LES PORTAILS VERTS = +150 pts\n' +
-                'CLIQUER une planète = voyager · MAP (M) = carte du système'
+                'CLIQUER LES ASTÉROÏDES = +100 pts · CLIQUER LES PORTAILS VERTS = +150 pts\n' +
+                'CLIQUER une planète = voyager · MAP (M) = carte · JEUX (G) = mini-jeux'
             );
             // Hint des planètes non-découvertes
             setTimeout(function () {
@@ -106,6 +118,41 @@ import { PORTFOLIO } from './portfolio-data';
                 }
             }, 5000);
         }, 3000);
+        // Messages radio périodiques
+        startRadioMessages();
+    }
+
+    // ----------------------------------------------------------
+    // MESSAGES RADIO (ambiance périodique)
+    // ----------------------------------------------------------
+    var radioMessages = [
+        '📡 Station de contrôle : soucoupe en observation, tout est calme.',
+        '📡 Capitaine, champ d\'astéroïdes détecté sur le radar. Restez vigilant.',
+        '📡 Nouveau signal : une station orbitale émet sur la fréquence 42.7 MHz.',
+        '📡 Rapport : le système solaire est stable. Aucune anomalie critique.',
+        '📡 Astéroïde dérivant à proximité — prêt à intercepter si nécessaire.',
+        '📡 Soucoupe, votre orbite est impeccable. Continuez l\'exploration.',
+        '📡 Portail vert détecté dans le secteur. Origine inconnue.',
+        '📡 Données de scan enregistrées. Stations découvertes : en progression.',
+        '📡 Contrôle : n\'oubliez pas, chaque planète révèle une partie du profil.',
+        '📡 Fréquence radio : bruit cosmique de fond détecté. C\'est... magnifique.',
+        '📡 Alerte : activité météoritique légère dans le secteur externe.',
+        '📡 Station de contrôle : mini-jeux disponibles via le panneau de bord (G).',
+        '📡 Capitaine, les trajectoires d\'orbite sont stables et élégantes aujourd\'hui.',
+        '📡 Signal intermittent : pourrait être un artefact ancien. Investigation recommandée.',
+        '📡 Contrôle : votre soucoupe vole comme un rêve. Beau travail.'
+    ];
+    var radioTimer = null;
+    function startRadioMessages() {
+        if (radioTimer) clearInterval(radioTimer);
+        radioTimer = setInterval(function () {
+            if (!hudStarted) return;
+            // Ne pas afficher si un toast est déjà visible
+            var toast = el('combat-toast');
+            if (toast && toast.classList.contains('show')) return;
+            var msg = radioMessages[Math.floor(Math.random() * radioMessages.length)];
+            showGameHint(msg);
+        }, 12000);  // toutes les 12 secondes
     }
 
     // ----------------------------------------------------------
@@ -239,7 +286,7 @@ import { PORTFOLIO } from './portfolio-data';
         var html = '';
         radar.forEach(function (r) {
             var cfg = SpaceCockpit.SECTIONS[r.id];
-            var isTarget = (ship.target === r.id && ship.mode !== 'idle');
+            var isTarget = (ship.target === r.id && ship.mode !== 'observing');
             var stateIcon = r.discovered ? '✓' : '?';
             var stateClass = r.discovered ? 'discovered' : 'unknown';
             var distStr = r.d < 1000 ? Math.round(r.d) + 'u' : (r.d / 1000).toFixed(1) + 'ku';
@@ -271,7 +318,7 @@ import { PORTFOLIO } from './portfolio-data';
                     stateEl.textContent = r.discovered ? '✓' : '?';
                     stateEl.className = 'nl-state ' + (r.discovered ? 'discovered' : 'unknown');
                 }
-                row.classList.toggle('active', ship.target === radar[i].id && ship.mode !== 'idle');
+                row.classList.toggle('active', ship.target === radar[i].id && ship.mode !== 'observing');
             });
         }
     }
@@ -295,16 +342,11 @@ import { PORTFOLIO } from './portfolio-data';
         if (!svg || !window.SpaceCockpit) return;
         var snapshot = SpaceCockpit.getSystemSnapshot();
 
-        // Determine SVG viewBox from actual planet positions (not orbit radii)
-        var minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
-        snapshot.forEach(function (s) {
-            if (s.x < minX) minX = s.x; if (s.x > maxX) maxX = s.x;
-            if (s.z < minZ) minZ = s.z; if (s.z > maxZ) maxZ = s.z;
-        });
-        var pad = 180;
-        var vb = Math.max(maxX - minX, maxZ - minZ) / 2 + pad;
-        var cx = (minX + maxX) / 2, cz = (minZ + maxZ) / 2;
-        svg.setAttribute('viewBox', (cx - vb) + ' ' + (cz - vb) + ' ' + (vb * 2) + ' ' + (vb * 2));
+        // ViewBox fixe basé sur le rayon d'orbite maximum (ne tremble pas)
+        var maxR = 0;
+        snapshot.forEach(function (s) { if (s.radius > maxR) maxR = s.radius; });
+        var vb = maxR + 90;
+        svg.setAttribute('viewBox', (-vb) + ' ' + (-vb) + ' ' + (vb * 2) + ' ' + (vb * 2));
         svg.dataset.vb = String(vb);
 
         // --- couches statiques ---
@@ -379,26 +421,36 @@ import { PORTFOLIO } from './portfolio-data';
     }
 
     function injectMapPath(svg) {
-        // Removes old path group, rebuilds and injects idle TSP path
+        // Removes old trail group, rebuilds orbit circles
         var old = svg.querySelector('#map-idle-path');
         if (old) old.remove();
-        var pathPoints = SpaceCockpit.getIdlePathPoints();
-        if (!pathPoints || pathPoints.length < 2) return;
+        var trails = SpaceCockpit.getOrbitTrailPoints();
+        if (!trails || trails.length === 0) return;
         var g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
         g.id = 'map-idle-path';
-        var poly = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
-        poly.setAttribute('points', pathPoints.map(p => p.x.toFixed(1) + ',' + p.z.toFixed(1)).join(' '));
-        poly.setAttribute('fill', 'none');
-        poly.setAttribute('stroke', 'rgba(0,225,255,0.25)');
-        poly.setAttribute('stroke-width', '1.5');
-        poly.setAttribute('stroke-dasharray', '4 4');
-        poly.setAttribute('stroke-linejoin', 'round');
-        g.appendChild(poly);
-        pathPoints.forEach(function(p) {
-            var dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
-            dot.setAttribute('cx', p.x.toFixed(1)); dot.setAttribute('cy', p.z.toFixed(1));
-            dot.setAttribute('r', '3'); dot.setAttribute('fill', 'rgba(0,225,255,0.5)');
-            g.appendChild(dot);
+        trails.forEach(function(t) {
+            // Cercle d'orbite coloré
+            var circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('cx', '0');
+            circle.setAttribute('cy', '0');
+            circle.setAttribute('r', String(t.radius));
+            circle.setAttribute('fill', 'none');
+            circle.setAttribute('stroke', t.color);
+            circle.setAttribute('stroke-opacity', '0.25');
+            circle.setAttribute('stroke-width', '1.5');
+            circle.setAttribute('stroke-dasharray', '3 6');
+            g.appendChild(circle);
+            // Points pulsés sur l'orbite (3, décalés à 120°)
+            for (var k = 0; k < 3; k++) {
+                var ang = (k / 3) * Math.PI * 2;
+                var dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+                dot.setAttribute('cx', (t.radius * Math.cos(ang)).toFixed(1));
+                dot.setAttribute('cy', (t.radius * Math.sin(ang)).toFixed(1));
+                dot.setAttribute('r', '2.5');
+                dot.setAttribute('fill', t.color);
+                dot.setAttribute('opacity', '0.6');
+                g.appendChild(dot);
+            }
         });
         svg.appendChild(g);
     }
@@ -409,16 +461,7 @@ import { PORTFOLIO } from './portfolio-data';
         var snapshot = SpaceCockpit.getSystemSnapshot();
         var ship = SpaceCockpit.getShipState();
 
-        // Recalculate viewBox from actual planet positions
-        var minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
-        snapshot.forEach(function (s) {
-            if (s.x < minX) minX = s.x; if (s.x > maxX) maxX = s.x;
-            if (s.z < minZ) minZ = s.z; if (s.z > maxZ) maxZ = s.z;
-        });
-        var pad = 180;
-        var vb = Math.max(maxX - minX, maxZ - minZ) / 2 + pad;
-        var cx = (minX + maxX) / 2, cz = (minZ + maxZ) / 2;
-        svg.setAttribute('viewBox', (cx - vb) + ' ' + (cz - vb) + ' ' + (vb * 2) + ' ' + (vb * 2));
+        // viewBox FIXE — pas de recalcul (sinon la map tremble)
 
         snapshot.forEach(function (s) {
             var g = svg.querySelector('.map-node[data-id="' + s.id + '"]');
@@ -473,7 +516,7 @@ import { PORTFOLIO } from './portfolio-data';
     function closePanel() {
             el('panel').classList.remove('open');
             lastScanned = null;
-            if (window.SpaceCockpit && SpaceCockpit.getMode() !== 'idle') SpaceCockpit.setIdleMode();
+            if (window.SpaceCockpit && SpaceCockpit.getMode() !== 'observing') SpaceCockpit.setObservingMode();
         }
 
     // ---------- Renderers (identiques, briques cockpit) ----------

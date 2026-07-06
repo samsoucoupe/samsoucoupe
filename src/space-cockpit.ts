@@ -12,7 +12,7 @@ import { PORTFOLIO, Project } from './portfolio-data';
 import * as BABYLON from '@babylonjs/core';
 
 // Types minimaux pour les objets métier
-type Mode = 'idle' | 'flying' | 'orbiting' | 'flying_moon' | 'orbiting_moon';
+type Mode = 'observing' | 'flying' | 'orbiting' | 'flying_moon' | 'orbiting_moon';
 
 interface SectionCfg {
     color: string;
@@ -79,12 +79,34 @@ interface CometEntry {
     life: number;
 }
 
+interface AsteroidEntry {
+    id: number;
+    root: BABYLON.TransformNode;
+    body: BABYLON.Mesh;
+    hit: BABYLON.Mesh;
+    pos: BABYLON.Vector3;
+    vel: BABYLON.Vector3;
+    rot: BABYLON.Vector3;   // vitesse de rotation sur chaque axe
+    hp: number;
+    life: number;
+}
+
 interface ShipState { x: number; y: number; z: number; speed: number; target: string; mode: Mode; }
 interface ScanState { id: string | null; progress: number; discoveredCount: number; total: number; }
 interface RadarBlip { id: string; dx: number; dz: number; d: number; discovered: boolean; color: string; label: string; }
 interface SystemSnap { id: string; x: number; z: number; color: string; label: string; glyph: string; radius: number; discovered: boolean; }
 interface ScoreEvent { score: number; gained: number; combo: number; reason: string; }
-interface IdlePathPoint { x: number; z: number; }
+
+// Point pulsé qui voyage le long d'une orbite
+interface OrbitPulse {
+    mesh: BABYLON.Mesh;
+    mat: BABYLON.StandardMaterial;
+    angle: number;
+    speed: number;
+}
+
+// Trail d'orbite pour la map 2D
+interface OrbitTrailInfo { id: string; radius: number; color: string; label: string; }
 
 type ScanCb = (sectionId: string) => void;
 type DiscoverCb = (sectionId: string) => void;
@@ -101,7 +123,6 @@ export interface SpaceCockpitAPI {
     flyTo: (sectionId: string) => void;
     returnToCenter: () => void;
     getMode: () => Mode;
-    getIdlePathPoints: () => IdlePathPoint[];
     getShipState: () => ShipState;
     getScanState: () => ScanState;
     getStationsForRadar: () => RadarBlip[];
@@ -114,7 +135,8 @@ export interface SpaceCockpitAPI {
     setOnModeCb: (cb: ModeCb) => void;
     setOnPortalCb: (cb: PortalCb) => void;
     setOnScoreCb: (cb: ScoreCb) => void;
-    setIdleMode: () => void;
+    setObservingMode: () => void;
+    getOrbitTrailPoints: () => OrbitTrailInfo[];
 }
 
 // ───────────────────────── module state ─────────────────────────
@@ -128,23 +150,35 @@ let engineGlow: BABYLON.Mesh[] = [];
 let engineParticles: BABYLON.ParticleSystem;
 let sunCore: BABYLON.Mesh;
 
+// --- trajectoires d'orbite stylées ---
+let orbitPulses: Record<string, OrbitPulse[]> = {};
+
+// --- astéroïdes (remplacent les ennemis) ---
+let asteroids: AsteroidEntry[] = [];
+let asteroidTimer = 0;
+let nextAsteroid = 6 + Math.random() * 8;
+
 // --- les planètes (orbitent autour du centre) ---
 let planets: Record<string, PlanetEntry> = {};
 const SUN_POS = BABYLON.Vector3.Zero();
 
 // --- état du vaisseau ---
-let mode: Mode = 'orbiting';
-let shipPos = new BABYLON.Vector3(0, 8, 70);
+let mode: Mode = 'observing';
+let shipPos = new BABYLON.Vector3(0, 120, 180);   // viewpoint 3/4 haut
 let targetPlanet = 'home';
 let targetMoon = -1;
-// Idle path state
-let idlePath: BABYLON.Vector3[] = [];       // array of BABYLON.Vector3 waypoints
-let idlePathIdx = 0;     // current waypoint index
-let idlePathT = 0;       // interpolation [0,1] between idx and idx+1
-const idleSpeed = 28;      // units/sec along the spline
-let orbitAngle = 0;               // angle d'orbite courant (idle et orbiting)
+// Observing : caméra en rotation lente autour du système + ship bobbing en place
+let observeCamAngle = 0;
+let observeBobSeed = 0;
+let orbitAngle = 0;               // angle d'orbite courant (orbiting)
 let shipYaw = 0;
 let currentSpeed = 0;
+
+// Transition douce vers observing (évite le TP)
+let transitioning = false;
+let transitionT = 0;             // 0→1
+let transitionFrom = new BABYLON.Vector3();
+let transitionFromYaw = 0;
 
 // --- scanner ---
 let scanProgress = 0;
@@ -194,29 +228,43 @@ const PLANET_ORBIT_R = 20;
 
     /* ============================================================ INIT */
 
-    // Précalcule une spline Lissajous-like passant par toutes les planètes (boucle fermée)
-    function buildIdlePath() {
-        const pts = Object.keys(planets).map(id => {
-            const p = planets[id].root.position;
-            return new BABYLON.Vector3(p.x, p.y + 4, p.z);
-        });
-        if (pts.length < 2) return;
-        // Nearest-neighbor TSP closes loop
-        const visited = new Array(pts.length).fill(false);
-        const order = [0]; visited[0] = true;
-        for (let n = 1; n < pts.length; n++) {
-            let best = -1, bestD = Infinity;
-            for (let i = 0; i < pts.length; i++) {
-                if (visited[i]) continue;
-                const d = BABYLON.Vector3.Distance(pts[order[n-1]], pts[i]);
-                if (d < bestD) { bestD = d; best = i; }
+    // Précalcule les cercles d'orbite stylés (anneaux émissifs + points qui voyagent)
+    function buildOrbitTrails() {
+        Object.keys(SECTIONS).forEach(id => {
+            if (id === 'home') return;
+            const cfg = SECTIONS[id];
+            const r = cfg.orbit.radius;
+            if (r <= 0) return;
+            const c = BABYLON.Color3.FromHexString(cfg.color);
+
+            // Anneau émissif fixe (trajectoire)
+            const trailMat = new BABYLON.StandardMaterial('trail_' + id, scene);
+            trailMat.emissiveColor = c.scale(0.35);
+            trailMat.alpha = 0.28;
+            trailMat.disableLighting = true;
+            const trail = BABYLON.MeshBuilder.CreateTorus('orbitTrail_' + id,
+                { diameter: r * 2, thickness: 0.3, tessellation: 128 }, scene);
+            trail.material = trailMat;
+            trail.isPickable = false;
+            trail.rotation.x = 0;   // cercle horizontal dans le plan XZ
+
+            // Points pulsés qui voyagent le long de l'orbite (3 par orbite, décalés)
+            orbitPulses[id] = [];
+            for (let k = 0; k < 3; k++) {
+                const pulseMat = new BABYLON.StandardMaterial('pulse_' + id + '_' + k, scene);
+                pulseMat.emissiveColor = c;
+                pulseMat.disableLighting = true;
+                const pulse = BABYLON.MeshBuilder.CreateSphere('pulse_' + id + '_' + k,
+                    { diameter: 1.4, segments: 8 }, scene);
+                pulse.material = pulseMat;
+                pulse.isPickable = false;
+                orbitPulses[id].push({
+                    mesh: pulse, mat: pulseMat,
+                    angle: (k / 3) * Math.PI * 2,
+                    speed: cfg.orbit.speed * 1.6   // un peu plus rapide que la planète
+                });
             }
-            order.push(best); visited[best] = true;
-        }
-        const loop = order.concat([order[0]]);
-        const nn = loop.map(i => pts[i]);
-        const spline = BABYLON.Curve3.CreateCatmullRomSpline(nn, 60, true);
-        idlePath = spline.getPoints();
+        });
     }
 
     function init() {
@@ -239,14 +287,15 @@ const PLANET_ORBIT_R = 20;
         buildStarfield3D();
         buildEngineParticles();
         buildPortals();           // Portails Rick & Morty (easter eggs / anomalies)
-        buildEnemies();           // Drones hostiles
+        buildAsteroids();
         attachPicking();
 
-        buildIdlePath();
-        shipPos = planets.home.root.position.clone();
+        buildOrbitTrails();
+        // Viewpoint d'observation 3/4 haut : la soucoupe est stationnée en hauteur
+        shipPos = new BABYLON.Vector3(0, 120, 180);
         ship.position.copyFrom(shipPos);
-        mode = 'idle';
-        startPortalsTimer();
+        shipYaw = 0;
+        mode = 'observing';
         engine.runRenderLoop(renderLoop);
         window.addEventListener('resize', () => engine.resize());
         ready = true;
@@ -709,134 +758,116 @@ const PLANET_ORBIT_R = 20;
         portals.splice(idx, 1);
     }
 
-    /* ============================================================ ENNEMIS
-     * Drones hostiles qui spawnent près du joueur. Clique pour tirer,
-     * détruire et gagner des points.
+    /* ============================================================ ASTÉROÏDES
+     * Rochers spatiaux qui dérivent dans le système. Clic pour tirer,
+     * détruire et gagner des points. Plusieurs HP pour les gros.
      */
-    let enemies = [];
-    let enemyTimer = 0;
-    let nextEnemy = 8 + Math.random() * 12;
+    function buildAsteroids() { /* rien à pré-construire, spawn à la volée */ }
 
-    function buildEnemies() { /* rien à pré-construire */ }
-
-    function spawnEnemy() {
+    function spawnAsteroid() {
+        // Nouvelle logique : traverse la scène comme une comète
         const ang = Math.random() * Math.PI * 2;
-        const dist = 60 + Math.random() * 80;
-        const pos = new BABYLON.Vector3(
-            shipPos.x + Math.cos(ang) * dist,
-            shipPos.y + (Math.random() - 0.5) * 25,
-            shipPos.z + Math.sin(ang) * dist
+        const startDist = 250;
+        const startPos = new BABYLON.Vector3(
+            Math.cos(ang) * startDist,
+            60 + (Math.random() - 0.5) * 60,
+            Math.sin(ang) * startDist
         );
+        // Cible : un point près de la soucoupe (traverse la zone visible)
+        const targetZone = new BABYLON.Vector3(
+            (Math.random() - 0.5) * 80,
+            80 + (Math.random() - 0.5) * 30,
+            (Math.random() - 0.5) * 80
+        );
+        const dir = targetZone.subtract(startPos).normalize();
+        const speed = 25 + Math.random() * 20;   // vitesse de traversée
 
-        const eid = enemies.length;
-        const root = new BABYLON.TransformNode('enemy_' + eid, scene);
-        root.metadata = { enemyId: eid };
-        root.position.copyFrom(pos);
+        const aid = asteroids.length;
+        const root = new BABYLON.TransformNode('asteroid_' + aid, scene);
+        root.metadata = { asteroidId: aid };
+        root.position.copyFrom(startPos);
 
-        // Corps du drone (pyramide inversée / diamant)
-        const bodyMat = new BABYLON.StandardMaterial('enemyBodyMat_' + eid, scene);
-        bodyMat.diffuseColor = new BABYLON.Color3(0.8, 0.15, 0.15);
-        bodyMat.emissiveColor = new BABYLON.Color3(0.6, 0.05, 0.05);
-        const body = BABYLON.MeshBuilder.CreatePolyhedron('enemyBody_' + eid,
-            { type: 1, size: 1.4 }, scene); // octahedron
+        const isBig = Math.random() > 0.6;
+        const size = isBig ? 3.5 + Math.random() * 2 : 1.5 + Math.random() * 1.2;
+
+        // Corps rocheux (polyèdre irrégulier)
+        const bodyMat = new BABYLON.StandardMaterial('astMat_' + aid, scene);
+        bodyMat.diffuseColor = new BABYLON.Color3(0.45, 0.38, 0.32);
+        bodyMat.emissiveColor = new BABYLON.Color3(0.08, 0.06, 0.04);
+        bodyMat.specularColor = new BABYLON.Color3(0.2, 0.18, 0.15);
+        const body = BABYLON.MeshBuilder.CreatePolyhedron('astBody_' + aid,
+            { type: 0, size }, scene);   // icosaèdre
         body.material = bodyMat;
         body.parent = root;
         body.isPickable = false;
 
-        // Cœur lumineux
-        const coreMat = new BABYLON.StandardMaterial('enemyCoreMat_' + eid, scene);
-        coreMat.emissiveColor = new BABYLON.Color3(1, 0.2, 0.1);
-        coreMat.disableLighting = true;
-        const core = BABYLON.MeshBuilder.CreateSphere('enemyCore_' + eid,
-            { diameter: 0.9, segments: 8 }, scene);
-        core.material = coreMat;
-        core.parent = root;
-        core.isPickable = false;
-
-        // Hitbox de visée
-        const hit = BABYLON.MeshBuilder.CreateSphere('enemyHit_' + eid,
-            { diameter: 4.5, segments: 8 }, scene);
-        const hm = new BABYLON.StandardMaterial('enemyHitMat_' + eid, scene);
+        // Hitbox de visée (sphère invisible, large pour clic facile)
+        const hit = BABYLON.MeshBuilder.CreateSphere('astHit_' + aid,
+            { diameter: size * 4, segments: 8 }, scene);
+        const hm = new BABYLON.StandardMaterial('astHitMat_' + aid, scene);
         hm.diffuseColor = new BABYLON.Color3(0, 0, 0);
         hm.alpha = 0;
         hit.material = hm;
         hit.parent = root;
         hit.isPickable = true;
-        hit.metadata = { enemyId: eid };
+        hit.metadata = { asteroidId: aid };
 
-        enemies.push({
-            id: eid, root, body, core, hit, pos: pos.clone(),
-            speed: 6 + Math.random() * 8,    // ralentis (était 12-26)
-            strafeOffset: Math.random() * Math.PI * 2,
-            life: 50                           // durée de vie plus longue
+        asteroids.push({
+            id: aid, root, body, hit,
+            pos: startPos.clone(),
+            vel: dir.scale(speed),
+            rot: new BABYLON.Vector3(
+                (Math.random() - 0.5) * 0.8,
+                (Math.random() - 0.5) * 0.6,
+                (Math.random() - 0.5) * 0.5
+            ),
+            hp: isBig ? 3 : 1,
+            life: 999   // plus de timer, destruction par sortie d'écran
         });
     }
 
-    function updateEnemies(dt) {
-        enemyTimer += dt;
-        if (enemyTimer >= nextEnemy && enemies.length < 4) {
-            spawnEnemy();
-            enemyTimer = 0;
-            nextEnemy = 10 + Math.random() * 20;  // spawn moins fréquent
+    function updateAsteroids(dt) {
+        asteroidTimer += dt;
+        if (asteroidTimer >= nextAsteroid && asteroids.length < 6) {
+            spawnAsteroid();
+            asteroidTimer = 0;
+            nextAsteroid = 4 + Math.random() * 6;
         }
-        for (let i = enemies.length - 1; i >= 0; i--) {
-            const e = enemies[i];
-            e.life -= dt;
-
-            // Se dirigent vers le joueur mais garde une distance minimale
-            const toShip = shipPos.subtract(e.pos);
-            const d = toShip.length();
-            if (d > 0.1) toShip.normalize();
-            // STOP si trop près (30u) — le joueur peut respirer
-            let dir;
-            if (d < 30) {
-                dir = toShip.scale(-1); // recule doucement
-            } else if (d > 80) {
-                dir = toShip; // approche si trop loin
-            } else {
-                // Strafe lateral dans la zone correcte
-                dir = new BABYLON.Vector3(
-                    Math.cos(elapsed * 1.2 + e.strafeOffset),
-                    Math.sin(elapsed * 0.9 + e.strafeOffset) * 0.3,
-                    Math.sin(elapsed * 1.2 + e.strafeOffset)
-                ).scale(0.25);
-            }
-            if (dir.lengthSquared() > 0.01) dir.normalize();
-            e.pos.addInPlace(dir.scale(e.speed * dt));
-            e.root.position.copyFrom(e.pos);
-
-            // Oriente le drone vers le joueur
-            const look = shipPos.subtract(e.pos);
-            if (look.lengthSquared() > 0.01) {
-                const yaw = Math.atan2(-look.x, -look.z);
-                e.root.rotation.y = yaw;
-                e.root.rotation.x = Math.sin(elapsed * 2 + e.strafeOffset) * 0.2;
-            }
-
-            // Pulse du cœur
-            const pulse = 1 + Math.sin(elapsed * 8 + e.strafeOffset) * 0.25;
-            e.core.scaling.setAll(pulse);
-
-            if (e.life <= 0) {
-                destroyEnemy(e.id, false);
+        for (let i = asteroids.length - 1; i >= 0; i--) {
+            const a = asteroids[i];
+            a.pos.addInPlace(a.vel.scale(dt));
+            a.root.position.copyFrom(a.pos);
+            a.body.rotation.x += a.rot.x * dt;
+            a.body.rotation.y += a.rot.y * dt;
+            a.body.rotation.z += a.rot.z * dt;
+            // Destruction si sort de l'écran (distance au centre trop grande)
+            const distFromCenter = a.pos.length();
+            if (distFromCenter > 350) {
+                destroyAsteroid(a.id, false);
             }
         }
     }
 
-    function destroyEnemy(id, byPlayer) {
-        const idx = enemies.findIndex(e => e.id === id);
+    function destroyAsteroid(id, byPlayer) {
+        const idx = asteroids.findIndex(a => a.id === id);
         if (idx === -1) return;
-        const e = enemies[idx];
+        const a = asteroids[idx];
         if (byPlayer) {
-            fireLaser(e.pos.clone(), new BABYLON.Color3(1, 0.3, 0.1));
-            spawnExplosion(e.pos.clone(), new BABYLON.Color4(1, 0.25, 0.1, 1), 60);
-            addScore(100, 'DRONE DÉTRUIT');
+            a.hp--;
+            if (a.hp > 0) {
+                // Touché mais pas détruit : flash
+                fireLaser(a.pos.clone(), new BABYLON.Color3(1, 0.7, 0.3));
+                spawnExplosion(a.pos.clone(), new BABYLON.Color4(1, 0.7, 0.3, 1), 15);
+                return;
+            }
+            fireLaser(a.pos.clone(), new BABYLON.Color3(1, 0.5, 0.2));
+            spawnExplosion(a.pos.clone(), new BABYLON.Color4(1, 0.5, 0.2, 1), 50);
+            addScore(100, 'ASTÉROÏDE DÉTRUIT');
         }
-        if (e.hit) e.hit.dispose();
-        e.body.dispose();
-        e.core.dispose();
-        e.root.dispose();
-        enemies.splice(idx, 1);
+        a.hit.dispose();
+        a.body.dispose();
+        a.root.dispose();
+        asteroids.splice(idx, 1);
     }
 
     /* ============================================================ COMÈTES
@@ -1020,11 +1051,11 @@ const PLANET_ORBIT_R = 20;
         scene.onPointerObservable.add(info => {
             if (info.type === BABYLON.PointerEventTypes.POINTERPICK) {
 
-                // Priorité  : ennemis (combat)
-                const enemyPick = scene.pick(scene.pointerX, scene.pointerY,
-                    m => m.metadata && m.metadata.enemyId !== undefined);
-                if (enemyPick.hit && enemyPick.pickedMesh) {
-                    destroyEnemy(enemyPick.pickedMesh.metadata.enemyId, true);
+                // Priorité  : astéroïdes (combat)
+                const asteroidPick = scene.pick(scene.pointerX, scene.pointerY,
+                    m => m.metadata && m.metadata.asteroidId !== undefined);
+                if (asteroidPick.hit && asteroidPick.pickedMesh) {
+                    destroyAsteroid(asteroidPick.pickedMesh.metadata.asteroidId, true);
                     return;
                 }
                 // Priorité  : anomalies vertes (combat / easter egg)
@@ -1048,7 +1079,7 @@ const PLANET_ORBIT_R = 20;
             // Hover → curseur
             if (info.type === BABYLON.PointerEventTypes.POINTERMOVE) {
                 const pick = scene.pick(scene.pointerX, scene.pointerY,
-                    m => m.metadata && (m.metadata.section || m.metadata.enemyId !== undefined || m.metadata.portalIndex !== undefined));
+                    m => m.metadata && (m.metadata.section || m.metadata.asteroidId !== undefined || m.metadata.portalIndex !== undefined));
                 canvas.style.cursor = pick.hit ? 'pointer' : 'default';
             }
         });
@@ -1091,11 +1122,14 @@ const PLANET_ORBIT_R = 20;
         // Portails Rick & Morty / anomalies
         updatePortals(dt);
 
-        // Ennemis
-        updateEnemies(dt);
+        // Astéroïdes
+        updateAsteroids(dt);
 
         // Comètes
         updateComets(dt);
+
+        // Points pulsés des trajectoires d'orbite
+        updateOrbitPulses(dt);
 
         scene.render();
     }
@@ -1136,17 +1170,55 @@ const PLANET_ORBIT_R = 20;
         }
     }
 
+    // Anime les points pulsés qui voyagent le long des trajectoires d'orbite
+    function updateOrbitPulses(dt) {
+        Object.keys(orbitPulses).forEach(id => {
+            const cfg = SECTIONS[id];
+            if (!cfg) return;
+            const r = cfg.orbit.radius;
+            const h = cfg.orbit.height;
+            orbitPulses[id].forEach(p => {
+                p.angle += p.speed * dt;
+                p.mesh.position.x = r * Math.cos(p.angle);
+                p.mesh.position.y = h;
+                p.mesh.position.z = r * Math.sin(p.angle);
+                // Pulse d'échelle + alpha pour un effet "signal"
+                const pulse = 0.8 + Math.sin(elapsed * 4 + p.angle * 3) * 0.4;
+                p.mesh.scaling.setAll(pulse);
+            });
+        });
+    }
+
     function updateShip(dt) {
         let moveDir = null;
 
         if (mode === 'flying') {
             const targetWorld = planets[targetPlanet].root.position.clone();
-            const toTarget = targetWorld.subtract(shipPos);
+            const orbitR = Math.max(PLANET_ORBIT_R, SECTIONS[targetPlanet].size + 22);
+
+            // Cible = point le plus proche sur le cercle d'orbite (pas le centre)
+            const toCenter = targetWorld.subtract(shipPos);
+            // Direction XZ vers le centre
+            const dirXZ = new BABYLON.Vector3(toCenter.x, 0, toCenter.z);
+            const horizDist = dirXZ.length();
+            let targetPoint: BABYLON.Vector3;
+            if (horizDist > 0.01) {
+                dirXZ.normalize();
+                targetPoint = new BABYLON.Vector3(
+                    targetWorld.x - dirXZ.x * orbitR,
+                    targetWorld.y + 8,   // altitude d'orbite
+                    targetWorld.z - dirXZ.z * orbitR
+                );
+            } else {
+                targetPoint = new BABYLON.Vector3(targetWorld.x + orbitR, targetWorld.y + 8, targetWorld.z);
+            }
+
+            const toTarget = targetPoint.subtract(shipPos);
             const dist = toTarget.length();
             moveDir = toTarget.clone();
             if (dist > 0.01) moveDir.normalize();
 
-            const desiredSpeed = dist < ARRIVE_DIST * 2 ? dist * 2.5 : MAX_SPEED;
+            const desiredSpeed = dist < orbitR ? dist * 2.5 : MAX_SPEED;
             currentSpeed += (desiredSpeed - currentSpeed) * Math.min(1, dt * 2.5);
             shipPos.addInPlace(moveDir.scale(currentSpeed * dt));
 
@@ -1156,31 +1228,39 @@ const PLANET_ORBIT_R = 20;
             }
             enginesBoost(dt, currentSpeed > 3);
 
-            if (dist < ARRIVE_DIST) {
+            // Arrivée : la soucoupe est déjà sur le cercle d'orbite
+            if (dist < 3) {
                 currentSpeed = 0;
-                mode = 'orbiting';
-                const d2 = planets[targetPlanet].root.position.subtract(shipPos);
+                // orbitAngle = angle correspondant à la position d'arrivée
+                const d2 = shipPos.subtract(targetWorld);
                 orbitAngle = Math.atan2(d2.z, d2.x);
+                mode = 'orbiting';
                 setModeCb('orbiting');
                 if (!planets[targetPlanet].discovered) {
-                                    planets[targetPlanet].discovered = true;
-                                    if (onDiscoverCb) onDiscoverCb(targetPlanet);
-                                }
-                            }
+                    planets[targetPlanet].discovered = true;
+                    if (onDiscoverCb) onDiscoverCb(targetPlanet);
+                }
+            }
         } else if (mode === 'orbiting') {
+            // La soucoupe orbite autour de la planète (cercle réel)
             const center = planets[targetPlanet].root.position;
-            const toPlanet = center.subtract(shipPos);
-            const distToPlanet = toPlanet.length();
-            if (distToPlanet > 0.5) toPlanet.normalize();
-            shipPos.x += Math.sin(elapsed * 0.6) * 0.3 * dt;
-            shipPos.y += Math.cos(elapsed * 0.5) * 0.2 * dt;
-            const desiredDist = PLANET_ORBIT_R;
-            const ajust = toPlanet.scale((distToPlanet - desiredDist) * dt * 1.5);
-            shipPos.addInPlace(ajust);
+            const cfg = SECTIONS[targetPlanet];
+            orbitAngle += dt * 0.25;   // vitesse d'orbite de la soucoupe
+            // Rayon dynamique : assez loin pour ne pas toucher la planète
+            const r = Math.max(PLANET_ORBIT_R, cfg.size + 22);
+            // Position orbitale cible : cercle dans le plan XZ autour de la planète
+            const targetX = center.x + Math.cos(orbitAngle) * r;
+            const targetZ = center.z + Math.sin(orbitAngle) * r;
+            const targetY = center.y + 8 + Math.sin(orbitAngle * 2) * 2;
+            // Lerp doux vers la position orbitale (évite la TP brutale)
+            shipPos.x += (targetX - shipPos.x) * Math.min(1, dt * 3);
+            shipPos.z += (targetZ - shipPos.z) * Math.min(1, dt * 3);
+            shipPos.y += (targetY - shipPos.y) * Math.min(1, dt * 3);
             currentSpeed = 0;
+            // Yaw pointe vers la planète (même convention que flying)
             const lookAt = center.subtract(shipPos);
             if (lookAt.lengthSquared() > 0.01) {
-                shipYaw = lerpAngle(shipYaw, Math.atan2(-lookAt.x, lookAt.z), Math.min(1, dt * 5));
+                shipYaw = lerpAngle(shipYaw, Math.atan2(-lookAt.x, -lookAt.z), Math.min(1, dt * 5));
             }
             enginesBoost(dt, false);
         } else if (mode === 'flying_moon') {
@@ -1228,21 +1308,38 @@ const PLANET_ORBIT_R = 20;
             if (scanProgress >= 1) {
                 if (onScanCb) onScanCb('projects');
             }
-        } else if (mode === 'idle') {
-            if (idlePath.length === 0) { mode = 'orbiting'; return; }
-            const from = idlePath[idlePathIdx];
-            const to = idlePath[(idlePathIdx + 1) % idlePath.length];
-            const t = idlePathT;
-            shipPos.x = from.x + (to.x - from.x) * t;
-            shipPos.y = from.y + (to.y - from.y) * t;
-            shipPos.z = from.z + (to.z - from.z) * t;
-            const dx = to.x - from.x, dz = to.z - from.z;
-            if (dx * dx + dz * dz > 0.01) {
-                shipYaw = lerpAngle(shipYaw, Math.atan2(-dx, -dz), Math.min(1, dt * 3));
+        } else if (mode === 'observing') {
+            // Soucoupe d'observation : orbite lente en hauteur autour du système + bobbing
+            observeCamAngle += dt * 0.08;   // ~80s par révolution
+            observeBobSeed += dt;
+            const orbitR = 180;
+            const baseX = Math.sin(observeCamAngle) * orbitR;
+            const baseZ = Math.cos(observeCamAngle) * orbitR;
+            const bobY = Math.sin(observeBobSeed * 0.5) * 2.5;
+            const bobX = Math.cos(observeBobSeed * 0.3) * 1.8;
+            const bobZ = Math.sin(observeBobSeed * 0.4) * 2.0;
+            const targetX = baseX + bobX;
+            const targetY = 120 + bobY;
+            const targetZ = baseZ + bobZ;
+            const targetYaw = Math.atan2(baseX, baseZ);
+
+            if (transitioning) {
+                // Lerp doux avec easing
+                transitionT += dt / 2.5;   // ~2.5s de transition
+                const t = Math.min(1, transitionT);
+                // ease-in-out
+                const e = t < 0.5 ? 2 * t * t : 1 - Math.pow(-2 * t + 2, 2) / 2;
+                shipPos.x = transitionFrom.x + (targetX - transitionFrom.x) * e;
+                shipPos.y = transitionFrom.y + (targetY - transitionFrom.y) * e;
+                shipPos.z = transitionFrom.z + (targetZ - transitionFrom.z) * e;
+                shipYaw = lerpAngle(transitionFromYaw, targetYaw, e);
+                if (t >= 1) transitioning = false;
+            } else {
+                shipPos.x = targetX;
+                shipPos.y = targetY;
+                shipPos.z = targetZ;
+                shipYaw = lerpAngle(shipYaw, targetYaw, Math.min(1, dt * 2));
             }
-            const segLen = Math.hypot(dx, dz);
-            idlePathT += (idleSpeed * dt) / (segLen || 1);
-            if (idlePathT >= 1) { idlePathT -= 1; idlePathIdx = (idlePathIdx + 1) % idlePath.length; }
             enginesBoost(dt, false);
         }
 
@@ -1288,28 +1385,32 @@ const PLANET_ORBIT_R = 20;
                 shipPos.x + fx * 20, shipPos.y - 1, shipPos.z + fz * 20
             );
             camera.setTarget(BABYLON.Vector3.Lerp(camera.getTarget(), look, Math.min(1, dt * 6)));
-        } else if (mode === 'idle') {
-            // Camera follows the ship loosely — show the saucer drifting by
+        } else if (mode === 'observing') {
+            // Chase cam derrière la soucoupe — vue plongeante 3/4 haut
             const fx = -Math.sin(shipYaw), fz = -Math.cos(shipYaw);
-            const back = 18, up = 6;
+            const back = 22, up = 18;   // plus haut pour plonger sur le système
             const desired = new BABYLON.Vector3(
                 shipPos.x - fx * back, shipPos.y + up, shipPos.z - fz * back
             );
-            camera.position = BABYLON.Vector3.Lerp(camera.position, desired, Math.min(1, dt * 2));
+            // Regarde vers le centre du système, plus bas que la soucoupe
             const look = new BABYLON.Vector3(
-                shipPos.x + fx * 20, shipPos.y - 1, shipPos.z + fz * 20
+                shipPos.x + fx * 40, shipPos.y - 25, shipPos.z + fz * 40
             );
-            camera.setTarget(BABYLON.Vector3.Lerp(camera.getTarget(), look, Math.min(1, dt * 4)));
+            // Pendant la transition : lerp rapide pour suivre le vaisseau
+            const camLerp = transitioning ? Math.min(1, dt * 5) : Math.min(1, dt * 2);
+            const tgtLerp = transitioning ? Math.min(1, dt * 6) : Math.min(1, dt * 3);
+            camera.position = BABYLON.Vector3.Lerp(camera.position, desired, camLerp);
+            camera.setTarget(BABYLON.Vector3.Lerp(camera.getTarget(), look, tgtLerp));
         } else {
-            // Orbiting: orbit slowly around the planet, zoomed out
-            const orbitCamAngle = elapsed * 0.15;
-            const cx = Math.sin(orbitCamAngle), cz = Math.cos(orbitCamAngle);
-            const back = 28, up = 8;
-            const camPos = new BABYLON.Vector3(
-                planetCenter.x + cx * back, planetCenter.y + up, planetCenter.z + cz * back
+            // Orbiting: chase cam derrière la soucoupe, regarde la planète
+            const fx = -Math.sin(shipYaw), fz = -Math.cos(shipYaw);
+            const back = 14, up = 5;
+            const desired = new BABYLON.Vector3(
+                shipPos.x - fx * back, shipPos.y + up, shipPos.z - fz * back
             );
-            camera.position = BABYLON.Vector3.Lerp(camera.position, camPos, Math.min(1, dt * 2));
-            camera.setTarget(BABYLON.Vector3.Lerp(camera.getTarget(), planetCenter, Math.min(1, dt * 6)));
+            camera.position = BABYLON.Vector3.Lerp(camera.position, desired, Math.min(1, dt * 3));
+            // Regarde vers la planète (au-delà de la soucoupe)
+            camera.setTarget(BABYLON.Vector3.Lerp(camera.getTarget(), planetCenter, Math.min(1, dt * 5)));
         }
 
         camera.fov = 1.05 + (mode === 'flying' ? Math.min(0.2, currentSpeed / MAX_SPEED * 0.2) : 0);
@@ -1362,8 +1463,11 @@ const PLANET_ORBIT_R = 20;
         const i = SECTION_ORDER.indexOf(targetPlanet);
         return SECTION_ORDER[(i + 1) % SECTION_ORDER.length];
     }
-    function getIdlePathPoints() {
-        return idlePath.map(p => ({ x: p.x, z: p.z }));
+    function getOrbitTrailPoints() {
+        // Retourne les points des cercles d'orbite pour la map 2D
+        return Object.keys(SECTIONS)
+            .filter(id => id !== 'home' && SECTIONS[id].orbit.radius > 0)
+            .map(id => ({ id, radius: SECTIONS[id].orbit.radius, color: SECTIONS[id].color, label: SECTIONS[id].label }));
     }
     function prevSection() {
         const i = SECTION_ORDER.indexOf(targetPlanet);
@@ -1394,11 +1498,15 @@ export const SpaceCockpit: SpaceCockpitAPI = {
     setOnModeCb: (cb: ModeCb) => { onModeCb = cb; },
     setOnPortalCb: (cb: PortalCb) => { onPortalCb = cb; },
     setOnScoreCb: (cb: ScoreCb) => { onScoreCb = cb; },
-    setIdleMode: () => {
-        mode = 'idle';
-        idlePathT = 0; idlePathIdx = 0; // reset path progression
+    setObservingMode: () => {
+        // Démarre une transition douce au lieu de TP
+        transitionFrom.copyFrom(shipPos);
+        transitionFromYaw = shipYaw;
+        transitioning = true;
+        transitionT = 0;
+        mode = 'observing';
     },
-    getIdlePathPoints,
+    getOrbitTrailPoints,
 };
 
 // Rétro-compatibilité : window.SpaceCockpit pour les scripts non-module
