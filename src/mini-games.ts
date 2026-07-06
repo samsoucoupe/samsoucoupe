@@ -525,13 +525,13 @@ function drawSnake() {
 let mtX = 240;
 const MT_Y = 330, MT_W = 28, MT_H = 12, MT_SPD = 5;
 
-type CometType = 'normal' | 'fast' | 'big' | 'zigzag' | 'missile';
+type CometType = 'normal' | 'fast' | 'big' | 'zigzag' | 'missile' | 'boss';
 interface Comet {
     x: number; y: number; vx: number; vy: number;
     size: number; trail: { x: number; y: number }[];
-    type: CometType; homing: number;   // 0 = balistique, >0 = vise le joueur
+    type: CometType;
     color: string; glowColor: string;
-    phase: number;   // pour zigzag
+    phase: number;
 }
 let comets: Comet[] = [];
 let mtLives = 3;
@@ -539,23 +539,31 @@ let mtSpawnCd = 0;
 let mtLevel = 1;
 let mtSurvival = 0;
 let mtLevelTimer = 0;
-const LEVEL_DURATION = 10;   // 10s par niveau
+const LEVEL_DURATION = 10;
 
-const COMET_TYPES: Record<CometType, { size: number; speed: number; homing: number; color: string; glow: string }> = {
-    normal:  { size: 7,  speed: 90,  homing: 0,    color: '#e0f4ff', glow: 'rgba(180,220,255,0.4)' },
-    fast:    { size: 5,  speed: 160, homing: 0.3,  color: '#ff6b40', glow: 'rgba(255,107,64,0.4)' },
-    big:     { size: 12, speed: 60,  homing: 0.1,  color: '#b388ff', glow: 'rgba(179,136,255,0.4)' },
-    zigzag:  { size: 6,  speed: 110, homing: 0,    color: '#38ffb0', glow: 'rgba(56,255,176,0.4)' },
-    missile: { size: 6,  speed: 70,  homing: 1.5,  color: '#ff2050', glow: 'rgba(255,32,80,0.5)' },
+// Tranchée : zone de danger qui avance vers le joueur avec les niveaux
+let mtFrontY = 80;        // position de la ligne de front (Y), démarre plus bas
+const MT_FRONT_MAX = 250; // max (joueur à 330, laisse 80px d'esquive)
+const MT_FRONT_STEP = 18; // avancée par niveau (douce)
+
+const COMET_TYPES: Record<CometType, { size: number; speed: number; precision: number; turnRate: number; color: string; glow: string; canTrack: boolean }> = {
+    normal:  { size: 7,  speed: 90,  precision: 0,    turnRate: 2.0, color: '#e0f4ff', glow: 'rgba(180,220,255,0.4)', canTrack: false },
+    fast:    { size: 5,  speed: 160, precision: 0.8,  turnRate: 3.0, color: '#ff6b40', glow: 'rgba(255,107,64,0.4)', canTrack: false },
+    big:     { size: 12, speed: 60,  precision: 0.3,  turnRate: 1.5, color: '#b388ff', glow: 'rgba(179,136,255,0.4)', canTrack: false },
+    zigzag:  { size: 6,  speed: 110, precision: 0.5,  turnRate: 2.5, color: '#38ffb0', glow: 'rgba(56,255,176,0.4)', canTrack: false },
+    missile: { size: 6,  speed: 100, precision: 1.5, turnRate: 4.0, color: '#ff2050', glow: 'rgba(255,32,80,0.5)', canTrack: true  },
+    boss:    { size: 20, speed: 35,  precision: 0.2,  turnRate: 1.0, color: '#ffaa20', glow: 'rgba(255,170,32,0.5)', canTrack: false },
 };
 
 function startMeteor() {
     score = 0; mtLives = 3; extraLabel = 'VIES'; extraVal = '3';
     mtX = 240; comets = []; mtSpawnCd = 1.0;
     mtLevel = 1; mtSurvival = 0; mtLevelTimer = 0;
+    mtFrontY = 80;
     keys = {}; spacePrev = false;
     state = 'playing';
     updateHUD();
+    spawnBoss();
     startLoop();
 }
 
@@ -568,12 +576,14 @@ function updateMeteor(dt: number) {
     if (keys['ArrowRight'] || keys['d'] || keys['D']) mtX += MT_SPD;
     mtX = Math.max(MT_W / 2, Math.min(W - MT_W / 2, mtX));
 
-    // Niveau : augmente toutes les 10s
+    // Niveau : augmente toutes les 10s + avance la tranchée + spawn boss
     mtSurvival += dt;
     mtLevelTimer += dt;
     if (mtLevelTimer >= LEVEL_DURATION) {
         mtLevel++;
         mtLevelTimer = 0;
+        mtFrontY = Math.min(MT_FRONT_MAX, mtFrontY + MT_FRONT_STEP);
+        spawnBoss();   // une comète boss au début de chaque vague
     }
 
     // Score = survie × niveau (1pt/sec au lvl 1, 2pt/sec au lvl 2, etc.)
@@ -585,46 +595,43 @@ function updateMeteor(dt: number) {
     }
     updateHUD();
 
-    // Spawn : fréquence et type selon le niveau
+    // Spawn : fréquence qui augmente avec le niveau, +1 comète par tick tous les 3 niveaux
     mtSpawnCd -= dt;
     if (mtSpawnCd <= 0) {
-        spawnComet();
-        const baseCd = Math.max(0.25, 1.0 - mtLevel * 0.05);
+        // Nombre de comètes par tick : 1 base + 1 tous les 3 niveaux
+        const burst = 1 + Math.floor(mtLevel / 3);
+        for (let b = 0; b < burst; b++) spawnComet();
+        const baseCd = Math.max(0.2, 1.0 - mtLevel * 0.06);
         mtSpawnCd = baseCd + Math.random() * 0.3;
     }
 
-    // Comètes
+    // Comètes :
+    // - Missiles autoguidés : tracking AVANT la tranchée, puis ligne droite après
+    // - Comètes normales : toujours en ligne droite (visent position au spawn)
     for (let i = comets.length - 1; i >= 0; i--) {
         const c = comets[i];
+        const cfg = COMET_TYPES[c.type];
         // Trail
         c.trail.push({ x: c.x, y: c.y });
         if (c.trail.length > 14) c.trail.shift();
 
-        // Homing : ajuste la vx (et vy pour les missiles) vers le joueur
-        if (c.homing > 0) {
+        // Tracking : seulement les missiles, seulement AVANT la tranchée
+        if (cfg.canTrack && c.y < mtFrontY) {
             const targetDx = mtX - c.x;
             const targetDy = MT_Y - c.y;
-            // Plus le homing est fort, plus la correction est agressive
-            c.vx += (targetDx > 0 ? 1 : -1) * c.homing * 60 * dt;
-            // Missile : traque aussi en Y (vrai autoguidage)
-            if (c.type === 'missile') {
-                const dist = Math.sqrt(targetDx * targetDx + targetDy * targetDy);
-                if (dist > 1) {
-                    // Normalise et ajuste la vélocité vers la cible
-                    const speed = Math.sqrt(c.vx * c.vx + c.vy * c.vy);
-                    const desiredVx = (targetDx / dist) * speed;
-                    const desiredVy = (targetDy / dist) * speed;
-                    c.vx += (desiredVx - c.vx) * c.homing * dt;
-                    c.vy += (desiredVy - c.vy) * c.homing * dt;
-                }
+            const dist = Math.sqrt(targetDx * targetDx + targetDy * targetDy);
+            if (dist > 1) {
+                const speed = Math.sqrt(c.vx * c.vx + c.vy * c.vy);
+                const desiredVx = (targetDx / dist) * speed;
+                const desiredVy = (targetDy / dist) * speed;
+                const turnRate = cfg.turnRate * dt;
+                c.vx += (desiredVx - c.vx) * turnRate;
+                c.vy += (desiredVy - c.vy) * turnRate;
             }
-            // Limite la vx
-            const maxVx = 150;
-            c.vx = Math.max(-maxVx, Math.min(maxVx, c.vx));
         }
 
-        // Zigzag : oscillation horizontale
-        if (c.type === 'zigzag') {
+        // Zigzag : oscillation horizontale (hors tracking)
+        if (c.type === 'zigzag' && !cfg.canTrack) {
             c.phase += dt * 5;
             c.x += Math.sin(c.phase) * 40 * dt;
         }
@@ -651,38 +658,62 @@ function updateMeteor(dt: number) {
 
 function spawnComet() {
     const W = canvas!.width;
-    // Type selon le niveau
+    // Type selon le niveau — missiles dès le lvl 1
     let type: CometType = 'normal';
     const r = Math.random();
-    if (mtLevel >= 5 && r < 0.25) type = 'missile';
-    else if (mtLevel >= 3 && r < 0.2) type = 'big';
-    else if (mtLevel >= 2 && r < 0.4) type = 'fast';
-    else if (mtLevel >= 2 && r < 0.6) type = 'zigzag';
+    // Lvl 1 : surtout normal + quelques missiles
+    if (r < 0.15 + mtLevel * 0.02) type = 'missile';
+    else if (mtLevel >= 3 && r < 0.25) type = 'big';
+    else if (mtLevel >= 2 && r < 0.45) type = 'fast';
+    else if (mtLevel >= 2 && r < 0.65) type = 'zigzag';
     else type = 'normal';
 
     const cfg = COMET_TYPES[type];
-    const side = Math.floor(Math.random() * 3);
-    let x: number, y: number, vx: number, vy: number;
     const speed = cfg.speed * (1 + (mtLevel - 1) * 0.08);
 
-    if (type === 'missile') {
-        // Le missile spawn loin, vitesse modeste, mais traque en continu
-        x = Math.random() * W; y = -30;
-        vx = 0; vy = speed;
-    } else if (side === 0) {
-        x = Math.random() * W; y = -20;
-        vx = (Math.random() - 0.5) * 40; vy = speed;
-    } else if (side === 1) {
-        x = -20; y = Math.random() * 120;
-        vx = speed * 0.7; vy = speed * 0.7;
-    } else {
-        x = W + 20; y = Math.random() * 120;
-        vx = -speed * 0.7; vy = speed * 0.7;
-    }
+    // Toutes les comètes spawment en haut de l'écran
+    const x = Math.random() * W;
+    const y = -25;
+
+    // Direction vers la position du joueur au spawn
+    const targetX = mtX + (Math.random() - 0.5) * cfg.precision * 40;
+    const targetY = MT_Y;
+    const dx = targetX - x;
+    const dy = targetY - y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const vx = (dx / dist) * speed;
+    const vy = (dy / dist) * speed;
 
     comets.push({
         x, y, vx, vy, size: cfg.size, trail: [],
-        type, homing: cfg.homing, color: cfg.color, glowColor: cfg.glow,
+        type, color: cfg.color, glowColor: cfg.glow,
+        phase: 0,
+    });
+}
+
+// Boss : comète géante en début de vague, taille proportionnelle au niveau (max 3/4 largeur)
+function spawnBoss() {
+    const W = canvas!.width;
+    const cfg = COMET_TYPES['boss'];
+    // Taille : 20 base + 8 par niveau, max 3/4 de la largeur
+    const bossSize = Math.min(W * 0.375, 20 + mtLevel * 8);
+    const speed = cfg.speed * (1 + (mtLevel - 1) * 0.05);
+
+    const x = W / 2 + (Math.random() - 0.5) * W * 0.3;
+    const y = -bossSize - 10;
+
+    // Vise le joueur au spawn
+    const targetX = mtX;
+    const targetY = MT_Y;
+    const dx = targetX - x;
+    const dy = targetY - y;
+    const dist = Math.sqrt(dx * dx + dy * dy);
+    const vx = (dx / dist) * speed;
+    const vy = (dy / dist) * speed;
+
+    comets.push({
+        x, y, vx, vy, size: bossSize, trail: [],
+        type: 'boss', color: cfg.color, glowColor: cfg.glow,
         phase: 0,
     });
 }
@@ -696,6 +727,25 @@ function drawMeteor() {
     for (let i = 0; i < 40; i++) ctx.fillRect((i * 73) % W, (i * 97) % H, 1, 1);
 
     if (state === 'playing' || state === 'gameover') {
+        // Tranchée : zone de danger (gradient rouge entre mtFrontY et le bas)
+        if (mtFrontY < MT_Y) {
+            const grad = ctx.createLinearGradient(0, mtFrontY, 0, H);
+            grad.addColorStop(0, 'rgba(255,32,80,0.0)');
+            grad.addColorStop(0.5, 'rgba(255,32,80,0.08)');
+            grad.addColorStop(1, 'rgba(255,32,80,0.15)');
+            ctx.fillStyle = grad;
+            ctx.fillRect(0, mtFrontY, W, H - mtFrontY);
+            // Ligne de front
+            ctx.strokeStyle = 'rgba(255,32,80,0.4)';
+            ctx.lineWidth = 1;
+            ctx.setLineDash([6, 4]);
+            ctx.beginPath();
+            ctx.moveTo(0, mtFrontY);
+            ctx.lineTo(W, mtFrontY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+        }
+
         // Niveau (en bas à gauche)
         ctx.fillStyle = '#5d6f95';
         ctx.font = '10px Orbitron, monospace';
