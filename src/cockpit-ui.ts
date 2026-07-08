@@ -1,9 +1,26 @@
 /* ============================================================
  * cockpit-ui.ts — Boucle de jeu HUD + briefing + panneau station
  * ============================================================ */
-import { SpaceCockpit } from './space-cockpit';
 import { PORTFOLIO } from './portfolio-data';
-import { initMiniGames, openGamesMenu, closeGamesMenu } from './mini-games';
+
+// Lazy-loaded: Babylon (space-cockpit) + mini-jeux ne sont chargés qu'au clic.
+// space-cockpit assigne window.SpaceCockpit, mini-games exporte ses fonctions.
+let SpaceCockpit: import('./space-cockpit').SpaceCockpitAPI | undefined;
+let initMiniGames: () => void = () => {};
+let openGamesMenu: () => void = () => {};
+let closeGamesMenu: () => void = () => {};
+
+// Pré-charge le bundle 3D pendant le briefing (ne bloque pas le load initial)
+const cockpitReady = import('./space-cockpit').then(mod => {
+    SpaceCockpit = mod.SpaceCockpit;
+}).catch(e => console.error('space-cockpit load error:', e));
+
+// Mini-jeux chargés au clic JEUX
+const gamesReady = import('./mini-games').then(mod => {
+    initMiniGames = mod.initMiniGames;
+    openGamesMenu = mod.openGamesMenu;
+    closeGamesMenu = mod.closeGamesMenu;
+}).catch(e => console.error('mini-games load error:', e));
 
     function el(id: string): HTMLElement { return document.getElementById(id) as HTMLElement; }
     function esc(s: unknown) {
@@ -64,37 +81,41 @@ import { initMiniGames, openGamesMenu, closeGamesMenu } from './mini-games';
         var mapClose = el('map-close');
         if (mapClose) mapClose.addEventListener('click', toggleMap);
 
-        // Bouton MINI-JEUX
-        initMiniGames();
+        // Bouton MINI-JEUX — chargés en lazy, wire les listeners quand prêts
+        gamesReady.then(function () {
+            initMiniGames();
+        });
         var gamesBtn = el('games-btn');
         if (gamesBtn) gamesBtn.addEventListener('click', openGamesMenu);
         var gamesClose = el('games-close');
         if (gamesClose) gamesClose.addEventListener('click', closeGamesMenu);
 
-        // Callbacks 3D
-        if (!window.SpaceCockpit) { console.error('SpaceCockpit manquant'); return; }
-        SpaceCockpit.init();
-        SpaceCockpit.onReady(function () {
-            SpaceCockpit.setOnScanCb(function (sectionId) {
-                if (sectionId !== lastScanned) {
-                    lastScanned = sectionId;
-                    openStation(sectionId);
-                }
+        // Callbacks 3D — attend que le bundle Babylon soit chargé
+        cockpitReady.then(function () {
+            if (!SpaceCockpit) { console.error('SpaceCockpit manquant'); return; }
+            SpaceCockpit.init();
+            SpaceCockpit.onReady(function () {
+                SpaceCockpit.setOnScanCb(function (sectionId) {
+                    if (sectionId !== lastScanned) {
+                        lastScanned = sectionId;
+                        openStation(sectionId);
+                    }
+                });
+                SpaceCockpit.setOnDiscoverCb(function (sectionId) {
+                    // feedback visuel : la planète s'illumine déjà côté 3D
+                });
+                SpaceCockpit.setOnModeCb(function (m) {
+                    // Met à jour l'indicateur si besoin
+                });
+                SpaceCockpit.setOnPortalCb(function (quote) {
+                    showPortalToast(quote);
+                });
+                SpaceCockpit.setOnScoreCb(function (evt) {
+                    showCombatToast('+' + evt.gained + ' · ' + evt.reason + (evt.combo > 1 ? ' (x' + evt.combo + ')' : ''));
+                });
+                // Démarre la boucle HUD
+                requestAnimationFrame(hudLoop);
             });
-            SpaceCockpit.setOnDiscoverCb(function (sectionId) {
-                // feedback visuel : la planète s'illumine déjà côté 3D
-            });
-            SpaceCockpit.setOnModeCb(function (m) {
-                // Met à jour l'indicateur si besoin
-            });
-            SpaceCockpit.setOnPortalCb(function (quote) {
-                showPortalToast(quote);
-            });
-            SpaceCockpit.setOnScoreCb(function (evt) {
-                showCombatToast('+' + evt.gained + ' · ' + evt.reason + (evt.combo > 1 ? ' (x' + evt.combo + ')' : ''));
-            });
-            // Démarre la boucle HUD
-            requestAnimationFrame(hudLoop);
         });
     }
 

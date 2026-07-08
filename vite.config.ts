@@ -15,7 +15,14 @@ export default defineConfig({
         main: fileURLToPath(new URL('./index.html', import.meta.url)),
         simple: fileURLToPath(new URL('./simple.html', import.meta.url)),
       },
+      output: {
+        manualChunks: {
+          // Babylon.js seul dans son chunk → cache navigateur + parallèle
+          babylon: ['@babylonjs/core'],
+        },
+      },
     },
+    chunkSizeWarningLimit: 600,
   },
   resolve: {
     alias: {
