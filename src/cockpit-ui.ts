@@ -86,9 +86,9 @@ const gamesReady = import('./mini-games').then(mod => {
             initMiniGames();
         });
         var gamesBtn = el('games-btn');
-        if (gamesBtn) gamesBtn.addEventListener('click', openGamesMenu);
+        if (gamesBtn) gamesBtn.addEventListener('click', function () { openGamesMenu(); });
         var gamesClose = el('games-close');
-        if (gamesClose) gamesClose.addEventListener('click', closeGamesMenu);
+        if (gamesClose) gamesClose.addEventListener('click', function () { closeGamesMenu(); });
 
         // Callbacks 3D — attend que le bundle Babylon soit chargé
         cockpitReady.then(function () {
