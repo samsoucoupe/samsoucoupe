@@ -4,9 +4,23 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Portfolio de samsoucoupe — pilote une soucoupe, explore l'espace, découvre les stations.">
+    <meta name="description" content="Portfolio de samsoucoupe — développeur backend full-stack. Pilote une soucoupe, explore l'espace, découvre mes projets et compétences.">
+    <meta name="author" content="samsoucoupe">
+    <meta name="keywords" content="samsoucoupe, développeur, backend, full-stack, portfolio, Babylon.js, TypeScript, Python, data science, game dev">
     <meta name="theme-color" content="#03060e">
-    <title>samsoucoupe — Universe</title>
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://samsoucoupe.github.io/samsoucoupe/">
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://samsoucoupe.github.io/samsoucoupe/">
+    <meta property="og:title" content="samsoucoupe — Universe">
+    <meta property="og:description" content="Développeur backend full-stack. Pilote une soucoupe, explore l'espace, découvre mes projets.">
+    <meta property="og:image" content="https://samsoucoupe.github.io/samsoucoupe/assets/pdpSamsoucoupe.gif">
+    <meta property="og:locale" content="fr_FR">
+    <meta property="og:site_name" content="samsoucoupe">
+
+    <title>samsoucoupe — Développeur Backend Full-Stack | Portfolio 3D</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
@@ -16,13 +30,36 @@
     <noscript><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet"></noscript>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/gif" href="assets/pdpSamsoucoupe.gif">
+
+    <!-- Structured data — JSON-LD -->
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "Person",
+        "name": "samsoucoupe",
+        "url": "https://samsoucoupe.github.io/samsoucoupe/",
+        "image": "https://samsoucoupe.github.io/samsoucoupe/assets/pdpSamsoucoupe.gif",
+        "jobTitle": "Développeur Backend Full-Stack",
+        "description": "Étudiant développeur passionné par le backend, la data science et le game dev.",
+        "knowsAbout": ["Python", "Java", "TypeScript", "Babylon.js", "Data Science", "Backend", "Game Development"],
+        "sameAs": [
+            "https://github.com/samsoucoupe",
+            "https://discord.com/users/388993523715801088",
+            "https://buymeacoffee.com/samsoucoupe",
+            "https://ko-fi.com/samsoucoupe"
+        ]
+    }
+    </script>
 </head>
 
 <body>
+    <!-- SEO : contenu sémantique lisible par les crawlers et screen readers -->
+    <h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">samsoucoupe — Développeur Backend Full-Stack</h1>
+
     <!-- Fond starfield warp 2D -->
     <canvas id="starfield"></canvas>
     <!-- Scène 3D Babylon -->
-    <canvas id="renderCanvas"></canvas>
+    <canvas id="renderCanvas" role="img" aria-label="Système solaire 3D interactif — pilote une soucoupe et explore les planètes">
 
     <!-- Vignette -->
     <div class="vignette" aria-hidden="true"></div>
@@ -183,7 +220,7 @@
             <div class="briefing-logo">
                 <span class="bl-bracket">&lt;</span>samsoucoupe<span class="bl-bracket">/&gt;</span>
             </div>
-            <h1 class="briefing-title">samsoucoupe universe</h1>
+            <h2 class="briefing-title">samsoucoupe universe</h2>
             <p class="briefing-sub">Observe mon système solaire depuis ta soucoupe. Chaque planète révèle une partie de mon profil. Découvre les 5.</p>
             <div class="briefing-controls">
                 <div class="bc-item"><span class="bc-key">CLIC</span><span>sur une planète pour y voyager</span></div>
@@ -201,6 +238,56 @@
                         </button>
         </div>
     </div>
+
+    <!-- ======================= FALLBACK SEO <noscript> ======================= -->
+    <noscript>
+        <div style="max-width:700px;margin:0 auto;padding:24px 16px;color:#e8f0ff;background:#03060e;font-family:system-ui,sans-serif">
+            <h2 style="font-size:1.5em;margin-bottom:8px">samsoucoupe</h2>
+            <p style="color:#9fb0d0;margin-bottom:16px">Développeur Backend Full-Stack. Étudiant développeur passionné par le backend, la data science et le game dev.</p>
+
+            <h3 style="font-size:1.1em;color:#00e1ff;margin:24px 0 8px">À propos</h3>
+            <p style="color:#9fb0d0;line-height:1.6">Je suis un étudiant développeur français passionné par les technologies backend et la data science. Mon expertise se concentre sur le développement backend avec une approche full-stack, combinée à une solide maîtrise des outils de données comme Excel et Power BI. Je suis particulièrement à l'aise avec Python, R et SQL.</p>
+
+            <h3 style="font-size:1.1em;color:#00e1ff;margin:24px 0 8px">Compétences</h3>
+            <h4 style="font-size:0.95em;color:#b388ff;margin:12px 0 4px">Backend &amp; Langages</h4>
+            <p style="color:#9fb0d0">Python, Java, Go, Kotlin, C, R, SQL</p>
+            <h4 style="font-size:0.95em;color:#b388ff;margin:12px 0 4px">Frameworks &amp; APIs</h4>
+            <p style="color:#9fb0d0">Spring, Flask, Angular, GraphQL, Swagger</p>
+            <h4 style="font-size:0.95em;color:#b388ff;margin:12px 0 4px">Data Science &amp; IA</h4>
+            <p style="color:#9fb0d0">Pandas, NumPy, Scikit-learn, PyTorch, TensorFlow, OpenCV, Matplotlib, Plotly, SciPy</p>
+            <h4 style="font-size:0.95em;color:#b388ff;margin:12px 0 4px">Outils Data &amp; BI</h4>
+            <p style="color:#9fb0d0">Power BI, Excel, MongoDB</p>
+            <h4 style="font-size:0.95em;color:#b388ff;margin:12px 0 4px">Frontend &amp; Web</h4>
+            <p style="color:#9fb0d0">HTML5, CSS3, JavaScript, TypeScript, Babylon.js, Markdown</p>
+            <h4 style="font-size:0.95em;color:#b388ff;margin:12px 0 4px">Game Development</h4>
+            <p style="color:#9fb0d0">Babylon.js, WebGL, Game Design, JavaScript Games</p>
+            <h4 style="font-size:0.95em;color:#b388ff;margin:12px 0 4px">DevOps &amp; Outils</h4>
+            <p style="color:#9fb0d0">Docker, Git, GitHub Actions, Render</p>
+
+            <h3 style="font-size:1.1em;color:#00e1ff;margin:24px 0 8px">Projets</h3>
+            <h4 style="font-size:1em;margin:16px 0 4px">SAE Neko Corporation — Loup-Garou Online</h4>
+            <p style="color:#9fb0d0;line-height:1.5">Implémentation complète du jeu Les Loups-Garous de Thiercelieux en microservices. Spring Boot, Angular, Docker, WebSocket, PostgreSQL, MongoDB.</p>
+            <h4 style="font-size:1em;margin:16px 0 4px">Candy Crush UE Game</h4>
+            <p style="color:#9fb0d0;line-height:1.5">Jeu Candy Crush en HTML/CSS/JavaScript pur. <a href="https://samsoucoupe.github.io/Candy-Crush-bis/">Voir le projet</a></p>
+            <h4 style="font-size:1em;margin:16px 0 4px">Velocity Olympiad — Game on Web 2024</h4>
+            <p style="color:#9fb0d0;line-height:1.5">Jeu 3D Babylon.js pour Game on Web 2024. <a href="https://samsoucoupe.github.io/Velocity-Olympiad/">Voir le projet</a></p>
+            <h4 style="font-size:1em;margin:16px 0 4px">Dreamland — Game on Web 2025</h4>
+            <p style="color:#9fb0d0;line-height:1.5">Expérience immersive Babylon.js pour Game on Web 2025. <a href="https://samsoucoupe.github.io/GOW2025/">Voir le projet</a></p>
+            <h4 style="font-size:1em;margin:16px 0 4px">Application Angular — DS4H MIAGE</h4>
+            <p style="color:#9fb0d0;line-height:1.5">Application web Angular pour le Master MIAGE. <a href="https://angular-m1s1-assignments-front.onrender.com/login">Voir le projet</a></p>
+            <h4 style="font-size:1em;margin:16px 0 4px">Dashboard Analytics Power BI</h4>
+            <p style="color:#9fb0d0;line-height:1.5">Tableau de bord interactif Power BI pour l'analyse business. SQL, Excel, visualisations avancées.</p>
+
+            <h3 style="font-size:1.1em;color:#00e1ff;margin:24px 0 8px">Contact</h3>
+            <p style="color:#9fb0d0">N'hésitez pas à me contacter pour discuter de projets, d'opportunités ou simplement pour échanger.</p>
+            <ul style="list-style:none;padding:0">
+                <li style="margin:8px 0"><a href="https://github.com/samsoucoupe" style="color:#00e1ff">GitHub</a></li>
+                <li style="margin:8px 0"><a href="https://buymeacoffee.com/samsoucoupe" style="color:#00e1ff">Buy Me a Coffee</a></li>
+                <li style="margin:8px 0"><a href="https://ko-fi.com/samsoucoupe" style="color:#00e1ff">Ko-fi</a></li>
+            </ul>
+            <p style="margin-top:24px"><a href="simple.html" style="color:#00e1ff">Version simple du portfolio (sans JavaScript)</a></p>
+        </div>
+    </noscript>
 
     <!-- ======================= FOOTER ======================= -->
     <footer class="footer">

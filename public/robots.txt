@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://samsoucoupe.github.io/samsoucoupe/sitemap.xml
