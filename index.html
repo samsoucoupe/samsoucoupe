@@ -53,11 +53,14 @@
 </head>
 
 <body>
+    <!-- Skip link pour navigation clavier -->
+    <a href="#hud" class="skip-link" style="position:absolute;left:-9999px;top:0;z-index:9999;padding:8px 16px;background:#00e1ff;color:#03060e;font-weight:700" onfocus="this.style.left='8px'" onblur="this.style.left='-9999px'">Aller au contenu</a>
+
     <!-- SEO : contenu sémantique lisible par les crawlers et screen readers -->
     <h1 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap">samsoucoupe — Développeur Backend Full-Stack</h1>
 
     <!-- Fond starfield warp 2D -->
-    <canvas id="starfield"></canvas>
+    <canvas id="starfield" aria-hidden="true"></canvas>
     <!-- Scène 3D Babylon -->
     <canvas id="renderCanvas" role="img" aria-label="Système solaire 3D interactif — pilote une soucoupe et explore les planètes">
 
@@ -65,15 +68,13 @@
     <div class="vignette" aria-hidden="true"></div>
 
     <!-- ======================= HUD JEU ======================= -->
-    <div id="hud" class="hud">
-
-
+    <div id="hud" class="hud" role="region" aria-label="Interface de pilotage">
 
         <!-- Top-left : progression -->
         <div class="hud-top-left">
-            <div class="mission-progress">
+            <div class="mission-progress" role="status" aria-live="polite" aria-label="Progression des stations découvertes">
                 <div class="mp-label">STATIONS DÉCOUVERTES</div>
-                <div class="mp-bar"><div class="mp-fill" id="mp-fill"></div></div>
+                <div class="mp-bar" role="progressbar" aria-valuenow="0" aria-valuemax="5" aria-valuemin="0"><div class="mp-fill" id="mp-fill"></div></div>
                 <div class="mp-count"><span id="mp-count">0</span> / 5</div>
             </div>
         </div>
@@ -81,23 +82,23 @@
         <!-- Top-right : titre + score + bouton map -->
         <div class="hud-top-right">
             <div class="game-title">&lt;samsoucoupe/&gt;</div>
-            <div class="score-hud" id="score-hud">
+            <div class="score-hud" id="score-hud" role="status" aria-live="polite" aria-label="Score">
                 <span class="sh-label">SCORE</span>
                 <span class="sh-value" id="score-val">0</span>
                 <span class="sh-combo" id="combo-val"></span>
                 <div class="score-tooltip" id="score-tooltip"></div>
             </div>
-            <button class="map-btn" id="map-btn" title="Carte du système (M)">
-                <i class="fas fa-map"></i> <span>MAP</span>
+            <button class="map-btn" id="map-btn" title="Carte du système (M)" aria-label="Ouvrir la carte du système">
+                <i class="fas fa-map" aria-hidden="true"></i> <span>MAP</span>
             </button>
-            <button class="map-btn" id="games-btn" title="Mini-jeux (G)">
-                <i class="fas fa-gamepad"></i> <span>JEUX</span>
+            <button class="map-btn" id="games-btn" title="Mini-jeux (G)" aria-label="Ouvrir les mini-jeux">
+                <i class="fas fa-gamepad" aria-hidden="true"></i> <span>JEUX</span>
             </button>
         </div>
 
         <!-- Bottom-left : journal de bord -->
         <div class="hud-bot-left">
-            <div class="nav-log" id="nav-log" aria-label="Journal de bord">
+            <div class="nav-log" id="nav-log" role="log" aria-label="Journal de bord" aria-live="polite">
                 <div class="nav-log-header">JOURNAL DE BORD</div>
                 <ul class="nav-log-list" id="nav-log-list"></ul>
             </div>
@@ -105,57 +106,57 @@
 
         <!-- Bottom-right : radar/minimap -->
         <div class="hud-bot-right">
-            <div class="radar" id="radar">
-                <div class="radar-sweep"></div>
-                <div class="radar-range" aria-label="Portée radar"></div>
-                <div class="radar-player" aria-label="Vous êtes ici"></div>
-                <div class="radar-blips" id="radar-blips"></div>
+            <div class="radar" id="radar" role="img" aria-label="Radar — position des stations et astéroïdes">
+                <div class="radar-sweep" aria-hidden="true"></div>
+                <div class="radar-range" aria-hidden="true"></div>
+                <div class="radar-player" aria-hidden="true"></div>
+                <div class="radar-blips" id="radar-blips" aria-hidden="true"></div>
             </div>
             <div class="radar-label">RADAR · <span id="radar-range-val">200</span>u</div>
         </div>
 
         <!-- Scanner banner (quand on scanne) -->
-        <div class="scanner" id="scanner">
-            <div class="scanner-icon"><i class="fas fa-satellite-dish"></i></div>
+        <div class="scanner" id="scanner" role="status" aria-live="assertive" aria-atomic="true">
+            <div class="scanner-icon"><i class="fas fa-satellite-dish" aria-hidden="true"></i></div>
             <div class="scanner-info">
                 <div class="scanner-label" id="scanner-label">SCAN EN COURS…</div>
-                <div class="scanner-bar"><div class="scanner-fill" id="scanner-fill"></div></div>
+                <div class="scanner-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"><div class="scanner-fill" id="scanner-fill"></div></div>
             </div>
         </div>
     </div>
 
     <!-- ======================= PANNEAU CONTENU STATION ======================= -->
-    <main class="panel" id="panel" aria-live="polite">
+    <main class="panel" id="panel" role="dialog" aria-labelledby="panel-title" aria-live="polite">
         <header class="panel-head">
             <h2 class="panel-title" id="panel-title">STATION</h2>
-            <button class="panel-close" id="panel-close" aria-label="Reprendre le vol"><i class="fas fa-times"></i></button>
+            <button class="panel-close" id="panel-close" aria-label="Reprendre le vol"><i class="fas fa-times" aria-hidden="true"></i></button>
         </header>
         <div class="panel-body" id="panel-body"></div>
         <footer class="panel-foot">
-            <span class="panel-hint"><i class="fas fa-arrow-left"></i> Reprends le vol pour explorer (Échap)</span>
+            <span class="panel-hint"><i class="fas fa-arrow-left" aria-hidden="true"></i> Reprends le vol pour explorer (Échap)</span>
         </footer>
     </main>
 
     <!-- ======================= TOAST PORTAIL (Rick & Morty) ======================= -->
-    <div class="portal-toast" id="portal-toast">
+    <div class="portal-toast" id="portal-toast" role="status" aria-live="polite">
         <div class="portal-toast-inner">
-            <span class="portal-icon"><i class="fas fa-vial"></i></span>
+            <span class="portal-icon"><i class="fas fa-vial" aria-hidden="true"></i></span>
             <span class="portal-quote" id="portal-quote"></span>
         </div>
     </div>
 
     <!-- ======================= TOAST COMBAT (score) ======================= -->
-    <div class="combat-toast" id="combat-toast"></div>
+    <div class="combat-toast" id="combat-toast" role="status" aria-live="polite"></div>
 
     <!-- ======================= MAP DU SYSTÈME ======================= -->
-    <div class="map-overlay" id="map-overlay">
+    <div class="map-overlay" id="map-overlay" role="dialog" aria-modal="false" aria-labelledby="map-title">
         <div class="map-panel">
             <header class="map-header">
-                <h3><i class="fas fa-globe"></i> SYSTÈME SOLAIRE</h3>
-                <button class="map-close" id="map-close" aria-label="Fermer"><i class="fas fa-times"></i></button>
+                <h3 id="map-title"><i class="fas fa-globe" aria-hidden="true"></i> SYSTÈME SOLAIRE</h3>
+                <button class="map-close" id="map-close" aria-label="Fermer la carte"><i class="fas fa-times" aria-hidden="true"></i></button>
             </header>
             <div class="map-canvas">
-                <svg id="map-svg" class="map-svg" preserveAspectRatio="xMidYMid meet"></svg>
+                <svg id="map-svg" class="map-svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Carte du système solaire — cliquez une planète pour y voyager"></svg>
             </div>
             <footer class="map-footer">
                 <span class="map-hint">Clique une planète pour y voyager</span>
@@ -164,38 +165,38 @@
     </div>
 
     <!-- ======================= MINI-JEUX ======================= -->
-    <div class="games-overlay" id="games-overlay">
+    <div class="games-overlay" id="games-overlay" role="dialog" aria-modal="false" aria-labelledby="games-title">
         <div class="games-panel">
             <header class="games-header">
-                <h3><i class="fas fa-gamepad"></i> MINI-JEUX</h3>
-                <div class="games-score" id="games-score-bar" style="display:none">
+                <h3 id="games-title"><i class="fas fa-gamepad" aria-hidden="true"></i> MINI-JEUX</h3>
+                <div class="games-score" id="games-score-bar" style="display:none" role="status" aria-live="polite">
                     <span class="is-label">SCORE</span>
                     <span class="is-value" id="game-score">0</span>
                     <span class="is-label" id="game-extra-label">VIES</span>
                     <span class="is-value" id="game-extra-val">3</span>
                 </div>
-                <button class="games-close" id="games-close" aria-label="Fermer"><i class="fas fa-times"></i></button>
+                <button class="games-close" id="games-close" aria-label="Fermer les mini-jeux"><i class="fas fa-times" aria-hidden="true"></i></button>
             </header>
             <!-- MENU -->
-            <div class="games-menu" id="games-menu">
-                <div class="game-card" data-game="invader">
-                    <div class="game-icon">👾</div>
+            <div class="games-menu" id="games-menu" role="list">
+                <div class="game-card" data-game="invader" role="listitem" tabindex="0">
+                    <div class="game-icon" aria-hidden="true">👾</div>
                     <div class="game-info">
                         <h4>SPACE INVADER</h4>
                         <p>Détruis les aliens avant qu'ils touchent le sol</p>
                         <span class="game-keys">← → ESPACE</span>
                     </div>
                 </div>
-                <div class="game-card" data-game="snake">
-                    <div class="game-icon">🐍</div>
+                <div class="game-card" data-game="snake" role="listitem" tabindex="0">
+                    <div class="game-icon" aria-hidden="true">🐍</div>
                     <div class="game-info">
                         <h4>SPACE SNAKE</h4>
                         <p>Mange les planètes, grandis sans te mordre</p>
                         <span class="game-keys">← → ↑ ↓</span>
                     </div>
                 </div>
-                <div class="game-card" data-game="meteor">
-                    <div class="game-icon">☄️</div>
+                <div class="game-card" data-game="meteor" role="listitem" tabindex="0">
+                    <div class="game-icon" aria-hidden="true">☄️</div>
                     <div class="game-info">
                         <h4>COMET DODGE</h4>
                         <p>Esquive les comètes diagonales le plus longtemps possible</p>
@@ -205,13 +206,14 @@
             </div>
             <!-- PLAY -->
             <div class="games-play" id="games-play" style="display:none">
-                <canvas id="game-canvas" width="480" height="360"></canvas>
+                <canvas id="game-canvas" width="480" height="360" role="img" aria-label="Zone de jeu mini-jeu"></canvas>
                 <div class="games-footer">
                     <span class="game-hint" id="game-hint"></span>
-                    <button class="game-back" id="game-back"><i class="fas fa-arrow-left"></i> Menu</button>
+                    <button class="game-back" id="game-back" aria-label="Retour au menu des mini-jeux"><i class="fas fa-arrow-left" aria-hidden="true"></i> Menu</button>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
     <!-- ======================= ÉCRAN D'ACCUEIL / BRIEFING ======================= -->
