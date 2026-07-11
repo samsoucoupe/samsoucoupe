@@ -44,13 +44,20 @@ const gamesReady = import('./mini-games').then(mod => {
         // Wire le bouton briefing → lance la 3D
                 el('briefing-start').addEventListener('click', startGame);
 
-                // Version simple
+                // Version simple — depuis le briefing
                 el('briefing-simple').addEventListener('click', function() {
                     window.location.href = 'simple.html';
                 });
 
-                // Auto-redirect mobile (< 768px) → simple directement
-                if (window.innerWidth < 768) {
+                // Version simple — depuis le HUD
+                var simpleBtn = el('simple-btn');
+                if (simpleBtn) simpleBtn.addEventListener('click', function() {
+                    window.location.href = 'simple.html';
+                });
+
+                // Auto-redirect mobile (< 768px) → simple, SAUF si l'utilisateur
+                // a explicitement demandé la 3D via ?3d=1 (bouton "s'envoler" sur simple.html)
+                if (window.innerWidth < 768 && !/[?&]3d=1\b/.test(location.search)) {
                     window.location.href = 'simple.html';
                 }
 
