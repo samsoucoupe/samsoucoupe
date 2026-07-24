@@ -1,0 +1,179 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1180" height="610" viewBox="0 0 1180 610">
+<defs>
+  <style>
+    .panel-title { font-family: 'Courier New', Consolas, monospace; font-size: 11px; fill: #38BDF8; letter-spacing: 2px; opacity: 0.7; }
+    .term-label  { font-family: 'Courier New', Consolas, monospace; font-size: 12px; fill: #64748B; letter-spacing: 0.5px; }
+    .scan-label  { font-family: 'Courier New', Consolas, monospace; font-size: 10px; fill: #F87171; letter-spacing: 1px; }
+  </style>
+  <linearGradient id="borderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+    <stop offset="0%" stop-color="#7C3AED"/>
+    <stop offset="50%" stop-color="#22D3EE"/>
+    <stop offset="100%" stop-color="#10B981"/>
+  </linearGradient>
+  <radialGradient id="bgGlow" cx="30%" cy="20%" r="80%">
+    <stop offset="0%" stop-color="#0B1120"/>
+    <stop offset="100%" stop-color="#050816"/>
+  </radialGradient>
+  <pattern id="scanlines" width="4" height="4" patternUnits="userSpaceOnUse">
+    <rect width="4" height="1" fill="#7DD3FC" opacity="0.05"/>
+  </pattern>
+  <linearGradient id="scanGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+    <stop offset="0%" stop-color="#22D3EE" stop-opacity="0"/>
+    <stop offset="45%" stop-color="#22D3EE" stop-opacity="0.05"/>
+    <stop offset="50%" stop-color="#22D3EE" stop-opacity="0.65"/>
+    <stop offset="55%" stop-color="#22D3EE" stop-opacity="0.05"/>
+    <stop offset="100%" stop-color="#7C3AED" stop-opacity="0"/>
+  </linearGradient>
+  <mask id="revealMask" maskUnits="userSpaceOnUse" x="0" y="0" width="1180" height="620">
+    <rect x="0" y="0" width="1180" height="0" fill="#fff">
+      <animate attributeName="height" from="0" to="560" dur="2.6s" begin="0.2s" fill="freeze" calcMode="spline" keySplines="0.25 0.1 0.25 1"/>
+    </rect>
+  </mask>
+<clipPath id="lc0"><rect x="500" y="26.00" width="0" height="24"><animate attributeName="width" from="0" to="690" dur="0.38s" begin="0.75s" fill="freeze"/></rect></clipPath>
+<clipPath id="lc1"><rect x="500" y="48.00" width="0" height="24"><animate attributeName="width" from="0" to="690" dur="0.38s" begin="0.82s" fill="freeze"/></rect></clipPath>
+<clipPath id="lc2"><rect x="500" y="70.00" width="0" height="24"><animate attributeName="width" from="0" to="690" dur="0.38s" begin="0.89s" fill="freeze"/></rect></clipPath>
+<clipPath id="lc3"><rect x="500" y="92.00" width="0" height="24"><animate attributeName="width" from="0" to="690" dur="0.38s" begin="0.96s" fill="freeze"/></rect></clipPath>
+<clipPath id="lc4"><rect x="500" y="114.00" width="0" height="24"><animate attributeName="width" from="0" to="690" dur="0.38s" begin="1.03s" fill="freeze"/></rect></clipPath>
+<clipPath id="lc5"><rect x="500" y="136.00" width="0" height="24"><animate attributeName="width" from="0" to="690" dur="0.38s" begin="1.10s" fill="freeze"/></rect></clipPath>
+<clipPath id="lc6"><rect x="500" y="158.00" width="0" height="24"><animate attributeName="width" from="0" to="690" dur="0.38s" begin="1.17s" fill="freeze"/></rect></clipPath>
+<clipPath id="lc7"><rect x="500" y="180.00" width="0" height="24"><animate attributeName="width" from="0" to="690" dur="0.38s" begin="1.24s" fill="freeze"/></rect></clipPath>
+<clipPath id="lc8"><rect x="500" y="202.00" width="0" height="24"><animate attributeName="width" from="0" to="690" dur="0.38s" begin="1.31s" fill="freeze"/></rect></clipPath>
+<clipPath id="lc9"><rect x="500" y="224.00" width="0" height="24"><animate attributeName="width" from="0" to="690" dur="0.38s" begin="1.38s" fill="freeze"/></rect></clipPath>
+<clipPath id="lc10"><rect x="500" y="246.00" width="0" height="24"><animate attributeName="width" from="0" to="690" dur="0.38s" begin="1.45s" fill="freeze"/></rect></clipPath>
+<clipPath id="lc11"><rect x="500" y="268.00" width="0" height="24"><animate attributeName="width" from="0" to="690" dur="0.38s" begin="1.52s" fill="freeze"/></rect></clipPath>
+<clipPath id="lc12"><rect x="500" y="290.00" width="0" height="24"><animate attributeName="width" from="0" to="690" dur="0.38s" begin="1.59s" fill="freeze"/></rect></clipPath>
+<clipPath id="lc13"><rect x="500" y="312.00" width="0" height="24"><animate attributeName="width" from="0" to="690" dur="0.38s" begin="1.66s" fill="freeze"/></rect></clipPath>
+<clipPath id="lc14"><rect x="500" y="334.00" width="0" height="24"><animate attributeName="width" from="0" to="690" dur="0.38s" begin="1.73s" fill="freeze"/></rect></clipPath>
+<clipPath id="lc15"><rect x="500" y="356.00" width="0" height="24"><animate attributeName="width" from="0" to="690" dur="0.38s" begin="1.80s" fill="freeze"/></rect></clipPath>
+<clipPath id="lc16"><rect x="500" y="378.00" width="0" height="24"><animate attributeName="width" from="0" to="690" dur="0.38s" begin="1.87s" fill="freeze"/></rect></clipPath>
+<clipPath id="lc17"><rect x="500" y="400.00" width="0" height="24"><animate attributeName="width" from="0" to="690" dur="0.38s" begin="1.94s" fill="freeze"/></rect></clipPath>
+<clipPath id="lc18"><rect x="500" y="422.00" width="0" height="24"><animate attributeName="width" from="0" to="690" dur="0.38s" begin="2.01s" fill="freeze"/></rect></clipPath>
+<clipPath id="lc19"><rect x="500" y="444.00" width="0" height="24"><animate attributeName="width" from="0" to="690" dur="0.38s" begin="2.08s" fill="freeze"/></rect></clipPath>
+<clipPath id="lc20"><rect x="500" y="466.00" width="0" height="24"><animate attributeName="width" from="0" to="690" dur="0.38s" begin="2.15s" fill="freeze"/></rect></clipPath>
+</defs>
+
+<rect width="1180" height="610" fill="url(#bgGlow)"/>
+<rect width="1180" height="610" fill="url(#scanlines)"/>
+
+<rect x="10" y="10" width="490" height="590" rx="16" fill="none" stroke="url(#borderGrad)" stroke-width="1" opacity="0.35"/>
+<rect x="510" y="10" width="660" height="590" rx="16" fill="none" stroke="url(#borderGrad)" stroke-width="1" opacity="0.35"/>
+
+<text x="30" y="24" class="panel-title">VISUAL.MAP</text>
+<text x="524" y="24" class="panel-title">SYSTEM.INFO</text>
+<text x="255" y="600" text-anchor="middle" class="term-label">samsoucoupe@ufo ~ % ./scan --abduct</text>
+<text x="1132" y="24" class="scan-label">SCANNING</text>
+
+<g mask="url(#revealMask)">
+<g>
+  <radialGradient id="planetGlow">
+    <stop offset="0%" stop-color="#bb9af7" stop-opacity="0.25"/>
+    <stop offset="60%" stop-color="#bb9af7" stop-opacity="0.04"/>
+    <stop offset="100%" stop-color="#bb9af7" stop-opacity="0"/>
+  </radialGradient>
+  <defs>
+    <radialGradient id="planetFill" cx="35%" cy="35%">
+      <stop offset="0%" stop-color="#7dcfff" stop-opacity="0.8"/>
+      <stop offset="50%" stop-color="#bb9af7" stop-opacity="0.9"/>
+      <stop offset="100%" stop-color="#bb9af7" stop-opacity="0.3"/>
+    </radialGradient>
+  </defs>
+
+  <circle cx="250" cy="300" r="200" fill="url(#planetGlow)"/>
+
+  <ellipse cx="250" cy="300" rx="180" ry="55" fill="none" stroke="#7aa2f7" stroke-width="1" opacity="0.2" stroke-dasharray="3,6"/>
+  <ellipse cx="250" cy="300" rx="130" ry="38" fill="none" stroke="#7aa2f7" stroke-width="1" opacity="0.13" stroke-dasharray="2,4"/>
+
+  <circle cx="250" cy="300" r="75" fill="url(#planetFill)"/>
+
+  <g>
+    <animateTransform attributeName="transform" type="rotate" from="0 250 300" to="360 250 300" dur="40s" repeatCount="indefinite"/>
+    <circle cx="430" cy="300" r="3" fill="#7dcfff"/>
+    <circle cx="120" cy="300" r="2" fill="#8b949e"/>
+    <circle cx="380" cy="300" r="1.5" fill="#7aa2f7" opacity="0.8"/>
+  </g>
+  <g>
+    <animateTransform attributeName="transform" type="rotate" from="360 250 300" to="0 250 300" dur="55s" repeatCount="indefinite"/>
+    <circle cx="380" cy="300" r="2.5" fill="#7dcfff" opacity="0.7"/>
+    <circle cx="120" cy="300" r="1.5" fill="#8b949e" opacity="0.5"/>
+  </g>
+
+  <circle cx="296.5" cy="277.6" r="1.41" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="3.5s" begin="0.5s" repeatCount="indefinite"/></circle>
+  <circle cx="262.2" cy="184.8" r="1.11" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="4.1s" begin="1.4s" repeatCount="indefinite"/></circle>
+  <circle cx="135.0" cy="507.5" r="1.27" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="2.4s" begin="0.6s" repeatCount="indefinite"/></circle>
+  <circle cx="250.3" cy="403.9" r="1.09" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="1.5s" begin="1.4s" repeatCount="indefinite"/></circle>
+  <circle cx="405.2" cy="67.1" r="1.07" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="1.6s" begin="0.8s" repeatCount="indefinite"/></circle>
+  <circle cx="48.4" cy="138.4" r="1.32" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="3.1s" begin="0.1s" repeatCount="indefinite"/></circle>
+  <circle cx="99.6" cy="486.6" r="0.93" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="3.9s" begin="1.0s" repeatCount="indefinite"/></circle>
+  <circle cx="227.0" cy="59.8" r="0.37" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="3.2s" begin="1.8s" repeatCount="indefinite"/></circle>
+  <circle cx="132.8" cy="382.2" r="0.57" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="2.4s" begin="2.2s" repeatCount="indefinite"/></circle>
+  <circle cx="415.0" cy="309.2" r="0.57" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="2.4s" begin="0.9s" repeatCount="indefinite"/></circle>
+  <circle cx="54.4" cy="389.7" r="1.18" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="3.6s" begin="2.8s" repeatCount="indefinite"/></circle>
+  <circle cx="60.5" cy="540.2" r="0.86" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="4.3s" begin="0.4s" repeatCount="indefinite"/></circle>
+  <circle cx="71.0" cy="48.4" r="0.77" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="2.9s" begin="1.8s" repeatCount="indefinite"/></circle>
+  <circle cx="433.8" cy="81.1" r="1.24" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="4.3s" begin="0.8s" repeatCount="indefinite"/></circle>
+  <circle cx="345.0" cy="135.2" r="0.98" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="4.0s" begin="0.4s" repeatCount="indefinite"/></circle>
+  <circle cx="478.0" cy="338.3" r="1.49" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="2.8s" begin="1.7s" repeatCount="indefinite"/></circle>
+  <circle cx="175.0" cy="356.0" r="0.72" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="3.7s" begin="0.9s" repeatCount="indefinite"/></circle>
+  <circle cx="226.9" cy="486.9" r="1.20" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="4.5s" begin="2.7s" repeatCount="indefinite"/></circle>
+  <circle cx="218.7" cy="329.0" r="0.68" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="1.8s" begin="2.1s" repeatCount="indefinite"/></circle>
+  <circle cx="164.1" cy="456.5" r="1.48" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="1.8s" begin="1.4s" repeatCount="indefinite"/></circle>
+  <circle cx="398.1" cy="108.9" r="1.56" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="2.0s" begin="2.1s" repeatCount="indefinite"/></circle>
+  <circle cx="341.9" cy="158.3" r="0.84" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="2.0s" begin="2.0s" repeatCount="indefinite"/></circle>
+  <circle cx="174.5" cy="149.7" r="1.12" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="4.2s" begin="1.0s" repeatCount="indefinite"/></circle>
+  <circle cx="384.5" cy="248.3" r="0.47" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="4.1s" begin="1.1s" repeatCount="indefinite"/></circle>
+  <circle cx="24.4" cy="430.8" r="1.13" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="4.1s" begin="2.7s" repeatCount="indefinite"/></circle>
+  <circle cx="116.1" cy="360.1" r="0.94" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="2.1s" begin="0.1s" repeatCount="indefinite"/></circle>
+  <circle cx="344.6" cy="415.4" r="0.68" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="2.3s" begin="1.0s" repeatCount="indefinite"/></circle>
+  <circle cx="33.4" cy="157.1" r="1.59" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="3.2s" begin="3.0s" repeatCount="indefinite"/></circle>
+  <circle cx="95.4" cy="130.5" r="1.03" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="2.4s" begin="1.2s" repeatCount="indefinite"/></circle>
+  <circle cx="219.8" cy="261.7" r="1.19" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="2.7s" begin="1.0s" repeatCount="indefinite"/></circle>
+  <circle cx="432.0" cy="213.5" r="0.94" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="3.3s" begin="1.6s" repeatCount="indefinite"/></circle>
+  <circle cx="291.1" cy="164.8" r="0.72" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="2.4s" begin="1.0s" repeatCount="indefinite"/></circle>
+  <circle cx="327.9" cy="157.1" r="0.52" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="3.6s" begin="0.9s" repeatCount="indefinite"/></circle>
+  <circle cx="77.5" cy="206.3" r="0.36" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="3.2s" begin="0.6s" repeatCount="indefinite"/></circle>
+  <circle cx="241.5" cy="241.4" r="1.23" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="4.2s" begin="2.4s" repeatCount="indefinite"/></circle>
+  <circle cx="222.1" cy="121.7" r="1.43" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="3.1s" begin="2.5s" repeatCount="indefinite"/></circle>
+  <circle cx="431.5" cy="278.6" r="0.49" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="3.4s" begin="2.4s" repeatCount="indefinite"/></circle>
+  <circle cx="115.9" cy="246.5" r="1.01" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="4.5s" begin="1.5s" repeatCount="indefinite"/></circle>
+  <circle cx="415.4" cy="486.9" r="1.27" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="1.7s" begin="0.2s" repeatCount="indefinite"/></circle>
+  <circle cx="97.9" cy="308.5" r="1.18" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="3.8s" begin="3.0s" repeatCount="indefinite"/></circle>
+  <circle cx="395.3" cy="374.8" r="1.39" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="4.1s" begin="1.8s" repeatCount="indefinite"/></circle>
+  <circle cx="181.5" cy="276.9" r="1.44" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="3.5s" begin="1.0s" repeatCount="indefinite"/></circle>
+  <circle cx="451.3" cy="371.7" r="0.73" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="4.0s" begin="0.5s" repeatCount="indefinite"/></circle>
+  <circle cx="188.2" cy="50.6" r="0.41" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="3.4s" begin="2.2s" repeatCount="indefinite"/></circle>
+  <circle cx="459.7" cy="506.1" r="0.91" fill="#8b949e" opacity="0.3"><animate attributeName="opacity" values="0.08;0.7;0.08" dur="3.6s" begin="0.4s" repeatCount="indefinite"/></circle>
+</g>
+</g>
+
+<g clip-path="url(#lc0)"><text x="520" y="0"><tspan x="520" y="42" style="font-family:'Courier New',Consolas,monospace;font-size:17px;font-weight:bold;fill:#7C3AED;">samsoucoupe</tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;">@ufo ———————————————————————————————————————————</tspan></text></g>
+<g clip-path="url(#lc1)"><text x="520" y="0"><tspan x="520" y="66" style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;">. </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;font-weight:bold;fill:#22D3EE;">Handle</tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;"> : ····················· </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#E5E7EB;">samsoucoupe</tspan></text></g>
+<g clip-path="url(#lc2)"><text x="520" y="0"><tspan x="520" y="88" style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;">. </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;font-weight:bold;fill:#22D3EE;">Role</tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;"> : ············· </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#E5E7EB;">Backend Java · DevOps</tspan></text></g>
+<g clip-path="url(#lc3)"><text x="520" y="0"><tspan x="520" y="110" style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;">. </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;font-weight:bold;fill:#22D3EE;">Origin</tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;"> : ····················· </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#E5E7EB;">France 🇫🇷</tspan></text></g>
+<g clip-path="url(#lc4)"><text x="520" y="0"><tspan x="520" y="132" style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;">. </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;font-weight:bold;fill:#22D3EE;">Focus</tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;"> : ······ </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#E5E7EB;">Spring Boot · CI/CD · Cloud</tspan></text></g>
+<g clip-path="url(#lc5)"><text x="520" y="0"><tspan x="520" y="154" style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;">. </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;font-weight:bold;fill:#22D3EE;">Status</tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;"> : · </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#E5E7EB;">Building • Automating • Shipping</tspan></text></g>
+<g clip-path="url(#lc6)"><text x="520" y="0"><tspan x="520" y="176" style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;">. </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;font-weight:bold;fill:#22D3EE;">ToolChain</tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;"> : ··· </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#E5E7EB;">IntelliJ, Git, Docker, K8s</tspan></text></g>
+<g clip-path="url(#lc7)"><text x="520" y="198"> </text></g>
+<g clip-path="url(#lc8)"><text x="520" y="0"><tspan x="520" y="220" style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;">. </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;font-weight:bold;fill:#22D3EE;">Core.Lang</tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;"> : ····· </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#E5E7EB;">Java, Kotlin, Python, Go</tspan></text></g>
+<g clip-path="url(#lc9)"><text x="520" y="0"><tspan x="520" y="242" style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;">. </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;font-weight:bold;fill:#22D3EE;">Core.Backend</tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;"> : · </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#E5E7EB;">Spring Boot, JPA, Hibernate</tspan></text></g>
+<g clip-path="url(#lc10)"><text x="520" y="0"><tspan x="520" y="264" style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;">. </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;font-weight:bold;fill:#22D3EE;">Core.API</tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;"> : ··········· </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#E5E7EB;">REST, GraphQL, gRPC</tspan></text></g>
+<g clip-path="url(#lc11)"><text x="520" y="0"><tspan x="520" y="286" style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;">. </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;font-weight:bold;fill:#22D3EE;">Core.Database</tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;"> : · </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#E5E7EB;">PostgreSQL, MongoDB, Redis</tspan></text></g>
+<g clip-path="url(#lc12)"><text x="520" y="0"><tspan x="520" y="308" style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;">. </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;font-weight:bold;fill:#22D3EE;">Core.DevOps</tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;"> : · </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#E5E7EB;">Docker, K8s, Jenkins, ArgoCD</tspan></text></g>
+<g clip-path="url(#lc13)"><text x="520" y="330"> </text></g>
+<g clip-path="url(#lc14)"><text x="520" y="0"><tspan x="520" y="352" style="font-family:'Courier New',Consolas,monospace;font-size:15px;font-weight:bold;fill:#10B981;">- Contact ———————————————————————————————————————</tspan></text></g>
+<g clip-path="url(#lc15)"><text x="520" y="0"><tspan x="520" y="374" style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;">. </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;font-weight:bold;fill:#22D3EE;">Grid.Discord</tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;"> : ············· </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#E5E7EB;">samsoucoupe#0</tspan></text></g>
+<g clip-path="url(#lc16)"><text x="520" y="0"><tspan x="520" y="396" style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;">. </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;font-weight:bold;fill:#22D3EE;">Grid.Coffee</tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;"> : · </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#E5E7EB;">buymeacoffee.com/samsoucoupe</tspan></text></g>
+<g clip-path="url(#lc17)"><text x="520" y="0"><tspan x="520" y="418" style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;">. </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;font-weight:bold;fill:#22D3EE;">Grid.Github</tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;"> : ···· </tspan><tspan style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#E5E7EB;">samsoucoupe/samsoucoupe</tspan></text></g>
+<g clip-path="url(#lc18)"><text x="520" y="440"> </text></g>
+<g clip-path="url(#lc19)"><text x="520" y="0"><tspan x="520" y="462" style="font-family:'Courier New',Consolas,monospace;font-size:15px;font-weight:bold;fill:#10B981;">- Live Stats ———————————————————————————————————————</tspan></text></g>
+<g clip-path="url(#lc20)"><text x="520" y="0"><tspan x="520" y="484" style="font-family:'Courier New',Consolas,monospace;font-size:15px;fill:#475569;">. See live GitHub stats badges below ↓</tspan></text></g>
+<rect x="522" y="485.0" width="9" height="16" fill="#22D3EE" opacity="0"><animate attributeName="opacity" values="0;0;1;0;1;0;1;0" keyTimes="0;0.01;0.02;0.3;0.5;0.7;0.85;1" dur="1.4s" begin="3.66s" repeatCount="indefinite"/></rect>
+
+
+<rect x="0" y="-70" width="1180" height="70" fill="url(#scanGrad)" opacity="0.7" style="mix-blend-mode:screen">
+  <animateTransform attributeName="transform" type="translate" from="0 -70" to="0 680" dur="4.2s" repeatCount="indefinite"/>
+</rect>
+
+<rect x="3" y="3" width="1174" height="604" rx="16" fill="none" stroke="url(#borderGrad)" stroke-width="2" opacity="0.8">
+  <animate attributeName="opacity" values="0.5;0.95;0.5" dur="3.2s" repeatCount="indefinite"/>
+</rect>
+</svg>

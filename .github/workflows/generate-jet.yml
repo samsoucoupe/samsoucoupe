@@ -1,0 +1,45 @@
+name: Generate UFO Contribution Heatmap
+
+on:
+  schedule:
+    - cron: '0 0 * * *'  # daily at midnight UTC
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - generate.mjs
+      - .github/workflows/generate-jet.yml
+
+permissions:
+  contents: write
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Generate UFO heatmap SVG
+        env:
+          GH_USERNAME: samsoucoupe
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OUTPUT_PATH: dist/github-jet.svg
+        run: node generate.mjs
+
+      - name: Commit and push
+        run: |
+          git config --local user.name "github-actions[bot]"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          if git diff --quiet; then
+            echo "No changes to commit."
+          else
+            git add dist/github-jet.svg
+            git commit -m "Update UFO contribution heatmap"
+            git push
+          fi

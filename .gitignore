@@ -1,5 +1,6 @@
 node_modules/
-dist/
+dist/*
+!dist/github-jet.svg
 .vite/
 *.local
 .DS_Store
