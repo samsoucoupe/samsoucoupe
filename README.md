@@ -18,9 +18,12 @@
 </p>
 
 <p align="center">
+  <a href="https://github.com/samsoucoupe">
   <img src="https://raw.githubusercontent.com/samsoucoupe/samsoucoupe/main/dist/github-jet.svg" alt="UFO Contribution Heatmap" width="100%"/>
+  </a>
 </p>
 
-### ✍️ Random Dev Quote
-![](https://quotes-github-readme.vercel.app/api?type=horizontal&theme=tokyonight)
 
+### ✍️ Random Dev Quote
+
+![](https://quotes-github-readme.vercel.app/api?type=horizontal&theme=tokyonight)
