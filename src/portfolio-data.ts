@@ -48,14 +48,18 @@ export interface Skills {
 }
 
 export interface ProjectMedia {
-    type: 'img' | 'video' | 'youtube';
+    type: 'img' | 'video' | 'youtube' | 'text';
     src: string;
     alt: string;
+    label?: string;
+    link?: string;
 }
 
 export interface Project {
     title: string;
     description: string;
+    contribution: string[];
+    choices: string[];
     tech: string[];
     media: ProjectMedia[];
     link: string | null;
@@ -86,9 +90,9 @@ export interface Portfolio {
 export const PORTFOLIO: Portfolio = {
     identity: {
         name: "samsoucoupe",
-        role: "Développeur Backend à tendance Full Stack",
-        tagline: "Passionné par le développement backend et les technologies de données.",
-        details: "Spécialisé en Python, R, SQL avec une expertise en outils de data comme Excel et Power BI.",
+        role: "Développeur backend & full-stack",
+        tagline: "Je conçois des applications web robustes, des API et des architectures orientées données.",
+        details: "De la conception au déploiement : Python, Java/Spring, TypeScript, SQL, Docker et Kubernetes.",
         avatar: avatarUrl,
         discord: "https://discord.com/users/388993523715801088",
         github: "https://github.com/samsoucoupe",
@@ -97,15 +101,15 @@ export const PORTFOLIO: Portfolio = {
     },
     about: {
         title: "À propos de moi",
-        subtitle: "Développeur Backend passionné 🚀",
+        subtitle: "Développeur backend & full-stack",
         paragraphs: [
-            "Je suis un étudiant développeur français passionné par les technologies backend et la data science. Actuellement en apprentissage de l'IA et du développement backend, j'aime créer des solutions robustes et efficaces.",
-            "Mon expertise se concentre sur le développement backend avec une approche full-stack, combinée à une solide maîtrise des outils de données comme Excel et Power BI. Je suis particulièrement à l'aise avec Python, R et SQL."
+            "Développeur français spécialisé dans la conception d'applications backend, d'API et de services orientés données. Je construis des solutions robustes, maintenables et sécurisées, de l'architecture à la mise en production.",
+            "Mon profil associe développement logiciel, traitement et visualisation des données, ainsi qu'exploitation d'infrastructures conteneurisées. Je travaille notamment avec Python, Java/Spring, TypeScript, SQL, Power BI, Docker, K3s et Argo CD."
         ],
         stats: [
-            { number: "15+", label: "Technologies maîtrisées" },
-            { number: "Backend", label: "Spécialisation" },
-            { number: "Data", label: "Passion" }
+            { number: "Backend", label: "API & services" },
+            { number: "Data", label: "SQL & décisionnel" },
+            { number: "DevOps", label: "Conteneurs & GitOps" }
         ]
     },
     skills: {
@@ -113,7 +117,7 @@ export const PORTFOLIO: Portfolio = {
         categories: [
             {
                 icon: "fas fa-server",
-                name: "Backend & Langages",
+                name: "Développement serveur & langages",
                 tags: [
                     { label: "Python", cls: "python" },
                     { label: "Java", cls: "java" },
@@ -126,7 +130,7 @@ export const PORTFOLIO: Portfolio = {
             },
             {
                 icon: "fas fa-code",
-                name: "Frameworks & APIs",
+                name: "Bibliothèques & interfaces",
                 tags: [
                     { label: "Spring", cls: "spring" },
                     { label: "Flask", cls: "flask" },
@@ -137,7 +141,7 @@ export const PORTFOLIO: Portfolio = {
             },
             {
                 icon: "fas fa-brain",
-                name: "Data Science & IA",
+                name: "Science des données & IA",
                 tags: [
                     { label: "Pandas", cls: "pandas" },
                     { label: "NumPy", cls: "numpy" },
@@ -152,7 +156,7 @@ export const PORTFOLIO: Portfolio = {
             },
             {
                 icon: "fas fa-chart-line",
-                name: "Outils Data & BI",
+                name: "Données & décisionnel",
                 tags: [
                     { label: "Power BI", cls: "powerbi" },
                     { label: "Excel", cls: "excel" },
@@ -161,7 +165,7 @@ export const PORTFOLIO: Portfolio = {
             },
             {
                 icon: "fas fa-laptop-code",
-                name: "Frontend & Web",
+                name: "Interfaces web",
                 tags: [
                     { label: "HTML5", cls: "html" },
                     { label: "CSS3", cls: "css" },
@@ -173,7 +177,7 @@ export const PORTFOLIO: Portfolio = {
             },
             {
                 icon: "fas fa-gamepad",
-                name: "Game Development",
+                name: "Développement de jeux",
                 tags: [
                     { label: "Babylon.js", cls: "babylonjs" },
                     { label: "WebGL", cls: "webgl" },
@@ -183,26 +187,65 @@ export const PORTFOLIO: Portfolio = {
             },
             {
                 icon: "fas fa-tools",
-                name: "DevOps & Outils",
+                name: "DevOps, déploiement & outils",
                 tags: [
                     { label: "Docker", cls: "docker" },
+                    { label: "Kubernetes / K3s", cls: "kubernetes" },
+                    { label: "Argo CD", cls: "argocd" },
+                    { label: "Kustomize", cls: "kustomize" },
+                    { label: "Traefik", cls: "traefik" },
+                    { label: "cert-manager", cls: "certmanager" },
+                    { label: "GHCR", cls: "ghcr" },
                     { label: "Git", cls: "git" },
                     { label: "GitHub Actions", cls: "github" },
+                    { label: "CI/CD", cls: "cicd" },
+                    { label: "Administration VPS", cls: "vps" },
                     { label: "Render", cls: "render" }
                 ]
             }
         ]
     },
     projects: {
-        title: "Projets",
+        title: "Missions",
         items: [
             {
+                title: "samsoucoupe universe - Portfolio 3D",
+                description: "Portfolio interactif conçu comme un système solaire à explorer, avec une version simplifiée pour garantir un accès direct au contenu.",
+                contribution: [
+                    "Conception de l'expérience, de l'identité visuelle et de la navigation entre les différentes stations du portfolio.",
+                    "Développement de la scène 3D, du cockpit, de la carte, des interactions, des mini-jeux et de la version responsive simplifiée.",
+                    "Structuration des contenus en TypeScript, optimisation du chargement et déploiement automatisé sur GitHub Pages."
+                ],
+                choices: [
+                    "Babylon.js pour transformer un portfolio classique en expérience 3D interactive directement dans le navigateur.",
+                    "TypeScript et Vite pour structurer le projet, fiabiliser le code et conserver un cycle de développement rapide.",
+                    "Une version simple distincte pour préserver la lisibilité, l'accessibilité et l'usage mobile sans imposer le chargement de la 3D."
+                ],
+                tech: ["Babylon.js", "TypeScript", "Vite", "WebGL", "HTML5", "CSS3", "GitHub Pages"],
+                media: [],
+                link: null,
+                icon: "fas fa-shuttle-space",
+                color: "#00e1ff",
+                status: "actif"
+            },
+            {
                 title: "SAE Neko Corporation - Loup-Garou Online",
-                description: "Implémentation complète du jeu 'Les Loups-Garous de Thiercelieux' en microservices. WebSocket, Angular, bots IA, Docker, CI/CD...",
-                tech: ["Spring Boot", "Angular", "Docker", "WebSocket", "JWT", "PostgreSQL", "MongoDB", "Microservices", "DevOps", "Game Dev"],
+                description: "Plateforme multijoueur distribuée permettant de jouer au Loup-Garou en temps réel, avec des parties autonomes animées par des bots.",
+                contribution: [
+                    "Conception de l'architecture en microservices et coordination technique de l'équipe.",
+                    "Développement des services d'authentification, de découverte, de jeu, d'historisation, de moteur de jeu et de communication WebSocket.",
+                    "Mise en place de JWT, du pseudo-autoscaling Kubernecheap, de MongoDB, de l'intégration Angular, de Docker et des workflows d'intégration continue."
+                ],
+                choices: [
+                    "Spring Boot pour isoler les responsabilités métier et faire évoluer les services indépendamment.",
+                    "WebSocket et STOMP pour synchroniser instantanément les actions, les phases et les messages d'une partie.",
+                    "MongoDB pour conserver l'état imbriqué et évolutif des parties ; MySQL pour les données relationnelles des joueurs ; Cassandra pour les messages ordonnés par partie.",
+                    "Docker et GitHub Actions pour rendre l'environnement reproductible et automatiser les vérifications."
+                ],
+                tech: ["Spring Boot", "Angular", "Docker", "WebSocket", "STOMP", "JWT", "MongoDB", "MySQL", "Cassandra", "Microservices", "CI/CD"],
                 media: [
                     { type: "img", src: "assets/SAE 2025/nekoCORPV1.png", alt: "SAE Neko Corporation - Architecture" },
-                    { type: "youtube", src: "https://youtu.be/fy7tetjotq8", alt: "Video demo" }
+                    { type: "video", src: "assets/SAE 2025/Vidéo SAE.mp4", alt: "Démonstration vidéo du projet", label: "Démonstration vidéo" }
                 ],
                 link: null,
                 icon: "fas fa-users",
@@ -210,51 +253,53 @@ export const PORTFOLIO: Portfolio = {
                 status: "terminée"
             },
             {
-                title: "Candy Crush UE Game",
-                description: "Implémentation complète du jeu Candy Crush en HTML/CSS/JavaScript pur. Animations, score, gameplay fidèle.",
-                tech: ["HTML5", "CSS3", "JavaScript", "Game Dev"],
-                link: "https://samsoucoupe.github.io/Candy-Crush-bis/",
-                media: [{ type: "img", src: "assets/candy-crush/image.png", alt: "Candy Crush UE Game" }],
-                icon: "fas fa-gamepad",
+                title: "Game on Web 2024-2025",
+                description: "Participation à deux éditions du concours Game on Web pour découvrir Babylon.js et expérimenter la création de jeux 3D dans le navigateur. Cette expérience m'a ensuite permis de concevoir ce portfolio.",
+                contribution: [
+                    "Création de Velocity Olympiad en 2024 puis de Dreamland en 2025.",
+                    "Développement des scènes, de la navigation, des interactions et des mécaniques de progression."
+                ],
+                choices: [
+                    "Babylon.js a été choisi pour découvrir un moteur 3D web complet et produire des expériences accessibles sans installation.",
+                    "TypeScript a permis de structurer les objets, les interactions et la progression des deux jeux."
+                ],
+                tech: ["Babylon.js", "TypeScript", "WebGL", "Jeu 3D"],
+                link: null,
+                media: [
+                    { type: "video", src: "assets/GOW/2024/videogow2024.mp4", alt: "Velocity Olympiad", label: "Velocity Olympiad - 2024", link: "https://samsoucoupe.github.io/Velocity-Olympiad/" },
+                    { type: "video", src: "assets/GOW/2025/videogow2025.mp4", alt: "Dreamland", label: "Dreamland - 2025" },
+                    { type: "img", src: "assets/GOW/2025/iconweb.png", alt: "Dreamland - Icône Web", label: "Dreamland - 2025" }
+                ],
+                icon: "fas fa-trophy",
+                color: "#6366f1",
+                status: "terminée"
+            },
+            {
+                title: "Projets académiques web",
+                description: "Deux projets universitaires réalisés pour pratiquer le développement d'interfaces web et consolider mes bases en JavaScript, TypeScript et Angular.",
+                contribution: [
+                    "Candy Crush : développement de la grille, des échanges de pièces, de la détection des combinaisons, du score et des animations en JavaScript.",
+                    "Application DS4H MIAGE : développement d'écrans et organisation de l'application en composants et services Angular."
+                ],
+                choices: [
+                    "JavaScript sans framework pour manipuler directement la logique du jeu, les événements et le DOM dans Candy Crush.",
+                    "Angular et TypeScript pour apprendre à structurer une application plus importante avec des composants réutilisables."
+                ],
+                tech: ["Angular", "TypeScript", "JavaScript", "HTML5", "CSS3"],
+                link: null,
+                media: [
+                    { type: "img", src: "assets/candy-crush/image.png", alt: "Candy Crush UE Game", label: "Candy Crush - projet universitaire", link: "https://samsoucoupe.github.io/Candy-Crush-bis/" },
+                    { type: "text", src: "", alt: "Application Angular DS4H MIAGE", label: "Application Angular - projet universitaire" }
+                ],
+                icon: "fas fa-graduation-cap",
                 color: "#f59e0b",
                 status: "terminée"
             },
             {
-                title: "Velocity Olympiad - Game on Web 2024",
-                description: "Jeu 3D Babylon.js pour Game on Web 2024. Olympic theme, 3D, TypeScript, WebGL.",
-                tech: ["Babylon.js", "TypeScript", "WebGL", "3D Game"],
-                link: "https://samsoucoupe.github.io/Velocity-Olympiad/",
-                media: [{ type: "video", src: "assets/GOW/2024/videogow2024.mp4", alt: "Velocity Olympiad" }],
-                icon: "fas fa-trophy",
-                color: "#6366f1",
-                status: "archivé"
-            },
-            {
-                title: "Dreamland - Game on Web 2025",
-                description: "Expérience immersive Babylon.js pour Game on Web 2025. Dreamland, 3D, progression game dev.",
-                tech: ["Babylon.js", "TypeScript", "WebGL", "3D Game"],
-                link: "https://samsoucoupe.github.io/GOW2025/",
-                media: [
-                    { type: "video", src: "assets/GOW/2025/videogow2025.mp4", alt: "Dreamland video" },
-                    { type: "img", src: "assets/GOW/2025/iconweb.png", alt: "Dreamland - Icône Web" }
-                ],
-                icon: "fas fa-magic",
-                color: "#10b981",
-                status: "actif"
-            },
-            {
-                title: "Application Angular - DS4H MIAGE",
-                description: "Application web Angular pour le Master MIAGE. Bonnes pratiques frontend, TypeScript, HTML5, CSS3.",
-                tech: ["Angular", "TypeScript", "HTML5", "CSS3"],
-                link: "https://angular-m1s1-assignments-front.onrender.com/login",
-                media: [],
-                icon: "fab fa-angular",
-                color: "#c3002f",
-                status: "terminée"
-            },
-            {
                 title: "Dashboard Analytics Power BI",
-                description: "Tableau de bord interactif Power BI pour l'analyse business. SQL, Excel, visualisations avancées.",
+                description: "Réalisation d'un tableau de bord interactif pour préparer, analyser et restituer des données métier.",
+                contribution: [],
+                choices: [],
                 tech: ["Power BI", "SQL", "Excel"],
                 link: null,
                 media: [],
@@ -271,7 +316,6 @@ export const PORTFOLIO: Portfolio = {
     statusLabels: {
         'terminée': 'TERMINÉE',
         'actif': 'ACTIF',
-        'archivé': 'ARCHIVÉ',
         'en cours': 'EN COURS'
     }
 };

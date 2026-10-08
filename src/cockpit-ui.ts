@@ -597,6 +597,7 @@ const gamesReady = import('./mini-games').then(mod => {
             case 'contact':  title.textContent = 'ÉMETTEUR';    html = renderContact(P); break;
         }
         body.innerHTML = html;
+        initProjectCarousels(body);
         panel.classList.add('open');
     }
 
@@ -614,7 +615,7 @@ const gamesReady = import('./mini-games').then(mod => {
             '<div class="hero-name">' + esc(id.name || '') + '</div>' +
             '<div class="hero-role">' + esc(id.role || '') + '</div>' +
             '<div class="hero-desc">' + esc(id.tagline || '') + ' ' + esc(id.details || '') + '</div>' +
-            '<div class="hero-cta"><a class="cta" href="https://github.com/samsoucoupe" target="_blank"><i class="fab fa-github"></i> GitHub</a><a class="cta" href="https://discord.com/users/388993523715801088" target="_blank"><i class="fab fa-discord"></i> Discord</a></div>' +
+            '<div class="hero-cta"><a class="cta" href="https://github.com/samsoucoupe" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i> GitHub</a><a class="cta" href="https://discord.com/users/388993523715801088" target="_blank" rel="noopener noreferrer"><i class="fab fa-discord"></i> Discord</a></div>' +
             '</div></div>';
     }
     function renderAbout(P) {
@@ -640,33 +641,64 @@ const gamesReady = import('./mini-games').then(mod => {
     }
     function renderProjects(P) {
         var pr = P.projects || {};
-        var STATUS = P.statusLabels || { 'terminée': 'TERMINÉE', 'actif': 'ACTIF', 'archivé': 'ARCHIVÉ', 'en cours': 'EN COURS' };
+        var STATUS = P.statusLabels || { 'terminée': 'TERMINÉE', 'actif': 'ACTIF', 'en cours': 'EN COURS' };
         var h = '<div class="projects">';
         (pr.items || []).forEach(function (p, i) {
             var media = '';
             if (p.media && p.media.length) {
-                var m = p.media[0];
-                if (m.type === 'img') media = '<div class="proj-media"><img src="' + esc(m.src) + '" alt="' + esc(m.alt) + '" loading="lazy"></div>';
-                else if (m.type === 'video') media = '<div class="proj-media"><video controls preload="none"><source src="' + esc(m.src) + '" type="video/mp4"></video></div>';
-                else if (m.type === 'youtube') media = '<div class="proj-media"><a href="' + esc(m.src) + '" target="_blank"><i class="fab fa-youtube"></i> Dossier vidéo</a></div>';
+                var slides = p.media.map(function (m) {
+                    var content = '';
+                    if (m.type === 'img') content = '<img src="' + esc(m.src) + '" alt="' + esc(m.alt) + '" loading="lazy">';
+                    else if (m.type === 'video') content = '<video controls preload="metadata"><source src="' + esc(m.src) + '" type="video/mp4"></video>';
+                    else if (m.type === 'youtube') content = '<iframe src="' + esc(m.src) + '" title="' + esc(m.alt) + '" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+                    else if (m.type === 'text') content = '<div class="project-media-note"><i class="fab fa-angular"></i><span>' + esc(m.alt) + '</span></div>';
+                    if (m.link) content = '<a class="carousel-project-link" href="' + esc(m.link) + '" target="_blank" rel="noopener noreferrer">' + content + '</a>';
+                    return '<figure class="project-slide">' + content + (m.label ? '<figcaption>' + esc(m.label) + '</figcaption>' : '') + '</figure>';
+                }).join('');
+                media = '<div class="project-carousel-wrap"><button class="carousel-btn carousel-prev" type="button" aria-label="Média précédent"><i class="fas fa-chevron-left"></i></button><div class="proj-media project-carousel" aria-label="Galerie du projet">' + slides + '</div><button class="carousel-btn carousel-next" type="button" aria-label="Média suivant"><i class="fas fa-chevron-right"></i></button></div>';
             }
             var tags = (p.tech || []).map(function (t) { return '<span>' + esc(t) + '</span>'; }).join('');
-            var link = p.link ? '<a class="cta" href="' + esc(p.link) + '" target="_blank" style="margin-top:8px;"><i class="fas fa-rocket"></i> Lancer</a>' : '';
+            var link = p.link ? '<a class="cta" href="' + esc(p.link) + '" target="_blank" rel="noopener noreferrer" style="margin-top:8px;"><i class="fas fa-rocket"></i> Lancer</a>' : '';
+            var contribution = (p.contribution || []).map(function (item) { return '<li>' + esc(item) + '</li>'; }).join('');
+            var choices = (p.choices || []).map(function (item) { return '<li>' + esc(item) + '</li>'; }).join('');
+            var details = (contribution || choices) ? '<details class="project-details"><summary>En savoir plus</summary>' +
+                (contribution ? '<h5>Mon rôle</h5><ul>' + contribution + '</ul>' : '') +
+                (choices ? '<h5>Pourquoi ces choix</h5><ul>' + choices + '</ul>' : '') +
+                '</details>' : '';
             var st = p.status || 'terminée';
             var sl = STATUS[st] || st.toUpperCase();
-            h += '<div class="project" style="--accent:' + esc(p.color || '#00e1ff') + '"><div class="proj-top"><span class="proj-code">M-' + (101 + i) + '</span><span class="proj-status ' + esc(st) + '">' + esc(sl) + '</span></div><h4><i class="' + esc(p.icon || '') + '"></i> ' + esc(p.title) + '</h4>' + media + '<p>' + esc(p.description) + '</p><div class="proj-stack">' + tags + '</div>' + link + '</div>';
+            h += '<div class="project" style="--accent:' + esc(p.color || '#00e1ff') + '"><div class="proj-top"><span class="proj-code">M-' + (101 + i) + '</span><span class="proj-status ' + esc(st) + '">' + esc(sl) + '</span></div><h4><i class="' + esc(p.icon || '') + '"></i> ' + esc(p.title) + '</h4>' + media + '<p>' + esc(p.description) + '</p><div class="proj-stack">' + tags + '</div>' + details + link + '</div>';
         });
         h += '</div>';
         return h;
     }
-        function renderContact(P) {
+        function initProjectCarousels(root) {
+        root.querySelectorAll('.project-carousel-wrap').forEach(function (wrap) {
+            var carousel = wrap.querySelector('.project-carousel');
+            var slides = carousel ? carousel.querySelectorAll('.project-slide') : [];
+            if (!carousel || slides.length < 2) {
+                wrap.querySelectorAll('.carousel-btn').forEach(function (button) { button.remove(); });
+                return;
+            }
+            var currentIndex = 0;
+            function move(direction) {
+                var slide = carousel.querySelector('.project-slide');
+                var distance = slide ? slide.getBoundingClientRect().width + 8 : carousel.clientWidth;
+                currentIndex = (currentIndex + direction + slides.length) % slides.length;
+                carousel.scrollTo({ left: currentIndex * distance, behavior: 'smooth' });
+            }
+            wrap.querySelector('.carousel-prev').addEventListener('click', function () { move(-1); });
+            wrap.querySelector('.carousel-next').addEventListener('click', function () { move(1); });
+        });
+    }
+    function renderContact(P) {
             var c = P.contact || {}; var id = P.identity || {};
             var h = '<p class="hero-desc" style="text-align:center;margin-bottom:8px;">' + esc(c.description || '') + '</p>';
             h += '<div class="contact-grid">';
-            if (id.discord) h += '<a class="contact-card" href="' + esc(id.discord) + '" target="_blank"><i class="fab fa-discord"></i><b>Discord</b><small>#samsoucoupe</small></a>';
-            if (id.github)  h += '<a class="contact-card" href="' + esc(id.github) + '" target="_blank"><i class="fab fa-github"></i><b>GitHub</b><small>/samsoucoupe</small></a>';
-            if (id.bmc)     h += '<a class="contact-card" href="' + esc(id.bmc) + '" target="_blank"><i class="fas fa-coffee"></i><b>Coffee</b><small>soutien</small></a>';
-            if (id.kofi)    h += '<a class="contact-card" href="' + esc(id.kofi) + '" target="_blank"><i class="fas fa-heart"></i><b>Ko-fi</b><small>soutien</small></a>';
+            if (id.discord) h += '<a class="contact-card" href="' + esc(id.discord) + '" target="_blank" rel="noopener noreferrer"><i class="fab fa-discord"></i><b>Discord</b><small>#samsoucoupe</small></a>';
+            if (id.github)  h += '<a class="contact-card" href="' + esc(id.github) + '" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i><b>GitHub</b><small>/samsoucoupe</small></a>';
+            if (id.bmc)     h += '<a class="contact-card" href="' + esc(id.bmc) + '" target="_blank" rel="noopener noreferrer"><i class="fas fa-coffee"></i><b>Coffee</b><small>soutien</small></a>';
+            if (id.kofi)    h += '<a class="contact-card" href="' + esc(id.kofi) + '" target="_blank" rel="noopener noreferrer"><i class="fas fa-heart"></i><b>Ko-fi</b><small>soutien</small></a>';
             h += '</div>';
             return h;
         }

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Portfolio de samsoucoupe — développeur backend full-stack. Version simplifiée : à propos, compétences, projets et contact.">
+    <meta name="description" content="Portfolio de samsoucoupe — développeur backend et full-stack spécialisé dans les API, la donnée et le déploiement.">
     <meta name="author" content="samsoucoupe">
     <meta name="theme-color" content="#03060e">
     <meta name="robots" content="index, follow">
@@ -14,7 +14,7 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://samsoucoupe.github.io/samsoucoupe/simple.html">
     <meta property="og:title" content="samsoucoupe — Portfolio (version simple)">
-    <meta property="og:description" content="Développeur backend full-stack. Compétences, projets et contact.">
+    <meta property="og:description" content="Développeur backend et full-stack spécialisé dans les API, la donnée et le déploiement.">
     <meta property="og:locale" content="fr_FR">
     <meta property="og:site_name" content="samsoucoupe">
 
@@ -117,9 +117,19 @@
         .proj-status.terminée { background: rgba(0,225,255,0.08); color: #00e1ff; border: 1px solid rgba(0,225,255,0.2); }
         .proj-status.actif { background: rgba(0,255,100,0.08); color: #00ff64; border: 1px solid rgba(0,255,100,0.2); }
         .proj-status.en-cours { background: rgba(255,180,0,0.08); color: #ffb400; border: 1px solid rgba(255,180,0,0.2); }
-        .proj-status.archivé { background: rgba(255,255,255,0.04); color: rgba(255,255,255,0.55); border: 1px solid rgba(255,255,255,0.1); }
+
         .proj-desc { font-size: 11px; line-height: 1.55; color: rgba(255,255,255,0.6); margin-bottom: 8px; }
         .proj-img { width: 100%; border-radius: 3px; margin-bottom: 8px; max-height: 180px; object-fit: cover; }
+        .proj-video { width: 100%; border-radius: 3px; max-height: 180px; display: block; object-fit: cover; }
+        iframe.proj-video { height: 180px; border: 0; }
+        .project-media-note { height: 180px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; background: rgba(0,225,255,.06); color: #00e1ff; font-family: 'Orbitron', monospace; font-size: 10px; text-align: center; padding: 12px; }
+        .project-media-note i { font-size: 32px; }
+        .project-carousel-wrap { display: grid; grid-template-columns: 34px minmax(0, 1fr) 34px; align-items: center; gap: 5px; margin-bottom: 8px; }
+        .project-carousel { display: flex; gap: 8px; overflow-x: hidden; scroll-snap-type: x mandatory; }
+        .project-slide { flex: 0 0 100%; min-width: 0; scroll-snap-align: start; margin: 0; }
+        .project-slide figcaption { padding: 5px; color: rgba(255,255,255,.55); font-size: 9px; text-align: center; }
+        .carousel-project-link { display: block; text-decoration: none; }
+        .carousel-btn { width: 34px; height: 44px; border: 1px solid rgba(0,225,255,.3); border-radius: 4px; background: rgba(0,225,255,.06); color: #00e1ff; cursor: pointer; }
         .proj-tech { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: 8px; }
         .proj-tech span { font-size: 9px; padding: 2px 6px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); border-radius: 2px; color: rgba(255,255,255,0.55); }
         .proj-link { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; padding: 5px 12px; border: 1px solid #00e1ff; color: #00e1ff; border-radius: 3px; text-decoration: none; font-family: 'Orbitron', monospace; letter-spacing: 1px; }
@@ -173,9 +183,9 @@
     <noscript>
         <div style="max-width:600px;margin:0 auto;padding:24px 16px;color:#e8f0ff;background:#03060e;font-family:system-ui,sans-serif">
             <h2 style="font-size:1.5em;margin-bottom:8px">samsoucoupe</h2>
-            <p style="color:#9fb0d0;margin-bottom:16px">Développeur Backend Full-Stack. Python, Java, TypeScript, Data Science, Game Dev.</p>
+            <p style="color:#9fb0d0;margin-bottom:16px">Développeur backend full-stack. Python, Java, TypeScript, science des données et développement de jeux.</p>
             <h3 style="font-size:1.1em;color:#00e1ff;margin:24px 0 8px">Projets</h3>
-            <p style="color:#9fb0d0"><a href="https://samsoucoupe.github.io/Candy-Crush-bis/" style="color:#00e1ff">Candy Crush UE Game</a> · <a href="https://samsoucoupe.github.io/Velocity-Olympiad/" style="color:#00e1ff">Velocity Olympiad</a> · <a href="https://samsoucoupe.github.io/GOW2025/" style="color:#00e1ff">Dreamland</a></p>
+            <p style="color:#9fb0d0">Portfolio 3D · SAE Neko Corporation · Game on Web 2024–2025 · Projets académiques web</p>
             <h3 style="font-size:1.1em;color:#00e1ff;margin:24px 0 8px">Contact</h3>
             <p style="color:#9fb0d0"><a href="https://github.com/samsoucoupe" style="color:#00e1ff">GitHub</a> · <a href="https://buymeacoffee.com/samsoucoupe" style="color:#00e1ff">Buy Me a Coffee</a> · <a href="https://ko-fi.com/samsoucoupe" style="color:#00e1ff">Ko-fi</a></p>
             <p style="margin-top:16px"><a href="index.html?3d=1" style="color:#00e1ff">← Version 3D interactive</a></p>
@@ -187,7 +197,7 @@
     <script type="module">
         import { PORTFOLIO } from '/src/portfolio-data';
         var P = PORTFOLIO || {};
-        var STATUS = P.statusLabels || { 'terminée': 'TERMINÉE', 'actif': 'ACTIF', 'archivé': 'ARCHIVÉ', 'en cours': 'EN COURS' };
+        var STATUS = P.statusLabels || { 'terminée': 'TERMINÉE', 'actif': 'ACTIF', 'en cours': 'EN COURS' };
 
         function esc(s) {
             return String(s || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
@@ -247,11 +257,25 @@
             pr.items.forEach(function(p) {
                 var img = '';
                 if (p.media && p.media.length) {
-                    var m = p.media[0];
-                    if (m.type === 'img') img = '<img class="proj-img" src="' + esc(m.src) + '" alt="' + esc(m.alt || '') + '" loading="lazy">';
+                    var slides = p.media.map(function(m) {
+                        var content = '';
+                        if (m.type === 'img') content = '<img class="proj-img" src="' + esc(m.src) + '" alt="' + esc(m.alt || '') + '" loading="lazy">';
+                        else if (m.type === 'video') content = '<video class="proj-video" controls preload="metadata"><source src="' + esc(m.src) + '" type="video/mp4"></video>';
+                        else if (m.type === 'youtube') content = '<iframe class="proj-video" src="' + esc(m.src) + '" title="' + esc(m.alt || '') + '" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+                        else if (m.type === 'text') content = '<div class="project-media-note"><i class="fab fa-angular"></i><span>' + esc(m.alt || '') + '</span></div>';
+                        if (m.link) content = '<a class="carousel-project-link" href="' + esc(m.link) + '" target="_blank" rel="noopener noreferrer">' + content + '</a>';
+                        return '<figure class="project-slide">' + content + (m.label ? '<figcaption>' + esc(m.label) + '</figcaption>' : '') + '</figure>';
+                    }).join('');
+                    img = '<div class="project-carousel-wrap"><button class="carousel-btn carousel-prev" type="button" aria-label="Média précédent"><i class="fas fa-chevron-left"></i></button><div class="project-carousel" aria-label="Galerie du projet">' + slides + '</div><button class="carousel-btn carousel-next" type="button" aria-label="Média suivant"><i class="fas fa-chevron-right"></i></button></div>';
                 }
                 var tech = (p.tech || []).map(function(t) { return '<span>' + esc(t) + '</span>'; }).join('');
-                var link = p.link ? '<a class="proj-link" href="' + esc(p.link) + '" target="_blank"><i class="fas fa-rocket"></i> Lancer</a>' : '';
+                var link = p.link ? '<a class="proj-link" href="' + esc(p.link) + '" target="_blank" rel="noopener noreferrer"><i class="fas fa-rocket"></i> Lancer</a>' : '';
+                var contribution = (p.contribution || []).map(function(item) { return '<li>' + esc(item) + '</li>'; }).join('');
+                var choices = (p.choices || []).map(function(item) { return '<li>' + esc(item) + '</li>'; }).join('');
+                var details = (contribution || choices) ? '<details class="project-details"><summary>En savoir plus</summary>' +
+                    (contribution ? '<h5>Mon rôle</h5><ul>' + contribution + '</ul>' : '') +
+                    (choices ? '<h5>Pourquoi ces choix</h5><ul>' + choices + '</ul>' : '') +
+                    '</details>' : '';
                 var st = p.status || 'terminée';
                 var sl = STATUS[st] || st.toUpperCase();
                 root.innerHTML += '<div class="proj-card">' +
@@ -259,7 +283,7 @@
                     img +
                     '<p class="proj-desc">' + esc(p.description) + '</p>' +
                     '<div class="proj-tech">' + tech + '</div>' +
-                    link +
+                    details + link +
                 '</div>';
             });
             root.innerHTML += '</div>';
@@ -271,12 +295,31 @@
             root.innerHTML += '<div class="contact"><div class="sec-title">Contact</div>';
             if (ct.description) root.innerHTML += '<p class="contact-desc">' + esc(ct.description) + '</p>';
             root.innerHTML += '<div class="contact-links">';
-            if (id.discord) root.innerHTML += '<a class="contact-link" href="' + esc(id.discord) + '" target="_blank"><i class="fab fa-discord"></i><b>Discord</b><small>#samsoucoupe</small></a>';
-            if (id.github)  root.innerHTML += '<a class="contact-link" href="' + esc(id.github) + '" target="_blank"><i class="fab fa-github"></i><b>GitHub</b><small>/samsoucoupe</small></a>';
-            if (id.bmc)     root.innerHTML += '<a class="contact-link" href="' + esc(id.bmc) + '" target="_blank"><i class="fas fa-coffee"></i><b>Buy Me a Coffee</b><small>soutien</small></a>';
-            if (id.kofi)    root.innerHTML += '<a class="contact-link" href="' + esc(id.kofi) + '" target="_blank"><i class="fas fa-heart"></i><b>Ko-fi</b><small>soutien</small></a>';
+            if (id.discord) root.innerHTML += '<a class="contact-link" href="' + esc(id.discord) + '" target="_blank" rel="noopener noreferrer"><i class="fab fa-discord"></i><b>Discord</b><small>#samsoucoupe</small></a>';
+            if (id.github)  root.innerHTML += '<a class="contact-link" href="' + esc(id.github) + '" target="_blank" rel="noopener noreferrer"><i class="fab fa-github"></i><b>GitHub</b><small>/samsoucoupe</small></a>';
+            if (id.bmc)     root.innerHTML += '<a class="contact-link" href="' + esc(id.bmc) + '" target="_blank" rel="noopener noreferrer"><i class="fas fa-coffee"></i><b>Buy Me a Coffee</b><small>soutien</small></a>';
+            if (id.kofi)    root.innerHTML += '<a class="contact-link" href="' + esc(id.kofi) + '" target="_blank" rel="noopener noreferrer"><i class="fas fa-heart"></i><b>Ko-fi</b><small>soutien</small></a>';
             root.innerHTML += '</div></div>';
         }
+
+        // À initialiser après le dernier innerHTML +=, qui recrée les nœuds et leurs listeners.
+        root.querySelectorAll('.project-carousel-wrap').forEach(function(wrap) {
+            var carousel = wrap.querySelector('.project-carousel');
+            var slides = carousel ? carousel.querySelectorAll('.project-slide') : [];
+            if (!carousel || slides.length < 2) {
+                wrap.querySelectorAll('.carousel-btn').forEach(function(button) { button.remove(); });
+                return;
+            }
+            var currentIndex = 0;
+            function move(direction) {
+                var slide = carousel.querySelector('.project-slide');
+                var distance = slide ? slide.getBoundingClientRect().width + 8 : carousel.clientWidth;
+                currentIndex = (currentIndex + direction + slides.length) % slides.length;
+                carousel.scrollTo({ left: currentIndex * distance, behavior: 'smooth' });
+            }
+            wrap.querySelector('.carousel-prev').addEventListener('click', function() { move(-1); });
+            wrap.querySelector('.carousel-next').addEventListener('click', function() { move(1); });
+        });
     </script>
 </body>
 </html>
